@@ -1,0 +1,7 @@
+*.swp
+*.pyc
+docs/_build/
+build/
+dist/
+uhd.egg-info/
+*.so
