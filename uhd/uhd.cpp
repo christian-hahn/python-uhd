@@ -1,0 +1,252 @@
+#include <vector>
+
+#include <Python.h>
+#include "structmember.h"
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/arrayobject.h>
+
+#include <uhd/usrp/multi_usrp.hpp>
+#include <uhd/exception.hpp>
+
+#include "uhd.hpp"
+#include "uhd_types.hpp"
+#include "uhd_expect.hpp"
+#include "uhd_gen.hpp"
+#include "uhd_rx.hpp"
+
+namespace uhd {
+
+PyObject *UhdError;
+
+static void Uhd_dealloc(Uhd *self) {
+    delete self->receiver;
+    Py_TYPE(self)->tp_free(reinterpret_cast<PyObject *>(self));
+}
+
+static PyObject *Uhd_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+    Uhd *self = reinterpret_cast<Uhd *>(type->tp_alloc(type, 0));
+    return reinterpret_cast<PyObject *>(self);
+}
+
+static int Uhd_init(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+
+    std::string dev_addr;
+    if (nargs > 0) {
+        Expect<std::string> _dev_addr;
+        if (!(_dev_addr = to<std::string>(PyTuple_GetItem(args, 0)))) {
+            PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", _dev_addr.what());
+            return -1;
+        }
+        dev_addr = _dev_addr.get();
+    }
+
+    try {
+        self->dev = uhd::usrp::multi_usrp::make(dev_addr);
+    } catch(const uhd::exception &e) {
+        PyErr_SetString(UhdError, e.what());
+        return -1;
+    } catch(...) {
+        PyErr_SetString(UhdError, "Error: unknown exception has occurred.");
+        return -1;
+    }
+
+    self->receiver = new ReceiveWorker(self->dev, std::ref(self->dev_lock));
+    self->receiver->init();
+
+    return 0;
+}
+
+static PyObject *_get_receive(Uhd *self) {
+
+    Expect<ReceiveResult> _result;
+    if (!(_result = self->receiver->read()))
+        return PyErr_Format(PyExc_TypeError, "Failed to receive: %s", _result.what());
+    ReceiveResult &result = _result.get();
+
+    const size_t num_channels = result.bufs.size();
+
+    PyObject *ret, *ele;
+    if (!(ret = PyList_New(num_channels)))
+        return PyErr_Format(PyExc_ValueError, "Failed to create list.");
+    npy_intp dims = result.num_samps;
+    for (unsigned int i = 0; i < num_channels; i++) {
+        ele = PyArray_SimpleNewFromData(1, &dims, NPY_COMPLEX64, result.bufs[i]);
+        PyArray_ENABLEFLAGS(reinterpret_cast<PyArrayObject *>(ele), NPY_ARRAY_OWNDATA);
+        PyList_SET_ITEM(ret, i, ele);
+    }
+
+    return ret;
+}
+
+static PyObject *Uhd_receive(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+
+    if (nargs == 2 || nargs == 3) {
+
+        PyObject *_num_samps = PyTuple_GetItem(args, 0);
+        PyObject *_channels = PyTuple_GetItem(args, 1);
+
+        size_t num_samps = 0;
+        std::vector<size_t> channels;
+
+        if (PyLong_CheckExact(_num_samps))
+            num_samps = static_cast<size_t>(PyLong_AsUnsignedLongMask(_num_samps));
+        else
+            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 1: number of samples must be integer.");
+
+        PyObject *_sequence;
+        if (PySequence_Check(_channels) && (_sequence = PySequence_Fast(_channels, "Expected sequence.")) != nullptr) {
+            channels.resize(PySequence_Fast_GET_SIZE(_sequence));
+            for (size_t i = 0; i < channels.size(); i++) {
+                PyObject *elem = PySequence_Fast_GET_ITEM(_sequence, i);
+                if (PyLong_CheckExact(elem)) {
+                    channels[i] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
+                } else {
+                    Py_DECREF(_sequence);
+                    PyErr_SetString(PyExc_TypeError, "Invalid argument for argument # 2: channels must be list of integers.");
+                    return nullptr;
+                }
+            }
+            Py_DECREF(_sequence);
+        } else {
+            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 2: expected sequence.");
+        }
+
+        bool streaming = false;
+        if (nargs > 2) {
+            Expect<bool> _streaming;
+            if (!(_streaming = to<bool>(PyTuple_GetItem(args, 2))))
+                return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", _streaming.what());
+            streaming = _streaming.get();
+        }
+
+        std::future<void> accepted = self->receiver->request(streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
+                                                             num_samps, std::move(channels));
+        accepted.wait();
+
+        if (streaming) {
+            Py_INCREF(Py_None);
+            return Py_None;
+        }
+
+        return _get_receive(self);
+    } else if (nargs == 0) {
+        return _get_receive(self);
+    } else {
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expect {0, 2, or 3} arguments.", nargs);
+    }
+}
+
+static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
+
+    std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop, 0, {});
+    accepted.wait();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef module_methods[] = {{NULL}};
+static PyMemberDef Uhd_members[] = {{NULL}};
+
+static std::vector<PyMethodDef> Uhd_methods;
+const static std::vector<PyMethodDef> Uhd_user_methods = {{
+    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS, ""},
+    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_VARARGS, ""},
+}};
+
+static PyTypeObject UhdType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "uhd.Uhd",                                 /* tp_name */
+    sizeof(Uhd),                               /* tp_basicsize */
+    0,                                         /* tp_itemsize */
+    (destructor)Uhd_dealloc,                   /* tp_dealloc */
+    0,                                         /* tp_print */
+    0,                                         /* tp_getattr */
+    0,                                         /* tp_setattr */
+    0,                                         /* tp_as_async */
+    0,                                         /* tp_repr */
+    0,                                         /* tp_as_number */
+    0,                                         /* tp_as_sequence */
+    0,                                         /* tp_as_mapping */
+    0,                                         /* tp_hash  */
+    0,                                         /* tp_call */
+    0,                                         /* tp_str */
+    0,                                         /* tp_getattro */
+    0,                                         /* tp_setattro */
+    0,                                         /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /* tp_flags */
+    "Uhd object",                              /* tp_doc */
+    0,                                         /* tp_traverse */
+    0,                                         /* tp_clear */
+    0,                                         /* tp_richcompare */
+    0,                                         /* tp_weaklistoffset */
+    0,                                         /* tp_iter */
+    0,                                         /* tp_iternext */
+    0,                                         /* tp_methods (DEFERRED) */
+    Uhd_members,                               /* tp_members */
+    0,                                         /* tp_getset */
+    0,                                         /* tp_base */
+    0,                                         /* tp_dict */
+    0,                                         /* tp_descr_get */
+    0,                                         /* tp_descr_set */
+    0,                                         /* tp_dictoffset */
+    (initproc)Uhd_init,                        /* tp_init */
+    0,                                         /* tp_alloc */
+    Uhd_new,                                   /* tp_new */
+};
+
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "uhd",                                  /* m_name */
+    "USRP hardware driver Python module.",  /* m_doc */
+    -1,                                     /* m_size */
+    module_methods,                         /* m_methods */
+    NULL,                                   /* m_reload */
+    NULL,                                   /* m_traverse */
+    NULL,                                   /* m_clear */
+    NULL,                                   /* m_free */
+};
+
+#ifdef __cplusplus
+extern "C"
+#endif
+PyMODINIT_FUNC PyInit_uhd(void) {
+
+    import_array();
+
+    /** Register generated & user methods **/
+    Uhd_methods.clear();
+    for (const auto &method: Uhd_gen_methods)
+        Uhd_methods.push_back(method);
+    for (const auto &method: Uhd_user_methods)
+        Uhd_methods.push_back(method);
+    Uhd_methods.push_back({NULL});
+    UhdType.tp_methods = Uhd_methods.data();
+
+    if (PyType_Ready(&UhdType) < 0)
+        return nullptr;
+
+    PyObject *m = nullptr;
+    if ((m = PyModule_Create(&moduledef)) == nullptr)
+        return nullptr;
+
+    Py_INCREF(&UhdType);
+    PyModule_AddObject(m, "Uhd", reinterpret_cast<PyObject *>(&UhdType));
+
+    UhdError = PyErr_NewExceptionWithDoc((char *)"uhd.error", (char *)"UHD exception.", NULL, NULL);
+    Py_INCREF(UhdError);
+    PyModule_AddObject(m, "UhdError", UhdError);
+
+    return m;
+}
+
+}
