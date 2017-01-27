@@ -81,51 +81,50 @@ static PyObject *_get_receive(Uhd *self) {
     return ret;
 }
 
-static PyObject *Uhd_receive(Uhd *self, PyObject *args) {
+static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
 
-    if (nargs == 2 || nargs == 3) {
+    if (nargs) {
 
-        PyObject *_num_samps = PyTuple_GetItem(args, 0);
-        PyObject *_channels = PyTuple_GetItem(args, 1);
-
+        /** Required **/
         size_t num_samps = 0;
+        PyObject *_channels = nullptr;
         std::vector<size_t> channels;
+        /** Optional **/
+        PyObject *_streaming = nullptr;
+        bool streaming = false;
+        double seconds_in_future = 1.0;
+        double timeout = 5.0;
 
-        if (PyLong_CheckExact(_num_samps))
-            num_samps = static_cast<size_t>(PyLong_AsUnsignedLongMask(_num_samps));
-        else
-            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 1: number of samples must be integer.");
+        static const char *kwds_list[] = {"num_samps", "channels", "streaming",
+                                          "seconds_in_future", "timeout", nullptr};
+        if(!PyArg_ParseTupleAndKeywords(args, kwds, "IO|Odd", const_cast<char **>(kwds_list), &num_samps,
+                                        &_channels, &_streaming, &seconds_in_future, &timeout)) {
+            return nullptr;
+        }
 
-        PyObject *_sequence;
-        if (PySequence_Check(_channels) && (_sequence = PySequence_Fast(_channels, "Expected sequence.")) != nullptr) {
-            channels.resize(PySequence_Fast_GET_SIZE(_sequence));
-            for (size_t i = 0; i < channels.size(); i++) {
-                PyObject *elem = PySequence_Fast_GET_ITEM(_sequence, i);
+        if (PySequence_Check(_channels) && (_channels = PySequence_Fast(_channels, "Expected sequence.")) != nullptr) {
+            channels.resize(PySequence_Fast_GET_SIZE(_channels));
+            for (size_t it = 0; it < channels.size(); it++) {
+                PyObject *elem = PySequence_Fast_GET_ITEM(_channels, it);
                 if (PyLong_CheckExact(elem)) {
-                    channels[i] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
+                    channels[it] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
                 } else {
-                    Py_DECREF(_sequence);
+                    Py_DECREF(_channels);
                     PyErr_SetString(PyExc_TypeError, "Invalid argument for argument # 2: channels must be list of integers.");
                     return nullptr;
                 }
             }
-            Py_DECREF(_sequence);
+            Py_DECREF(_channels);
         } else {
             return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 2: expected sequence.");
         }
 
-        bool streaming = false;
-        if (nargs > 2) {
-            Expect<bool> _streaming;
-            if (!(_streaming = to<bool>(PyTuple_GetItem(args, 2))))
-                return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", _streaming.what());
-            streaming = _streaming.get();
-        }
+        streaming = (_streaming) ? PyObject_IsTrue(_streaming) : streaming;
 
         std::future<void> accepted = self->receiver->request(streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
-                                                             num_samps, std::move(channels));
+                                                             num_samps, std::move(channels), seconds_in_future, timeout);
         accepted.wait();
 
         if (streaming) {
@@ -134,20 +133,14 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args) {
         }
 
         return _get_receive(self);
-    } else if (nargs == 0) {
-        return _get_receive(self);
     } else {
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expect {0, 2, or 3} arguments.", nargs);
+        return _get_receive(self);
     }
 }
 
 static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
 
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
-
-    std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop, 0, {});
+    std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop);
     accepted.wait();
 
     Py_INCREF(Py_None);
@@ -159,8 +152,8 @@ static PyMemberDef Uhd_members[] = {{NULL}};
 
 static std::vector<PyMethodDef> Uhd_methods;
 const static std::vector<PyMethodDef> Uhd_user_methods = {{
-    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS, ""},
-    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_VARARGS, ""},
+    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, ""},
+    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, ""},
 }};
 
 static PyTypeObject UhdType = {

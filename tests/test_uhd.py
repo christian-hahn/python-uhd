@@ -39,9 +39,9 @@ class UhdTestCase(unittest.TestCase):
                 for streaming in [True, False]:
                     try:
                         print('Testing RX (channels = {}, num_samps = {}, streaming = {})'.format(
-                              str(channels), num_samps, str(streaming)))
+                              channels, num_samps, streaming))
                         if streaming:
-                            self.dut.receive(num_samps, channels, True)
+                            self.dut.receive(num_samps, channels, streaming=True, seconds_in_future=1.0)
                             samps = self.dut.receive()
                             self.dut.stop_receive()
                         else:

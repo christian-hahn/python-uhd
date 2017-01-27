@@ -21,11 +21,14 @@ enum class ReceiveRequestType {
 };
 
 struct ReceiveRequest {
-    ReceiveRequest(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels)
-    : type(type), num_samps(num_samps), channels(std::move(channels)) {}
+    ReceiveRequest(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels,
+                   double seconds_in_future, double timeout)
+    : type(type), num_samps(num_samps), channels(std::move(channels)),
+      seconds_in_future(seconds_in_future), timeout(timeout) {}
     ReceiveRequestType type;
     size_t num_samps;
     std::vector<size_t> channels;
+    double seconds_in_future, timeout;
     std::promise<void> accepted;
 };
 
@@ -40,7 +43,8 @@ class ReceiveWorker {
     ReceiveWorker(uhd::usrp::multi_usrp::sptr dev, std::mutex &dev_lock);
     ~ReceiveWorker();
     void init();
-    std::future<void> request(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels);
+    std::future<void> request(ReceiveRequestType type, size_t num_samps = 0, std::vector<size_t> &&channels = {},
+                              double seconds_in_future = 0.0, double timeout = 0.0);
     Expect<ReceiveResult> read();
     bool stream_in_progress();
 

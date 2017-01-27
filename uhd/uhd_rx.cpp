@@ -35,9 +35,11 @@ ReceiveWorker::~ReceiveWorker() {
     }
 }
 
-std::future<void> ReceiveWorker::request(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels) {
+std::future<void> ReceiveWorker::request(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels,
+                                         double seconds_in_future, double timeout) {
 
-    std::unique_ptr<ReceiveRequest> request = std::unique_ptr<ReceiveRequest>(new ReceiveRequest(type, num_samps, std::move(channels)));
+    std::unique_ptr<ReceiveRequest> request = std::unique_ptr<ReceiveRequest>(new ReceiveRequest(type, num_samps, std::move(channels),
+                                                                              seconds_in_future, timeout));
     std::future<void> accepted = request->accepted.get_future();
     requests.push(std::move(request));
     return accepted;
@@ -92,6 +94,7 @@ void ReceiveWorker::worker() {
 
         const size_t num_channels = req->channels.size();
         const size_t num_samps = req->num_samps;
+
         _streaming = (req->type == ReceiveRequestType::Continuous) ? true : false;
 
         uhd::stream_args_t stream_args("fc32", "sc16");
@@ -115,7 +118,7 @@ void ReceiveWorker::worker() {
                 stream_cmd.time_spec = uhd::time_spec_t(0.0);
             } else {
                 stream_cmd.stream_now = false;
-                stream_cmd.time_spec = uhd::time_spec_t(0.1);
+                stream_cmd.time_spec = uhd::time_spec_t(req->seconds_in_future);
             }
 
             rx_stream->issue_stream_cmd(stream_cmd);
@@ -140,7 +143,7 @@ void ReceiveWorker::worker() {
             uhd::rx_metadata_t md;
 
             try {
-                size_t num_samps_recvd = rx_stream->recv(result.bufs, result.num_samps, md, 5.0, false);
+                size_t num_samps_recvd = rx_stream->recv(result.bufs, result.num_samps, md, req->timeout, false);
                 (void)num_samps_recvd;
             } catch(const uhd::exception &e) {
                 results.push(Error("UHD exception occurred: " + std::string(e.what())));
