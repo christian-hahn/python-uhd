@@ -1,8 +1,9 @@
 """ Spectrum analyzer visualization
 
-This module provides a PSD visualization. Uses matplot and Qt4Agg backend.
+This module provides a PSD visualization. Uses matplotlib and Qt5Agg backend.
 
-To install Qt4Agg on Ubuntu, apt-get install python-qt4.
+To install matplotlib using pip: sudo pip3 install matplotlib
+To install Qt5Agg using pip: sudo pip3 install pyqt5
 
 """
 
@@ -10,7 +11,7 @@ import numpy as np
 from scipy import signal
 
 import matplotlib
-matplotlib.use('Qt4Agg')
+matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 
 
@@ -31,7 +32,7 @@ class SpecAn(object):
         self.traces = []
         freqs = np.fft.fftshift(signal.welch(np.zeros(num_points), samp_rate, nperseg=num_points,
                                 scaling='spectrum', return_onesided=False)[0]) + freq_offset
-        for chan in xrange(num_chans):
+        for chan in range(num_chans):
             self.traces.append(self.axes.plot(freqs, np.ma.masked_all_like(freqs))[0])
         self.axes.grid()
 
