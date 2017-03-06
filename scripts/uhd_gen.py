@@ -190,16 +190,16 @@ def main():
         ret_type = get_clean_type(func['rtnType'])
 
         if func['name'] in blacklist:
-            print 'Skipped function %s: blacklisted' % func['name']
+            print('Skipped function {}: blacklisted'.format(func['name']))
         elif func['constructor']:
-            print 'Skipped function %s: constructor' % func['name']
+            print('Skipped function {}: constructor'.format(func['name']))
         elif func['destructor']:
-            print 'Skipped function %s: destructor' % func['name']
+            print('Skipped function {}: destructor'.format(func['name']))
         elif any([t not in known_param_types for t in param_types]):
-            print Text.RED + 'Skipped function %s: unknown param type: %s' % (func['name'], \
-                  ', '.join([t for t in param_types if t not in known_param_types])) + Text.RESET
+            print(Text.RED + 'Skipped function {}: unknown param type: {}'.format(func['name'], \
+                  ', '.join([t for t in param_types if t not in known_param_types])) + Text.RESET)
         elif ret_type not in known_ret_types and ret_type:
-            print Text.RED + 'Skipped function %s: unknown return type: %s' % (func['name'], ret_type) + Text.RESET
+            print(Text.RED + 'Skipped function {}: unknown return type: {}'.format(func['name'], ret_type) + Text.RESET)
         else:
             if func['name'] not in funcs:
                 funcs[func['name']] = [func]
@@ -208,7 +208,7 @@ def main():
 
     func_bodies = []
 
-    for func_name, func in funcs.iteritems():
+    for func_name, func in funcs.items():
         if len(func) == 1:
             func_body = get_func(func[0])
         else:
@@ -228,7 +228,7 @@ def main():
 
     cpp_body += '\n'.join(func_bodies) + '\n' if len(func_bodies) else ''
     cpp_body += 'const std::vector<PyMethodDef> Uhd_gen_methods = {{\n'
-    for func_name, func in funcs.iteritems():
+    for func_name, func in funcs.items():
         cpp_body += '    {\"%s\", (PyCFunction)Uhd_%s, METH_VARARGS, \"\"},\n' % (func_name,func_name)
     cpp_body += '    }};\n' \
               + '};\n'
