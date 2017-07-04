@@ -8,12 +8,22 @@
 
 #include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
+#include <uhd/version.hpp>
 
 #include "uhd.hpp"
 #include "uhd_types.hpp"
 #include "uhd_expect.hpp"
-#include "uhd_gen.hpp"
 #include "uhd_rx.hpp"
+
+#if UHD_VERSION == 30906
+  /** UHD tag release_003_009_006 **/
+  #include "uhd_30906.hpp"
+#elif UHD_VERSION == 3100199
+  /** UHD tag release_003_010_001_001 **/
+  #include "uhd_3100199.hpp"
+#else
+  #error Unsupported UHD version
+#endif
 
 namespace uhd {
 
@@ -104,21 +114,20 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
             return nullptr;
         }
 
-        if (PySequence_Check(_channels) && (_channels = PySequence_Fast(_channels, "Expected sequence.")) != nullptr) {
+        if (PySequence_Check(_channels) && (_channels = PySequence_Fast(_channels, "Expected sequence.")) != nullptr
+            && PySequence_Fast_GET_SIZE(_channels)) {
             channels.resize(PySequence_Fast_GET_SIZE(_channels));
             for (size_t it = 0; it < channels.size(); it++) {
                 PyObject *elem = PySequence_Fast_GET_ITEM(_channels, it);
                 if (PyLong_CheckExact(elem)) {
                     channels[it] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
                 } else {
-                    Py_DECREF(_channels);
                     PyErr_SetString(PyExc_TypeError, "Invalid argument for argument # 2: channels must be list of integers.");
                     return nullptr;
                 }
             }
-            Py_DECREF(_channels);
         } else {
-            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 2: expected sequence.");
+            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 2: expected sequence of non-zero length.");
         }
 
         streaming = (_streaming) ? PyObject_IsTrue(_streaming) : streaming;

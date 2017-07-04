@@ -16,7 +16,7 @@ uhd = Extension('uhd',
                 library_dirs = [],
                 extra_compile_args=['-std=c++11'],
                 sources = ['uhd/' + s for s in ['uhd.cpp', 'uhd_types.cpp',
-                                                'uhd_gen.cpp', 'uhd_rx.cpp']])
+                                                'uhd_rx.cpp']])
 
 setup(name = 'uhd',
       version = '{}.{}'.format(MAJOR_VERSION,MINOR_VERSION),
