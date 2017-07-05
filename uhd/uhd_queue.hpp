@@ -16,6 +16,7 @@ class Queue {
     T pop();
     void clear();
     bool empty();
+    size_t size();
 
   private:
     std::mutex _lock;
@@ -51,6 +52,12 @@ template <typename T>
 bool Queue<T>::empty() {
     std::lock_guard<std::mutex> lg(_lock);
     return _queue.empty();
+}
+
+template <typename T>
+size_t Queue<T>::size() {
+    std::lock_guard<std::mutex> lg(_lock);
+    return _queue.size();
 }
 
 }

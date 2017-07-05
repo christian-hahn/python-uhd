@@ -47,6 +47,7 @@ class ReceiveWorker {
                               double seconds_in_future = 0.0, double timeout = 0.0);
     Expect<ReceiveResult> read();
     bool stream_in_progress();
+    size_t num_received();
 
   private:
     void worker();

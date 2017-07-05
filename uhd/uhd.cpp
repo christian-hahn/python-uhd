@@ -147,6 +147,10 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
     }
 }
 
+static PyObject *Uhd_num_received(Uhd *self, void *closure) {
+    return from(self->receiver->num_received());
+}
+
 static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
 
     std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop);
@@ -160,10 +164,15 @@ static PyMethodDef module_methods[] = {{NULL}};
 static PyMemberDef Uhd_members[] = {{NULL}};
 
 static std::vector<PyMethodDef> Uhd_methods;
-const static std::vector<PyMethodDef> Uhd_user_methods = {{
+const static std::vector<PyMethodDef> Uhd_user_methods {
     {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, ""},
     {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, ""},
-}};
+};
+
+static PyGetSetDef Uhd_getset[] = {
+    {(char *)"num_received", (getter)Uhd_num_received, NULL, (char *)"Number of sample-blocks received.", NULL},
+    {NULL},
+};
 
 static PyTypeObject UhdType = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -195,7 +204,7 @@ static PyTypeObject UhdType = {
     0,                                         /* tp_iternext */
     0,                                         /* tp_methods (DEFERRED) */
     Uhd_members,                               /* tp_members */
-    0,                                         /* tp_getset */
+    Uhd_getset,                                /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */
@@ -206,7 +215,7 @@ static PyTypeObject UhdType = {
     Uhd_new,                                   /* tp_new */
 };
 
-static struct PyModuleDef moduledef = {
+static PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "uhd",                                  /* m_name */
     "USRP hardware driver Python module.",  /* m_doc */

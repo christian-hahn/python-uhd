@@ -84,7 +84,7 @@ void ReceiveWorker::worker() {
             req->type == ReceiveRequestType::Continuous)
             _receiving = true;
 
-         /** Accept request **/
+        /** Accept request **/
         req->accepted.set_value();
 
         if (req->type == ReceiveRequestType::Stop)
@@ -197,6 +197,10 @@ void ReceiveWorker::worker() {
 
 bool ReceiveWorker::stream_in_progress() {
     return _streaming;
+}
+
+size_t ReceiveWorker::num_received() {
+    return results.size();
 }
 
 }

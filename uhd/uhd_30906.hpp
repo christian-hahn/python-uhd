@@ -2347,7 +2347,7 @@ PyObject *Uhd_write_register(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-const std::vector<PyMethodDef> Uhd_gen_methods = {
+const std::vector<PyMethodDef> Uhd_gen_methods {
     {"clear_command_time", (PyCFunction)Uhd_clear_command_time, METH_VARARGS, ""},
     {"enumerate_registers", (PyCFunction)Uhd_enumerate_registers, METH_VARARGS, ""},
     {"get_clock_source", (PyCFunction)Uhd_get_clock_source, METH_VARARGS, ""},
@@ -2427,7 +2427,8 @@ const std::vector<PyMethodDef> Uhd_gen_methods = {
     {"set_tx_subdev_spec", (PyCFunction)Uhd_set_tx_subdev_spec, METH_VARARGS, ""},
     {"set_user_register", (PyCFunction)Uhd_set_user_register, METH_VARARGS, ""},
     {"write_register", (PyCFunction)Uhd_write_register, METH_VARARGS, ""},
-    };
+};
+
 }
 
 #endif /** __UHD_GEN_HPP__ **/
