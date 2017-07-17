@@ -253,7 +253,7 @@ PyMODINIT_FUNC PyInit_uhd(void) {
     Py_INCREF(&UhdType);
     PyModule_AddObject(m, "Uhd", reinterpret_cast<PyObject *>(&UhdType));
 
-    UhdError = PyErr_NewExceptionWithDoc((char *)"uhd.error", (char *)"UHD exception.", NULL, NULL);
+    UhdError = PyErr_NewExceptionWithDoc((char *)"uhd.UhdError", (char *)"UHD exception.", NULL, NULL);
     Py_INCREF(UhdError);
     PyModule_AddObject(m, "UhdError", UhdError);
 
