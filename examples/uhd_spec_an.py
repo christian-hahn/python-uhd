@@ -3,21 +3,13 @@
 ''' Implements a spectrum analyzer.
     Tested with USRP B210 & B200mini. '''
 
+import uhd
 import signal
 import sys
 import numpy as np
 import argparse
 
 from spec_an import SpecAn
-import uhd
-
-
-def signal_handler(signal, frame):
-    """ Interrupt handler to catch Ctrl+C and shutdown receiver. """
-    try:
-        u.stop_receive()
-    finally:
-        sys.exit(0)
 
 
 def main():
@@ -28,11 +20,11 @@ def main():
                         type=float)
     parser.add_argument('span', help='Span in Hz.', type=float)
     parser.add_argument('--gain', help='Gain in dB.', type=float, default=40.)
-    parser.add_argument('--channels', help='Channels.', type=list, default=[0])
+    parser.add_argument('--channels', help='Channels.', type=int, nargs='+', default=[0])
     parser.add_argument('--num-samps', help='Number of samples per capture.',
                         type=int, default=2**18)
     parser.add_argument('--num-points', help='Number of samples in PSD.',
-                        type=int, default=2**14)
+                        type=int, default=2**12)
     args = parser.parse_args()
 
     # Create UHD object
@@ -43,11 +35,15 @@ def main():
 
     # Set the master clock rate, then set the sample rate derived from an
     # even integer divisor of the master clock rate
-    master_clock_rate = float(args.span * np.floor(61.44e6 / args.span / 4.) * 4.)
+    master_clock_rate = 30.72e6 if len(args.channels) > 1 else 61.44e6
+    master_clock_rate = float(args.span * np.floor(master_clock_rate
+                        / args.span / 2.) * 2.)
     u.set_master_clock_rate(master_clock_rate)
     master_clock_rate = u.get_master_clock_rate()
     divisor = max(float(np.floor(master_clock_rate / args.span / 2.) * 2.), 1)
     u.set_rx_rate(u.get_master_clock_rate() / divisor)
+
+    #u.set_rx_rate(args.span)
     samp_rate = u.get_rx_rate()
 
     # Setup each channel: set gain, LO frequency, etc.
@@ -68,17 +64,31 @@ def main():
     print('rx_rate = {} Hz'.format(u.get_rx_rate()))
 
     spec = SpecAn(samp_rate, args.num_points, num_chans=len(args.channels),
-                  limits=[-125.,0.], freq_offset=args.center_freq)
+                  limits=[-125., 0.], freq_offset=args.center_freq)
 
     # Start streaming & update graphic continuously
-    u.receive(args.num_samps, args.channels, True)
-    while True:
-        samps = u.receive()
-        samps_sqrd = np.real(samps[0] * np.conj(samps[0]))
-        avg_pwr = 10.*np.log10(np.mean(samps_sqrd))
-        peak_pwr = 10.*np.log10(np.max(samps_sqrd))
-        print('avg-pwr = {:.3f} dBfs, peak-pwr = {:.3f} dBfs'.format(avg_pwr, peak_pwr))
-        spec.update(samps)
+    try:
+        u.receive(args.num_samps, args.channels, streaming=True)
+        while True:
+            # Receive a block of samples
+            samps = u.receive()
+            # Compute average and peak power
+            samps_sqrd = np.real(samps[0] * np.conj(samps[0]))
+            avg_pwr = 10. * np.log10(np.mean(samps_sqrd))
+            peak_pwr = 10. * np.log10(np.max(samps_sqrd))
+            print('avg-pwr = {:.3f} dBfs, peak-pwr = {:.3f} dBfs'
+                  .format(avg_pwr, peak_pwr))
+            spec.update(samps)
+            # Drop extra blocks of samples if we're not keeping up.
+            while u.num_received > 1:
+                samps = u.receive()
+    finally:
+        u.stop_receive()
+
+
+def signal_handler(signal, frame):
+    """ Interrupt handler to catch Ctrl+C and exit. """
+    sys.exit(0)
 
 
 if __name__ == '__main__':
