@@ -3,8 +3,10 @@
 #include <Python.h>
 
 #include <uhd/usrp/multi_usrp.hpp>
+#include <uhd/usrp/subdev_spec.hpp>
 #include <uhd/exception.hpp>
 #include <uhd/types/dict.hpp>
+#include <uhd/types/tune_request.hpp>
 
 #include "uhd.hpp"
 #include "uhd_types.hpp"
@@ -50,23 +52,71 @@ bool is<std::complex<double>>(PyObject *obj) {
     return static_cast<bool>(PyComplex_CheckExact(obj));
 }
 
+static const std::array<std::pair<std::string,tune_request_t::policy_t>,3> tune_request_policies = {{
+    {"none", tune_request_t::policy_t::POLICY_NONE},
+    {"auto", tune_request_t::policy_t::POLICY_AUTO},
+    {"manual", tune_request_t::policy_t::POLICY_MANUAL},
+}};
+
+template<>
+bool is<tune_request_t::policy_t>(PyObject *obj) {
+    if (!is<std::string>(obj))
+        return false;
+    Expect<std::string> req;
+    if (!(req = to<std::string>(obj)))
+        return false;
+    return (std::find_if(tune_request_policies.begin(),
+            tune_request_policies.end(),
+            [&req](const std::pair<std::string,tune_request_t::policy_t> &v) {
+                return v.first == req.get();
+            }) != tune_request_policies.end());
+}
+
+template<>
+bool is<device_addr_t>(PyObject *obj) {
+    return is<std::string>(obj);
+}
+
 template<>
 bool is<tune_request_t>(PyObject *obj) {
     if (PyFloat_CheckExact(obj)) {
         return true;
     } else if (PyDict_CheckExact(obj)) {
+        /** target_freq / float / required **/
         PyObject *target_freq = PyDict_GetItemString(obj, "target_freq");
         if (target_freq && PyFloat_CheckExact(target_freq)) {
+            /** lo_off / float / optional **/
             PyObject *lo_off = PyDict_GetItemString(obj, "lo_off");
-            if (lo_off && PyFloat_CheckExact(lo_off))
-                return true;
+            if (!lo_off || !PyFloat_CheckExact(lo_off))
+                return false;
+            /** rf_freq_policy / str / optional **/
+            PyObject *rf_freq_policy = PyDict_GetItemString(obj, "rf_freq_policy");
+            if (!rf_freq_policy || !is<tune_request_t::policy_t>(rf_freq_policy))
+                return false;
+            /** rf_freq / double / optional **/
+            PyObject *rf_freq = PyDict_GetItemString(obj, "rf_freq");
+            if (!rf_freq || !PyFloat_CheckExact(rf_freq))
+                return false;
+            /** dsp_freq_policy / str / optional **/
+            PyObject *dsp_freq_policy = PyDict_GetItemString(obj, "dsp_freq_policy");
+            if (!dsp_freq_policy || !is<tune_request_t::policy_t>(dsp_freq_policy))
+                return false;
+            /** dsp_freq / double / optional **/
+            PyObject *dsp_freq = PyDict_GetItemString(obj, "dsp_freq");
+            if (!dsp_freq || !PyFloat_CheckExact(dsp_freq))
+                return false;
+            /** args / str / optional **/
+            PyObject *args = PyDict_GetItemString(obj, "args");
+            if (!args || !is<device_addr_t>(args))
+                return false;
+            return true;
         }
     }
     return false;
 }
 
 template<>
-bool is<uhd::usrp::subdev_spec_t>(PyObject *obj) {
+bool is<usrp::subdev_spec_t>(PyObject *obj) {
     return is<std::string>(obj);
 }
 
@@ -128,29 +178,115 @@ Expect<std::complex<double>> to<std::complex<double>>(PyObject *arg) {
 }
 
 template<>
+Expect<tune_request_t::policy_t> to<tune_request_t::policy_t>(PyObject *arg) {
+    if (is<std::string>(arg)) {
+        char *c_str = PyUnicode_AsUTF8(arg);
+        if (c_str) {
+            const std::string str(c_str);
+            const auto &ret = std::find_if(tune_request_policies.begin(), tune_request_policies.end(),
+                                     [&str](const std::pair<std::string,tune_request_t::policy_t> &v) {
+                                     return v.first == str;});
+            if (ret != tune_request_policies.end())
+                return ret->second;
+        }
+    }
+    return Error("Expected string: {'none', 'auto', 'manual'}.");
+}
+
+template<>
+Expect<device_addr_t> to<device_addr_t>(PyObject *arg) {
+    if (is<device_addr_t>(arg)) {
+        char *str = PyUnicode_AsUTF8(arg);
+        if (str) {
+            try {
+                return device_addr_t(std::string(str));
+            } catch(const uhd::exception &e) {
+                return Error(e.what());
+            }
+        }
+        return Error("Failed to get UTF-8 string from object.");
+    }
+    return Error("Expected string.");
+}
+
+template<>
 Expect<tune_request_t> to<tune_request_t>(PyObject *arg) {
     if (PyFloat_CheckExact(arg)) {
         return tune_request_t(PyFloat_AsDouble(arg));
     } else if (PyDict_CheckExact(arg)) {
-        PyObject *target_freq = PyDict_GetItemString(arg, "target_freq");
-        if (target_freq && PyFloat_CheckExact(target_freq)) {
-            PyObject *lo_off = PyDict_GetItemString(arg, "lo_off");
-            if (lo_off && PyFloat_CheckExact(lo_off))
-                return tune_request_t(PyFloat_AsDouble(target_freq),
-                                      PyFloat_AsDouble(lo_off));
+        PyObject *target_freq_ = PyDict_GetItemString(arg, "target_freq");
+        if (target_freq_) {
+            Expect<double> target_freq = to<double>(target_freq_);
+            if (!target_freq)
+                return Error("target_freq: " + std::string(target_freq.what()));
+
+            /** lo_off / str / optional **/
+            tune_request_t ret;
+            PyObject *lo_off_ = PyDict_GetItemString(arg, "lo_off");
+            if (lo_off_) {
+                Expect<double> lo_off = to<double>(lo_off_);
+                if (!lo_off)
+                    return Error("lo_off: " + std::string(lo_off.what()));
+                ret = tune_request_t(target_freq.get(), lo_off.get());
+            } else {
+                ret = tune_request_t(target_freq.get());
+            }
+
+            PyObject *rf_freq_policy_ = PyDict_GetItemString(arg, "rf_freq_policy");
+            PyObject *rf_freq_ = PyDict_GetItemString(arg, "rf_freq");
+            PyObject *dsp_freq_policy_ = PyDict_GetItemString(arg, "dsp_freq_policy");
+            PyObject *dsp_freq_ = PyDict_GetItemString(arg, "dsp_freq");
+            PyObject *args_ = PyDict_GetItemString(arg, "args");
+
+            /** rf_freq_policy / str / optional **/
+            if (rf_freq_policy_) {
+                Expect<tune_request_t::policy_t> rf_freq_policy = to<tune_request_t::policy_t>(rf_freq_policy_);
+                if (!rf_freq_policy)
+                    return Error("rf_freq_policy: " + std::string(rf_freq_policy.what()));
+                ret.rf_freq_policy = rf_freq_policy.get();
+            }
+            /** rf_freq / double / optional **/
+            if (rf_freq_) {
+                Expect<double> rf_freq = to<double>(rf_freq_);
+                if (!rf_freq)
+                    return Error("rf_freq: " + std::string(rf_freq.what()));
+                ret.rf_freq = rf_freq.get();
+            }
+            /** dsp_freq_policy / str / optional **/
+            if (dsp_freq_policy_) {
+                Expect<tune_request_t::policy_t> dsp_freq_policy = to<tune_request_t::policy_t>(dsp_freq_policy_);
+                if (!dsp_freq_policy)
+                    return Error("dsp_freq_policy: " + std::string(dsp_freq_policy.what()));
+                ret.dsp_freq_policy = dsp_freq_policy.get();
+            }
+            /** dsp_freq / double / optional **/
+            if (dsp_freq_) {
+                Expect<double> dsp_freq = to<double>(dsp_freq_);
+                if (!dsp_freq)
+                    return Error("dsp_freq: " + std::string(dsp_freq.what()));
+                ret.dsp_freq = dsp_freq.get();
+            }
+            /** args / str / optional **/
+            if (args_) {
+                Expect<device_addr_t> args = to<device_addr_t>(args_);
+                if (!args)
+                    return Error("args: " + std::string(args.what()));
+                ret.args = args.get();
+            }
+
+            return ret;
         }
-        return Error("Expected dict with {'target_freq': <float>, 'lo_off': <float>}.");
     }
     return Error("Expected float or dict with {'target_freq': <float>, 'lo_off': <float>}.");
 }
 
 template<>
-Expect<uhd::usrp::subdev_spec_t> to<uhd::usrp::subdev_spec_t>(PyObject *arg) {
-    if (is<uhd::usrp::subdev_spec_t>(arg)) {
+Expect<usrp::subdev_spec_t> to<usrp::subdev_spec_t>(PyObject *arg) {
+    if (is<usrp::subdev_spec_t>(arg)) {
         char *str = PyUnicode_AsUTF8(arg);
         if (str) {
             try {
-                return uhd::usrp::subdev_spec_t(std::string(str));
+                return usrp::subdev_spec_t(std::string(str));
             } catch(const uhd::exception &e) {
                 return Error(e.what());
             }
@@ -212,7 +348,7 @@ PyObject *from(const tune_result_t &value) {
     return PyErr_Format(PyExc_ValueError, "Failed to create dict.");
 }
 
-PyObject *from(const uhd::usrp::subdev_spec_t &value) {
+PyObject *from(const usrp::subdev_spec_t &value) {
     return PyUnicode_FromString(value.to_string().c_str());
 }
 
