@@ -13,6 +13,7 @@ import uhd
 import unittest
 from itertools import combinations
 import numpy as np
+from math import isclose
 
 
 def not_supported(function):
@@ -54,7 +55,7 @@ class UhdTestCase(unittest.TestCase):
         """ Given a set, get and range function: test a discrete
         range interface."""
         r = f_range()
-        if isinstance(r, dict):
+        if is_range(r):
             self.assertTrue(is_range(r))
             values = np.arange(r['start'], r['stop'], r['step']) if steps is \
                      None else np.linspace(r['start'], r['stop'], steps)
@@ -66,7 +67,7 @@ class UhdTestCase(unittest.TestCase):
         for value in values:
             f_set(value)
             ret = f_get()
-            if steps is None and isinstance(r, dict):
+            if is_range(r) and not isclose(r['step'], 0.):
                 self.assertLessEqual(abs(ret - value), r['step'])
             elif isinstance(r, list):
                 self.assertEqual(ret, value)
@@ -129,6 +130,15 @@ class UhdTestCase(unittest.TestCase):
                               lambda: self.dut.get_rx_freq(chan),
                               lambda: self.dut.get_rx_freq_range(chan),
                               steps=10)
+            r = self.dut.get_rx_freq_range(chan)
+            target_freq = round((r['start'] + r['stop']) / 2. / 1.e9) * 1.e9
+            for policy in ['none', 'auto', 'manual']:
+                tune_result = self.dut.set_rx_freq({'target_freq': target_freq,
+                    'lo_off': 0., 'rf_freq_policy': 'manual', 'rf_freq': target_freq,
+                    'dsp_freq_policy': 'manual', 'dsp_freq': 0.,
+                    'args': 'mode_n=integer'}, chan)
+                self.assertIsInstance(tune_result, dict)
+
 
     def test_tx_freq(self):
         """Test methods to get/set/enumerate TX frequency."""
@@ -137,6 +147,14 @@ class UhdTestCase(unittest.TestCase):
                               lambda: self.dut.get_tx_freq(chan),
                               lambda: self.dut.get_tx_freq_range(chan),
                               steps=10)
+            r = self.dut.get_tx_freq_range(chan)
+            target_freq = round((r['start'] + r['stop']) / 2. / 1.e9) * 1.e9
+            for policy in ['none', 'auto', 'manual']:
+                tune_result = self.dut.set_tx_freq({'target_freq': target_freq,
+                    'lo_off': 0., 'rf_freq_policy': 'manual', 'rf_freq': target_freq,
+                    'dsp_freq_policy': 'manual', 'dsp_freq': 0.,
+                    'args': 'mode_n=integer'}, chan)
+                self.assertIsInstance(tune_result, dict)
 
     def test_rx_bandwidth(self):
         """Test methods to get/set/enumerate RX bandwidth."""
