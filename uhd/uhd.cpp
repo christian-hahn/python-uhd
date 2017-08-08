@@ -15,13 +15,23 @@
 #include "uhd_expect.hpp"
 #include "uhd_rx.hpp"
 
-#if UHD_VERSION == 30906
-  /** UHD tag release_003_009_006 **/
-  #include "uhd_30906.hpp"
-#elif UHD_VERSION == 3100199
-  /** UHD tag release_003_010_001_001 **/
-  #include "uhd_3100199.hpp"
-#else
+#include "uhd_30802.hpp"
+#include "uhd_30803.hpp"
+#include "uhd_30804.hpp"
+#include "uhd_30805.hpp"
+#include "uhd_30900.hpp"
+#include "uhd_30901.hpp"
+#include "uhd_30902.hpp"
+#include "uhd_30903.hpp"
+#include "uhd_30904.hpp"
+#include "uhd_30905.hpp"
+#include "uhd_30906.hpp"
+#include "uhd_30907.hpp"
+#include "uhd_3100099.hpp"
+#include "uhd_3100199.hpp"
+#include "uhd_3100299.hpp"
+
+#ifndef __UHD_GEN_HPP__
   #error Unsupported UHD version
 #endif
 
