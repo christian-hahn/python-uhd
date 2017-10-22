@@ -11,129 +11,138 @@
 
 import uhd
 import numpy as np
-from scipy import signal as scipy
+from scipy.signal import lfilter, cheby1
 import alsaaudio
-import signal
-import sys
+import argparse
+
 
 def main():
+    """ Entry point. Contains main loop. """
 
-    # Parameters
-    signal_freq = 99.7e6  # This is the carrier frequency
-    chan = 0  # This is the receiver channel that will be used
-    gain = 40.  # Receiver gain
-    signal_bw = 200000.  # FM broadcast has a bandwidth of ~200 kHz
-    master_clock_rate = 32.e6
+    parser = argparse.ArgumentParser()
+    parser.add_argument('signal_freq', help='Signal frequency in Hz.',
+                        type=float)
+    parser.add_argument('--gain', help='RX gain in dB.', type=float, default=40.)
+    parser.add_argument('--max-deviation', help='Maximum deviation in Hz.',
+                        type=float, default=75.e3)
+    args = parser.parse_args()
+
+    # Constants
+    channel = 0  # This is the receiver channel that will be used
+    signal_bw = 200e3  # FM broadcast has a bandwidth of ~200 kHz
+    audio_bw = 15.e3  # Audio bandwidth
+    audio_samp_rate = 48e3  # Output audio sample-rate of 48 kSps
 
     # Create UHD object
     u = uhd.Uhd()
 
-    # Register an interrupt handler to catch Ctrl+C
-    def signal_handler(signal, frame):
-        try:
-            u.stop_receive()
-        finally:
-            sys.exit(0)
-    signal.signal(signal.SIGINT, signal_handler)
+    # Select optimal LO frequency: signal_freq - bandwidth rounded
+    # to nearest 1.25 MHz
+    lo_freq = float(np.floor((args.signal_freq - signal_bw) / 1.25e6) * 1.25e6)
+
+    # Set the LO frequency: round down to nearest achievable
+    tune_result = u.set_rx_freq(lo_freq, channel)
+    lo_freq = tune_result['actual_rf_freq']
+    u.set_rx_freq(lo_freq, channel)
+    lo_freq = u.get_rx_freq(channel)
+
+    # Compute ideal sample-rates & bandwidths
+    min_samp_rate = float((abs(args.signal_freq - lo_freq) + signal_bw) * 2.)
+    if_samp_rate = float(np.ceil(signal_bw / audio_samp_rate) * audio_samp_rate)
+    samp_rate = float(np.ceil(min_samp_rate / if_samp_rate) * if_samp_rate)
+    master_clock_rate = float(samp_rate * np.floor(61.44e6 / samp_rate / 4.) * 4.)
 
     # Set the master clock rate
     u.set_master_clock_rate(master_clock_rate)
     master_clock_rate = u.get_master_clock_rate()
 
-    # Set the LO frequency: round down to nearest achievable
-    center_freq = signal_freq - signal_bw  # This is the receiver LO frequency
-    tune_result = u.set_rx_freq(center_freq, chan)
-    print('tune-result =')
-    for k,v in tune_result.items():
-        print('  {} = {}'.format(k,v))
-    center_freq = tune_result['actual_rf_freq']
-    u.set_rx_freq(center_freq, chan)
-    center_freq = u.get_rx_freq(chan)
-
-    # Set the sample rate derived from an even integer divisor
-    # of the master clock rate
-    samp_rate = signal_freq - center_freq + signal_bw*2.
-    divisor = max(float(np.floor(master_clock_rate/samp_rate/2.)*2.), 2)
-    u.set_rx_rate(u.get_master_clock_rate()/divisor)
+    # Set the sample rate
+    u.set_rx_rate(samp_rate)
     samp_rate = u.get_rx_rate()
 
-    # Setup channel: set analog-bandwidth, antenna, gain
-    u.set_rx_bandwidth(samp_rate, chan)
-    u.set_rx_antenna('RX2', chan)
-    u.set_rx_gain(gain, chan)
+    # Compute the decimation factor and actual audio sample rate
+    if_decim_factor = round(samp_rate / if_samp_rate)
+    if_samp_rate = samp_rate / if_decim_factor
+    audio_decim_factor = round(if_samp_rate / audio_samp_rate)
+    audio_samp_rate = if_samp_rate / audio_decim_factor
 
-    print('bandwidth = {} Hz'.format(u.get_rx_bandwidth(chan)))
-    print('freq = {} Hz'.format(u.get_rx_freq(chan)))
-    print('antenna = {}'.format(u.get_rx_antenna(chan)))
-    print('gain = {:.3f} dB'.format(u.get_rx_gain(chan)))
+    # Setup channel: set analog-bandwidth, antenna, gain
+    u.set_rx_bandwidth(min_samp_rate, channel)
+    u.set_rx_antenna('RX2', channel)
+    u.set_rx_gain(args.gain, channel)
+
+    # Compute the number of samples
+    audio_num_samps = int(round(audio_samp_rate * 5.))  # 5 second blocks
+    num_samps = ((audio_num_samps * audio_decim_factor) + 1) * if_decim_factor
+
+    # Open sound device in playback mode
+    out = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK, mode=alsaaudio.PCM_NONBLOCK)
+    out.setchannels(1)
+    out.setrate(int(round(audio_samp_rate)))
+    out.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+    out.setperiodsize(audio_num_samps)
+
+    print('bandwidth = {} Hz'.format(u.get_rx_bandwidth(channel)))
+    print('freq = {} Hz'.format(u.get_rx_freq(channel)))
+    print('antenna = {}'.format(u.get_rx_antenna(channel)))
+    print('gain = {:.3f} dB'.format(u.get_rx_gain(channel)))
     print('master_clock_rate = {} Hz'.format(u.get_master_clock_rate()))
     print('rx_rate = {} Hz'.format(u.get_rx_rate()))
+    print('if_decim_factor = {}'.format(if_decim_factor))
+    print('if_samp_rate = {} Hz'.format(if_samp_rate))
+    print('audio_decim_factor = {}'.format(audio_decim_factor))
+    print('audio_samp_rate = {} Hz'.format(audio_samp_rate))
 
-    # Number of samples: round down to nearest 2^N
-    num_samps = int(2**np.floor(np.log2(samp_rate*1.)))
+    # Downconversion
+    dnconv = np.exp(-1j * 2. * np.pi * ((args.signal_freq - lo_freq) / samp_rate)
+             * np.arange(num_samps))
 
-    f_tone = signal_freq - center_freq
-    ref_wfm = np.exp(-1j*2*np.pi*(f_tone/samp_rate)*np.arange(num_samps))
+    # IF and audio low-pass filters
+    if_filter = cheby1(N=8, rp=3., Wn=signal_bw / samp_rate, btype='low')
+    audio_filter = cheby1(N=8, rp=3., Wn=15.e3 / if_samp_rate, btype='low')
 
-    # Start receive
-    u.receive(num_samps, [chan], True)
+    # De-emphasis filter
+    decay = np.exp(-1. / (if_samp_rate * 75e-6))
+    deemphasis_filter = [1 - decay], [1, -decay]
 
-    first = True
-    max_sig_audio = 0.
-    while True:
+    try:
+        # Start receive
+        u.receive(num_samps, [channel], True)
 
-        # Get received samples
-        samps = u.receive()
+        while True:
 
-        # Compute average power: this is for display purposes only
-        samps_sqrd = np.real(np.conj(samps[0])*samps[0])
-        avg_pwr = 10.*np.log10(np.mean(samps_sqrd))
-        peak_pwr = 10.*np.log10(np.max(samps_sqrd))
-        print('avg_pwr = {:.3f} dBfs, peak_pwr = {:.3f} dBfs'.format(avg_pwr, peak_pwr))
+            # Get received samples
+            samps = u.receive()[0]
 
-        # Down-convert to baseband
-        samps_dwn = samps[0]*ref_wfm
+            # Compute average power: this is for display purposes only
+            samps_sqrd = np.real(np.conj(samps) * samps)
+            avg_pwr = 10. * np.log10(np.mean(samps_sqrd))
+            peak_pwr = 10. * np.log10(np.max(samps_sqrd))
+            print('avg_pwr = {:.3f} dBfs, peak_pwr = {:.3f} dBfs'.format(avg_pwr, peak_pwr))
 
-        # Low-pass filter & decimate
-        dec_rate = int(samp_rate / signal_bw)
-        samps_dec = scipy.decimate(samps_dwn, dec_rate, zero_phase=False)
-        samp_rate_dec = samp_rate/dec_rate
+            # Downconvert to baseband
+            samps = samps * dnconv
 
-        # Polar discriminator
-        polar_desc = np.angle(samps_dec[1:] * np.conj(samps_dec[:-1]))
+            # Low-pass filter + decimate
+            samps = lfilter(*if_filter, samps)
+            samps = samps[::if_decim_factor]
 
-        # Apply de-emphasis filter
-        x = np.exp(-1/(samp_rate_dec * 75e-6))   # Calculate the decay between each sample
-        sig_deemp = scipy.lfilter([1-x],[1,-x],polar_desc)
+            # Phase-discriminator
+            samps = np.angle(samps[1:] * np.conj(samps[:-1]))
 
-        # Decimate signal to audio sampling rate: ~44-48 kHz
-        samp_rate_audio = 44100.0
-        dec_rate_audio = int(samp_rate_dec/samp_rate_audio)
-        samp_rate_audio = samp_rate_dec / dec_rate_audio
-        sig_audio = scipy.decimate(sig_deemp, dec_rate_audio, zero_phase=False)
+            # De-emphasis filter, low-pass filter
+            samps = lfilter(*audio_filter, samps)
+            samps = lfilter(*deemphasis_filter, samps)
 
-        # Scale audio signal: scale audio signal accordingn to max seen
-        max_sig_audio = max(float(np.max(np.abs(sig_audio))), max_sig_audio)
-        if max_sig_audio > 0.:
-            sig_audio = sig_audio * (2.**14 / max_sig_audio)
+            # Decimate to audio-sample rate and scale samples
+            # based on max-deviation
+            samps = samps[::audio_decim_factor]
+            samps = samps * (2.**14 / (args.max_deviation / if_samp_rate
+                    * (2. * np.pi)))
 
-        if first:
-            print('samp_rate_audio = {} Hz'.format(samp_rate_audio))
-
-            # Open the device in playback mode.
-            out = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK, mode=alsaaudio.PCM_NONBLOCK)
-            out.setchannels(1)
-            out.setrate(int(round(samp_rate_audio)))
-            out.setformat(alsaaudio.PCM_FORMAT_S16_LE)
-
-            # The period size controls the internal number of frames per period.
-            # The significance of this parameter is documented in the ALSA api.
-            out.setperiodsize(len(sig_audio))
-
-        out.write(sig_audio.astype('int16'))
-        first = False
-
-    u.stop_receive()
+            out.write(samps.astype('int16'))
+    finally:
+        u.stop_receive()
 
 
 if __name__ == '__main__':
