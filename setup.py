@@ -16,8 +16,8 @@ uhd = Extension('uhd',
                 include_dirs=[numpy.get_include(), 'uhd/'],
                 libraries=['uhd'],
                 extra_compile_args=['-std=c++11'],
-                sources=[join('uhd') for s in ['uhd.cpp', 'uhd_types.cpp',
-                                               'uhd_rx.cpp']])
+                sources=[join('uhd', s) for s in ['uhd.cpp', 'uhd_types.cpp',
+                                                  'uhd_rx.cpp']])
 
 
 setup(name='uhd',
