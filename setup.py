@@ -30,6 +30,8 @@ setup(
     version='{}.{}'.format(MAJOR_VERSION,MINOR_VERSION),
     description='A Python 3 C-extension to facilitate development with USRP '
         'hardware.',
+    setup_requires=['numpy'],
+    install_requires=['numpy'],
     ext_modules=[uhd],
     author='Christian Hahn',
     author_email='christianhahn09@gmail.com',
