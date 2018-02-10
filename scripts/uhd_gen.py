@@ -5,35 +5,41 @@ import CppHeaderParser
 from os.path import join
 
 
-known_param_types = {'bool': {'default': 'false'},
-                     'uint8_t': {'default': '0'},
-                     'uint32_t': {'default': '0'},
-                     'uint64_t': {'default': '0'},
-                     'double': {'default': '0.0'},
-                     'std::string': {'default': None},
-                     'size_t': {'default': '0'},
-                     'std::complex<double>': {'default': None},
-                     'uhd::usrp::subdev_spec_t': {'default': None},
-                     'tune_request_t': {'default': None}}
+known_param_types = {
+    'bool': {'default': 'false'},
+    'uint8_t': {'default': '0'},
+    'uint32_t': {'default': '0'},
+    'uint64_t': {'default': '0'},
+    'double': {'default': '0.0'},
+    'std::string': {'default': None},
+    'size_t': {'default': '0'},
+    'std::complex<double>': {'default': None},
+    'uhd::usrp::subdev_spec_t': {'default': None},
+    'tune_request_t': {'default': None},
+}
 
-known_ret_types = {'void': {'default': None},
-                   'bool': {'default': 'false'},
-                   'uint32_t': {'default': '0'},
-                   'uint64_t': {'default': '0'},
-                   'double': {'default': '0.0'},
-                   'size_t': {'default': '0'},
-                   'std::string': {'default': None},
-                   'tune_result_t': {'default': None},
-                   'uhd::usrp::subdev_spec_t': {'default': None},
-                   'std::vector<std::string>': {'default': None},
-                   'dict<std::string, std::string>': {'default': None},
-                   'meta_range_t': {'default': None},
-                   'freq_range_t': {'default': None},
-                   'gain_range_t': {'default': None}}
+known_ret_types = {
+    'void': {'default': None},
+    'bool': {'default': 'false'},
+    'uint32_t': {'default': '0'},
+    'uint64_t': {'default': '0'},
+    'double': {'default': '0.0'},
+    'size_t': {'default': '0'},
+    'std::string': {'default': None},
+    'tune_result_t': {'default': None},
+    'uhd::usrp::subdev_spec_t': {'default': None},
+    'std::vector<std::string>': {'default': None},
+    'dict<std::string, std::string>': {'default': None},
+    'meta_range_t': {'default': None},
+    'freq_range_t': {'default': None},
+    'gain_range_t': {'default': None},
+}
 
-blacklist = ['make', 'get_device', 'get_rx_stream', 'get_tx_stream',
-             'issue_stream_cmd', 'get_rx_dboard_iface',
-             'get_tx_dboard_iface', 'set_clock_config']
+blacklist = [
+    'make', 'get_device', 'get_rx_stream', 'get_tx_stream',
+    'issue_stream_cmd', 'get_rx_dboard_iface',
+    'get_tx_dboard_iface', 'set_clock_config',
+]
 
 
 def get_clean_type(name):
