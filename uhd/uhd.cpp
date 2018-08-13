@@ -62,7 +62,7 @@ static int Uhd_init(Uhd *self, PyObject *args) {
     if (nargs > 0) {
         Expect<std::string> _dev_addr;
         if (!(_dev_addr = to<std::string>(PyTuple_GetItem(args, 0)))) {
-            PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", _dev_addr.what());
+            PyErr_Format(PyExc_TypeError, "dev_addr: %s", _dev_addr.what());
             return -1;
         }
         dev_addr = _dev_addr.get();
@@ -88,7 +88,7 @@ static PyObject *_get_receive(Uhd *self) {
 
     Expect<ReceiveResult> _result;
     if (!(_result = self->receiver->read()))
-        return PyErr_Format(PyExc_TypeError, "Failed to receive: %s", _result.what());
+        return PyErr_Format(PyExc_RuntimeError, "Error on receive: %s", _result.what());
     ReceiveResult &result = _result.get();
 
     const size_t num_channels = result.bufs.size();
@@ -110,25 +110,18 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
 
-    if (nargs) {
+    if (nargs == 0) {
+        return _get_receive(self);
+    } else if (nargs >= 2) {
 
-        /** Required **/
-        size_t num_samps = 0;
-        PyObject *_channels = nullptr;
+        /** num_samps **/
+        Expect<size_t> num_samps;
+        if (!(num_samps = to<size_t>(PyTuple_GetItem(args, 0))))
+            return PyErr_Format(PyExc_TypeError, "num_samps: %s", num_samps.what());
+
+        /** channels **/
+        PyObject *_channels = PyTuple_GetItem(args, 1);
         std::vector<size_t> channels;
-        /** Optional **/
-        PyObject *_streaming = nullptr;
-        bool streaming = false;
-        double seconds_in_future = 1.0;
-        double timeout = 5.0;
-
-        static const char *kwds_list[] = {"num_samps", "channels", "streaming",
-                                          "seconds_in_future", "timeout", nullptr};
-        if(!PyArg_ParseTupleAndKeywords(args, kwds, "IO|Odd", const_cast<char **>(kwds_list), &num_samps,
-                                        &_channels, &_streaming, &seconds_in_future, &timeout)) {
-            return nullptr;
-        }
-
         if (PySequence_Check(_channels) && (_channels = PySequence_Fast(_channels, "Expected sequence.")) != nullptr
             && PySequence_Fast_GET_SIZE(_channels)) {
             channels.resize(PySequence_Fast_GET_SIZE(_channels));
@@ -137,18 +130,48 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
                 if (PyLong_CheckExact(elem)) {
                     channels[it] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
                 } else {
-                    PyErr_SetString(PyExc_TypeError, "Invalid argument for argument # 2: channels must be list of integers.");
+                    PyErr_SetString(PyExc_TypeError, "channels: Expected sequence of integers.");
                     return nullptr;
                 }
             }
         } else {
-            return PyErr_Format(PyExc_TypeError, "Invalid argument for argument # 2: expected sequence of non-zero length.");
+            return PyErr_Format(PyExc_TypeError, "channels: Expected sequence of non-zero length.");
         }
 
-        streaming = (_streaming) ? PyObject_IsTrue(_streaming) : streaming;
+        /** streaming (optional) **/
+        bool streaming = false;
+        if (nargs > 2) {
+            Expect<bool> _streaming;
+            if (!(_streaming = to<bool>(PyTuple_GetItem(args, 2))))
+                return PyErr_Format(PyExc_TypeError, "streaming: %s", _streaming.what());
+            streaming = _streaming.get();
+        }
 
-        std::future<void> accepted = self->receiver->request(streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
-                                                             num_samps, std::move(channels), seconds_in_future, timeout);
+        /** seconds_in_future (optional) **/
+        double seconds_in_future = 1.0;
+        if (nargs > 3) {
+            Expect<double> _seconds_in_future;
+            if (!(_seconds_in_future = to<double>(PyTuple_GetItem(args, 3))))
+                return PyErr_Format(PyExc_TypeError, "seconds_in_future: %s", _seconds_in_future.what());
+            seconds_in_future = _seconds_in_future.get();
+        }
+
+        /** timeout (optional) **/
+        double timeout = 5.0;
+        if (nargs > 4) {
+            Expect<double> _streaming;
+            if (!(_streaming = to<double>(PyTuple_GetItem(args, 4))))
+                return PyErr_Format(PyExc_TypeError, "timeout: %s", _streaming.what());
+            timeout = _streaming.get();
+        }
+
+        std::future<void> accepted = self->receiver->request(
+            streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
+            num_samps,
+            std::move(channels),
+            seconds_in_future,
+            timeout
+        );
         accepted.wait();
 
         if (streaming) {
@@ -158,7 +181,7 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
 
         return _get_receive(self);
     } else {
-        return _get_receive(self);
+        return PyErr_Format(PyExc_ValueError, "Invalid number of arguments: expected none or 2 or more.");
     }
 }
 
