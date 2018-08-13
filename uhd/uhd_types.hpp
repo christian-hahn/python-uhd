@@ -25,6 +25,8 @@ bool is<bool>(PyObject *obj);
 template<>
 bool is<uint8_t>(PyObject *obj);
 template<>
+bool is<uint16_t>(PyObject *obj);
+template<>
 bool is<uint32_t>(PyObject *obj);
 template<>
 bool is<uint64_t>(PyObject *obj);
@@ -49,6 +51,8 @@ Expect<bool> to<bool>(PyObject *arg);
 template<>
 Expect<uint8_t> to<uint8_t>(PyObject *arg);
 template<>
+Expect<uint16_t> to<uint16_t>(PyObject *arg);
+template<>
 Expect<uint32_t> to<uint32_t>(PyObject *arg);
 template<>
 Expect<uint64_t> to<uint64_t>(PyObject *arg);
@@ -67,6 +71,8 @@ Expect<uhd::usrp::subdev_spec_t> to<uhd::usrp::subdev_spec_t>(PyObject *arg);
 /** Functions to translate from <T> to PyObject. **/
 
 PyObject *from(const bool value);
+PyObject *from(const uint8_t value);
+PyObject *from(const uint16_t value);
 PyObject *from(const uint32_t value);
 PyObject *from(const uint64_t value);
 PyObject *from(const double value);

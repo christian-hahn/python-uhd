@@ -28,6 +28,11 @@ bool is<uint8_t>(PyObject *obj) {
 }
 
 template<>
+bool is<uint16_t>(PyObject *obj) {
+    return static_cast<bool>(PyLong_CheckExact(obj));
+}
+
+template<>
 bool is<uint32_t>(PyObject *obj) {
     return static_cast<bool>(PyLong_CheckExact(obj));
 }
@@ -140,6 +145,11 @@ static Expect<T> toUnsignedInt(PyObject *arg) {
 template<>
 Expect<uint8_t> to<uint8_t>(PyObject *arg) {
     return toUnsignedInt<uint8_t>(arg);
+}
+
+template<>
+Expect<uint16_t> to<uint16_t>(PyObject *arg) {
+    return toUnsignedInt<uint16_t>(arg);
 }
 
 template<>
@@ -305,6 +315,14 @@ PyObject *from(const bool value) {
     Py_RETURN_FALSE;
 }
 
+PyObject *from(const uint8_t value) {
+    return PyLong_FromLong(value);
+}
+
+PyObject *from(const uint16_t value) {
+    return PyLong_FromLong(value);
+}
+
 PyObject *from(const uint32_t value) {
     return PyLong_FromLong(value);
 }
@@ -328,6 +346,7 @@ inline static bool dict_insert_string_float(PyObject *dict, const char *key, con
             Py_DECREF(pval);
             return false;
         }
+        Py_DECREF(pval);
         return true;
     }
     return false;
@@ -358,11 +377,7 @@ PyObject *from(const std::vector<std::string> &value) {
         for (size_t i = 0; i < value.size(); i++) {
             PyObject *pval = PyUnicode_FromString(value[i].c_str());
             if (pval) {
-                if (PyList_SetItem(ret, i, pval)) {
-                    Py_DECREF(pval);
-                    Py_DECREF(ret);
-                    return PyErr_Format(PyExc_ValueError, "Failed to create list: error on insert.");
-                }
+                PyList_SET_ITEM(ret, i, pval);
             } else {
                 Py_DECREF(ret);
                 return PyErr_Format(PyExc_ValueError, "Failed to create list: failed to get string object.");
@@ -374,17 +389,19 @@ PyObject *from(const std::vector<std::string> &value) {
 }
 
 PyObject *from(const dict<std::string, std::string> &value) {
-    std::vector<std::string> keys = value.keys();
+    const std::vector<std::string> &keys = value.keys();
+    const std::vector<std::string> &values = value.vals();
     PyObject *ret = PyDict_New();
     if (ret) {
-        for (const auto &key : keys) {
-            PyObject *pval = PyUnicode_FromString(value[key].c_str());
+        for (size_t i = 0; i < keys.size(); i++) {
+            PyObject *pval = PyUnicode_FromString(values[i].c_str());
             if (pval) {
-                if (PyDict_SetItemString(ret, key.c_str(), pval)) {
+                if (PyDict_SetItemString(ret, keys[i].c_str(), pval)) {
                     Py_DECREF(pval);
                     Py_DECREF(ret);
                     return PyErr_Format(PyExc_ValueError, "Failed to create dict: error on insert.");
                 }
+                Py_DECREF(pval);
             } else {
                 Py_DECREF(ret);
                 return PyErr_Format(PyExc_ValueError, "Failed to create dict: failed to get string object.");
