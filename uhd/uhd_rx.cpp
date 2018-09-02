@@ -110,17 +110,9 @@ void ReceiveWorker::worker() {
 
             dev->set_time_now(uhd::time_spec_t(0.0));
             rx_stream = dev->get_rx_stream(stream_args);
-
             stream_cmd.num_samps = num_samps;
-
-            if (num_channels == 1) {
-                stream_cmd.stream_now = true;
-                stream_cmd.time_spec = uhd::time_spec_t(0.0);
-            } else {
-                stream_cmd.stream_now = false;
-                stream_cmd.time_spec = uhd::time_spec_t(req->seconds_in_future);
-            }
-
+            stream_cmd.stream_now = (req->seconds_in_future < 0.0001) ? true : false;
+            stream_cmd.time_spec = uhd::time_spec_t(req->seconds_in_future);
             rx_stream->issue_stream_cmd(stream_cmd);
 
         } catch(const uhd::exception &e) {
