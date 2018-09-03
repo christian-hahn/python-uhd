@@ -106,27 +106,50 @@ static PyObject *_get_receive(Uhd *self) {
     return ret;
 }
 
-static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
+#define DOC_RECEIVE \
+"Receive samples. Given at least, arguments 'num_samps' and 'channels', a new \n" \
+"receive is started. If no arguments are provided, this call must follow a \n" \
+"previous call to receive for which streaming = True." \
+"\n" \
+"Args:\n" \
+"    num_samps (int): number of samples\n" \
+"    channels (sequence): list of channels to receive\n" \
+"    streaming (bool, optional): is receive streaming\n" \
+"    seconds_in_future (float, optional): seconds in the future to receive\n" \
+"    timeout (float, optional): timeout in seconds\n" \
+"\n" \
+"Returns:\n" \
+"    list: list of ndarrays if not streaming else None\n"
+static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
 
-    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (PyTuple_Size(args)) {
 
-    if (nargs == 0) {
-        return _get_receive(self);
-    } else if (nargs >= 2) {
+        /** Required **/
+        PyObject *p_num_samps = nullptr;
+        PyObject *p_channels = nullptr;
+        /** Optional **/
+        PyObject *p_streaming = nullptr;
+        PyObject *p_seconds_in_future = nullptr;
+        PyObject *p_timeout = nullptr;
+        static const char *keywords[] = {"num_samps", "channels", "streaming",
+                                         "seconds_in_future", "timeout", nullptr};
+        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOO", const_cast<char **>(keywords), &p_num_samps,
+                                        &p_channels, &p_streaming, &p_seconds_in_future, &p_timeout)) {
+            return nullptr;
+        }
 
         /** num_samps **/
         Expect<size_t> num_samps;
-        if (!(num_samps = to<size_t>(PyTuple_GetItem(args, 0))))
+        if (!(num_samps = to<size_t>(p_num_samps)))
             return PyErr_Format(PyExc_TypeError, "num_samps: %s", num_samps.what());
 
         /** channels **/
-        PyObject *_channels = PyTuple_GetItem(args, 1);
         std::vector<size_t> channels;
-        if (PySequence_Check(_channels) && (_channels = PySequence_Fast(_channels, "Expected sequence.")) != nullptr
-            && PySequence_Fast_GET_SIZE(_channels)) {
-            channels.resize(PySequence_Fast_GET_SIZE(_channels));
+        if (PySequence_Check(p_channels) && (p_channels = PySequence_Fast(p_channels, "Expected sequence.")) != nullptr
+            && PySequence_Fast_GET_SIZE(p_channels)) {
+            channels.resize(PySequence_Fast_GET_SIZE(p_channels));
             for (size_t it = 0; it < channels.size(); it++) {
-                PyObject *elem = PySequence_Fast_GET_ITEM(_channels, it);
+                PyObject *elem = PySequence_Fast_GET_ITEM(p_channels, it);
                 if (PyLong_CheckExact(elem)) {
                     channels[it] = static_cast<size_t>(PyLong_AsUnsignedLongMask(elem));
                 } else {
@@ -140,34 +163,34 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
 
         /** streaming (optional) **/
         bool streaming = false;
-        if (nargs > 2) {
+        if (p_streaming) {
             Expect<bool> _streaming;
-            if (!(_streaming = to<bool>(PyTuple_GetItem(args, 2))))
+            if (!(_streaming = to<bool>(p_streaming)))
                 return PyErr_Format(PyExc_TypeError, "streaming: %s", _streaming.what());
             streaming = _streaming.get();
         }
 
         /** seconds_in_future (optional) **/
         double seconds_in_future = 1.0;
-        if (nargs > 3) {
+        if (p_seconds_in_future) {
             Expect<double> _seconds_in_future;
-            if (!(_seconds_in_future = to<double>(PyTuple_GetItem(args, 3))))
+            if (!(_seconds_in_future = to<double>(p_seconds_in_future)))
                 return PyErr_Format(PyExc_TypeError, "seconds_in_future: %s", _seconds_in_future.what());
             seconds_in_future = _seconds_in_future.get();
         }
 
         /** timeout (optional) **/
-        double timeout = 5.0;
-        if (nargs > 4) {
-            Expect<double> _streaming;
-            if (!(_streaming = to<double>(PyTuple_GetItem(args, 4))))
-                return PyErr_Format(PyExc_TypeError, "timeout: %s", _streaming.what());
-            timeout = _streaming.get();
+        double timeout = seconds_in_future + 0.1;
+        if (p_timeout) {
+            Expect<double> _timeout;
+            if (!(_timeout = to<double>(p_timeout)))
+                return PyErr_Format(PyExc_TypeError, "timeout: %s", _timeout.what());
+            timeout = _timeout.get();
         }
 
         std::future<void> accepted = self->receiver->request(
             streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
-            num_samps,
+            num_samps.get(),
             std::move(channels),
             seconds_in_future,
             timeout
@@ -178,22 +201,25 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwds) {
             Py_INCREF(Py_None);
             return Py_None;
         }
-
-        return _get_receive(self);
-    } else {
-        return PyErr_Format(PyExc_ValueError, "Invalid number of arguments: expected none or 2 or more.");
     }
+
+    return _get_receive(self);
 }
 
+#define DOC_NUM_RECEIVED \
+"Number of sample-blocks received.\n" \
+"\n" \
+"Returns:\n" \
+"    int: number of sample-blocks\n"
 static PyObject *Uhd_num_received(Uhd *self, void *closure) {
     return from(self->receiver->num_received());
 }
 
+#define DOC_STOP_RECEIVE \
+"Stop receiving."
 static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
-
     std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop);
     accepted.wait();
-
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -203,12 +229,12 @@ static PyMemberDef Uhd_members[] = {{NULL}};
 
 static std::vector<PyMethodDef> Uhd_methods;
 const static std::vector<PyMethodDef> Uhd_user_methods {
-    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, ""},
-    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, ""},
+    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, DOC_RECEIVE},
+    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, DOC_STOP_RECEIVE},
 };
 
 static PyGetSetDef Uhd_getset[] = {
-    {(char *)"num_received", (getter)Uhd_num_received, NULL, (char *)"Number of sample-blocks received.", NULL},
+    {(char *)"num_received", (getter)Uhd_num_received, NULL, (char *)DOC_NUM_RECEIVED, NULL},
     {NULL},
 };
 

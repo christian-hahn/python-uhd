@@ -18,15 +18,20 @@
 
 namespace uhd {
 
+#define DOC_CLEAR_COMMAND_TIME \
+"Clear the command time so future commands are sent ASAP.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): which motherboard to set the config\n"
 PyObject *Uhd_clear_command_time(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -42,15 +47,23 @@ PyObject *Uhd_clear_command_time(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_ENUMERATE_REGISTERS \
+"Enumerate the full paths of all low-level USRP registers accessible to read/write\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of register paths\n"
 PyObject *Uhd_enumerate_registers(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
@@ -66,6 +79,14 @@ PyObject *Uhd_enumerate_registers(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_CLOCK_SOURCE \
+"Get the currently set clock source.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int): which motherboard to get the config\n" \
+"\n" \
+"Returns:\n" \
+"    str: the string representing the clock source\n"
 PyObject *Uhd_get_clock_source(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -74,7 +95,7 @@ PyObject *Uhd_get_clock_source(Uhd *self, PyObject *args) {
 
     Expect<size_t> mboard;
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::string ret;
     try {
@@ -87,6 +108,14 @@ PyObject *Uhd_get_clock_source(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_CLOCK_SOURCES \
+"Get a list of possible clock sources.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int): which motherboard to get the list\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings for possible settings\n"
 PyObject *Uhd_get_clock_sources(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -95,7 +124,7 @@ PyObject *Uhd_get_clock_sources(Uhd *self, PyObject *args) {
 
     Expect<size_t> mboard;
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
@@ -108,15 +137,23 @@ PyObject *Uhd_get_clock_sources(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_FE_RX_FREQ_RANGE \
+"Get the center frequency range of the RF frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a frequency range object\n"
 PyObject *Uhd_get_fe_rx_freq_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     freq_range_t ret;
     try {
@@ -132,15 +169,23 @@ PyObject *Uhd_get_fe_rx_freq_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_FE_TX_FREQ_RANGE \
+"Get the center frequency range of the TX frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a frequency range object\n"
 PyObject *Uhd_get_fe_tx_freq_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     freq_range_t ret;
     try {
@@ -156,15 +201,25 @@ PyObject *Uhd_get_fe_tx_freq_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_FILTER_NAMES \
+"Enumerate the available filters in the signal path.\n" \
+"\n" \
+"Args:\n" \
+"    search_mask (str, optional):\n" \
+"        Select only certain filter names by specifying this search mask.\n" \
+"        E.g. if search mask is set to \"rx_frontends/A\" only filter names including that string will be returned.\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings representing the selected filter names.\n"
 PyObject *Uhd_get_filter_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<std::string> search_mask;
     if (nargs > 0 && !(search_mask = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", search_mask.what());
+        return PyErr_Format(PyExc_TypeError, "search_mask: %s", search_mask.what());
 
     std::vector<std::string> ret;
     try {
@@ -180,22 +235,41 @@ PyObject *Uhd_get_filter_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_GPIO_ATTR \
+"Get a GPIO attribute on a particular GPIO bank.\n" \
+"Possible attribute names:\n" \
+" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
+" - DDR - 1 for output 0 for input\n" \
+" - OUT - GPIO output level (not ATR mode)\n" \
+" - ATR_0X - ATR idle state\n" \
+" - ATR_RX - ATR receive only state\n" \
+" - ATR_TX - ATR transmit only state\n" \
+" - ATR_XX - ATR full duplex state\n" \
+" - READBACK - readback input GPIOs\n" \
+"\n" \
+"Args:\n" \
+"    bank (str): the name of a GPIO bank\n" \
+"    attr (str): the name of a GPIO attribute\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    int: the value set for this attribute\n"
 PyObject *Uhd_get_gpio_attr(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [2...3].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
 
     Expect<std::string> bank;
     if (!(bank = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", bank.what());
+        return PyErr_Format(PyExc_TypeError, "bank: %s", bank.what());
     Expect<std::string> attr;
     if (!(attr = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", attr.what());
+        return PyErr_Format(PyExc_TypeError, "attr: %s", attr.what());
 
     Expect<size_t> mboard;
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     uint32_t ret;
     try {
@@ -211,6 +285,14 @@ PyObject *Uhd_get_gpio_attr(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_GPIO_BANKS \
+"Enumerate gpio banks on the specified device.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a list of string for each bank name\n"
 PyObject *Uhd_get_gpio_banks(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -219,7 +301,7 @@ PyObject *Uhd_get_gpio_banks(Uhd *self, PyObject *args) {
 
     Expect<size_t> mboard;
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
@@ -232,15 +314,23 @@ PyObject *Uhd_get_gpio_banks(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_MASTER_CLOCK_RATE \
+"Get the master clock rate.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the master clock rate in Hz.\n"
 PyObject *Uhd_get_master_clock_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     double ret;
     try {
@@ -256,15 +346,23 @@ PyObject *Uhd_get_master_clock_rate(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_MBOARD_NAME \
+"Get canonical name for this USRP motherboard.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): which motherboard to query\n" \
+"\n" \
+"Returns:\n" \
+"    str: a string representing the name\n"
 PyObject *Uhd_get_mboard_name(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::string ret;
     try {
@@ -280,15 +378,23 @@ PyObject *Uhd_get_mboard_name(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_MBOARD_SENSOR_NAMES \
+"Get a list of possible motherboard sensor names.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of sensor names\n"
 PyObject *Uhd_get_mboard_sensor_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
@@ -304,15 +410,25 @@ PyObject *Uhd_get_mboard_sensor_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_NORMALIZED_RX_GAIN \
+"Return the normalized RX gain value.\n" \
+"See set_normalized_rx_gain() for a discussion of normalized\n" \
+"gains.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: s The normalized gain (in [0, 1])\n"
 PyObject *Uhd_get_normalized_rx_gain(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -328,15 +444,25 @@ PyObject *Uhd_get_normalized_rx_gain(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_NORMALIZED_TX_GAIN \
+"Return the normalized TX gain value.\n" \
+"See set_normalized_rx_gain() for a discussion of normalized\n" \
+"gains.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: s The normalized gain (in [0, 1])\n"
 PyObject *Uhd_get_normalized_tx_gain(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -352,6 +478,11 @@ PyObject *Uhd_get_normalized_tx_gain(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_NUM_MBOARDS \
+"Get the number of USRP motherboards in this configuration.\n" \
+"\n" \
+"Returns:\n" \
+"    int: value\n"
 PyObject *Uhd_get_num_mboards(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -369,6 +500,11 @@ PyObject *Uhd_get_num_mboards(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_PP_STRING \
+"Get a printable summary for this USRP configuration.\n" \
+"\n" \
+"Returns:\n" \
+"    str: a printable string\n"
 PyObject *Uhd_get_pp_string(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -386,15 +522,23 @@ PyObject *Uhd_get_pp_string(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_ANTENNA \
+"Get the selected RX antenna on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the antenna name\n"
 PyObject *Uhd_get_rx_antenna(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::string ret;
     try {
@@ -410,15 +554,23 @@ PyObject *Uhd_get_rx_antenna(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_ANTENNAS \
+"Get a list of possible RX antennas on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of antenna names\n"
 PyObject *Uhd_get_rx_antennas(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -434,15 +586,23 @@ PyObject *Uhd_get_rx_antennas(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_BANDWIDTH \
+"Get the RX bandwidth on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the bandwidth in Hz\n"
 PyObject *Uhd_get_rx_bandwidth(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -458,15 +618,23 @@ PyObject *Uhd_get_rx_bandwidth(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_BANDWIDTH_RANGE \
+"Get the range of the possible RX bandwidth settings.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a range of bandwidths in Hz\n"
 PyObject *Uhd_get_rx_bandwidth_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     meta_range_t ret;
     try {
@@ -482,15 +650,23 @@ PyObject *Uhd_get_rx_bandwidth_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_FREQ \
+"Get the RX center frequency.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the frequency in Hz\n"
 PyObject *Uhd_get_rx_freq(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -506,15 +682,27 @@ PyObject *Uhd_get_rx_freq(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_FREQ_RANGE \
+"Get the RX center frequency range.\n" \
+"This range includes the overall tunable range of the RX chain,\n" \
+"including frontend chain and digital down conversion chain.\n" \
+"This tunable limit does not include the baseband bandwidth;\n" \
+"users should assume that the actual range is +/- samp_rate/2.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a frequency range object\n"
 PyObject *Uhd_get_rx_freq_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     freq_range_t ret;
     try {
@@ -530,19 +718,37 @@ PyObject *Uhd_get_rx_freq_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_rx_gain_0(Uhd *self, PyObject *args) {
+#define DOC_GET_RX_GAIN \
+"(1) ""Get the RX gain value for the specified gain element.\n" \
+"For an empty name, sum across all gain elements.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the gain in dB\n" \
+"\n" \
+"(2) ""A convenience wrapper for getting overall RX gain\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): chan\n" \
+"\n" \
+"Returns:\n" \
+"    float: value\n"
+static PyObject *Uhd_get_rx_gain_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -558,15 +764,15 @@ static PyObject *_get_rx_gain_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_rx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_get_rx_gain_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -588,23 +794,32 @@ PyObject *Uhd_get_rx_gain(Uhd *self, PyObject *args) {
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _get_rx_gain_0(self, args);
+        return Uhd_get_rx_gain_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return _get_rx_gain_1(self, args);
+        return Uhd_get_rx_gain_1(self, args);
     }
-    return _get_rx_gain_0(self, args);
+    return Uhd_get_rx_gain_0(self, args);
 }
 
+#define DOC_GET_RX_GAIN_NAMES \
+"Get the names of the gain elements in the RX chain.\n" \
+"Gain elements are ordered from antenna to FPGA.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of gain element names\n"
 PyObject *Uhd_get_rx_gain_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -620,19 +835,37 @@ PyObject *Uhd_get_rx_gain_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_rx_gain_range_0(Uhd *self, PyObject *args) {
+#define DOC_GET_RX_GAIN_RANGE \
+"(1) ""Get the RX gain range for the specified gain element.\n" \
+"For an empty name, calculate the overall gain range.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a gain range object\n" \
+"\n" \
+"(2) ""A convenience wrapper for getting overall RX gain range\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): chan\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+static PyObject *Uhd_get_rx_gain_range_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     gain_range_t ret;
     try {
@@ -648,15 +881,15 @@ static PyObject *_get_rx_gain_range_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_rx_gain_range_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_get_rx_gain_range_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     gain_range_t ret;
     try {
@@ -678,14 +911,21 @@ PyObject *Uhd_get_rx_gain_range(Uhd *self, PyObject *args) {
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _get_rx_gain_range_0(self, args);
+        return Uhd_get_rx_gain_range_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return _get_rx_gain_range_1(self, args);
+        return Uhd_get_rx_gain_range_1(self, args);
     }
-    return _get_rx_gain_range_0(self, args);
+    return Uhd_get_rx_gain_range_0(self, args);
 }
 
+#define DOC_GET_RX_NUM_CHANNELS \
+"Get the number of RX channels in this configuration.\n" \
+"This is the number of USRPs times the number of RX channels per board,\n" \
+"where the number of RX channels per board is homogeneous among all USRPs.\n" \
+"\n" \
+"Returns:\n" \
+"    int: value\n"
 PyObject *Uhd_get_rx_num_channels(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -703,15 +943,23 @@ PyObject *Uhd_get_rx_num_channels(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_RATE \
+"Gets the RX sample rate.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the rate in Sps\n"
 PyObject *Uhd_get_rx_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -727,15 +975,23 @@ PyObject *Uhd_get_rx_rate(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_RATES \
+"Get a range of possible RX rates.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: the meta range of rates\n"
 PyObject *Uhd_get_rx_rates(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     meta_range_t ret;
     try {
@@ -751,15 +1007,23 @@ PyObject *Uhd_get_rx_rates(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_SENSOR_NAMES \
+"Get a list of possible RX frontend sensor names.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of sensor names\n"
 PyObject *Uhd_get_rx_sensor_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -775,15 +1039,23 @@ PyObject *Uhd_get_rx_sensor_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_SUBDEV_NAME \
+"Get the name of the RX frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the frontend name\n"
 PyObject *Uhd_get_rx_subdev_name(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::string ret;
     try {
@@ -799,15 +1071,23 @@ PyObject *Uhd_get_rx_subdev_name(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_SUBDEV_SPEC \
+"Get the RX frontend specification.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the frontend specification in use\n"
 PyObject *Uhd_get_rx_subdev_spec(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     uhd::usrp::subdev_spec_t ret;
     try {
@@ -823,6 +1103,14 @@ PyObject *Uhd_get_rx_subdev_spec(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TIME_SOURCE \
+"Get the currently set time source.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int): which motherboard to get the config\n" \
+"\n" \
+"Returns:\n" \
+"    str: the string representing the time source\n"
 PyObject *Uhd_get_time_source(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -831,7 +1119,7 @@ PyObject *Uhd_get_time_source(Uhd *self, PyObject *args) {
 
     Expect<size_t> mboard;
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::string ret;
     try {
@@ -844,6 +1132,14 @@ PyObject *Uhd_get_time_source(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TIME_SOURCES \
+"Get a list of possible time sources.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int): which motherboard to get the list\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings for possible settings\n"
 PyObject *Uhd_get_time_sources(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -852,7 +1148,7 @@ PyObject *Uhd_get_time_sources(Uhd *self, PyObject *args) {
 
     Expect<size_t> mboard;
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
@@ -865,6 +1161,13 @@ PyObject *Uhd_get_time_sources(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TIME_SYNCHRONIZED \
+"Are the times across all motherboards in this configuration synchronized?\n" \
+"Checks that all time registers are approximately close but not exact,\n" \
+"given that the RTT may varying for a control packet transaction.\n" \
+"\n" \
+"Returns:\n" \
+"    bool: true when all motherboards time registers are in sync\n"
 PyObject *Uhd_get_time_synchronized(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -882,15 +1185,23 @@ PyObject *Uhd_get_time_synchronized(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_ANTENNA \
+"Get the selected TX antenna on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the antenna name\n"
 PyObject *Uhd_get_tx_antenna(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::string ret;
     try {
@@ -906,15 +1217,23 @@ PyObject *Uhd_get_tx_antenna(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_ANTENNAS \
+"Get a list of possible TX antennas on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of antenna names\n"
 PyObject *Uhd_get_tx_antennas(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -930,15 +1249,23 @@ PyObject *Uhd_get_tx_antennas(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_BANDWIDTH \
+"Get the TX bandwidth on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the bandwidth in Hz\n"
 PyObject *Uhd_get_tx_bandwidth(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -954,15 +1281,23 @@ PyObject *Uhd_get_tx_bandwidth(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_BANDWIDTH_RANGE \
+"Get the range of the possible TX bandwidth settings.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a range of bandwidths in Hz\n"
 PyObject *Uhd_get_tx_bandwidth_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     meta_range_t ret;
     try {
@@ -978,15 +1313,23 @@ PyObject *Uhd_get_tx_bandwidth_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_FREQ \
+"Get the TX center frequency.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the frequency in Hz\n"
 PyObject *Uhd_get_tx_freq(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -1002,15 +1345,27 @@ PyObject *Uhd_get_tx_freq(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_FREQ_RANGE \
+"Get the TX center frequency range.\n" \
+"This range includes the overall tunable range of the TX chain,\n" \
+"including frontend chain and digital up conversion chain.\n" \
+"This tunable limit does not include the baseband bandwidth;\n" \
+"users should assume that the actual range is +/- samp_rate/2.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a frequency range object\n"
 PyObject *Uhd_get_tx_freq_range(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     freq_range_t ret;
     try {
@@ -1026,19 +1381,37 @@ PyObject *Uhd_get_tx_freq_range(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_tx_gain_0(Uhd *self, PyObject *args) {
+#define DOC_GET_TX_GAIN \
+"(1) ""Get the TX gain value for the specified gain element.\n" \
+"For an empty name, sum across all gain elements.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the gain in dB\n" \
+"\n" \
+"(2) ""A convenience wrapper for getting overall TX gain\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): chan\n" \
+"\n" \
+"Returns:\n" \
+"    float: value\n"
+static PyObject *Uhd_get_tx_gain_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -1054,15 +1427,15 @@ static PyObject *_get_tx_gain_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_tx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_get_tx_gain_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -1084,23 +1457,32 @@ PyObject *Uhd_get_tx_gain(Uhd *self, PyObject *args) {
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _get_tx_gain_0(self, args);
+        return Uhd_get_tx_gain_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return _get_tx_gain_1(self, args);
+        return Uhd_get_tx_gain_1(self, args);
     }
-    return _get_tx_gain_0(self, args);
+    return Uhd_get_tx_gain_0(self, args);
 }
 
+#define DOC_GET_TX_GAIN_NAMES \
+"Get the names of the gain elements in the TX chain.\n" \
+"Gain elements are ordered from antenna to FPGA.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of gain element names\n"
 PyObject *Uhd_get_tx_gain_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -1116,19 +1498,37 @@ PyObject *Uhd_get_tx_gain_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_tx_gain_range_0(Uhd *self, PyObject *args) {
+#define DOC_GET_TX_GAIN_RANGE \
+"(1) ""Get the TX gain range for the specified gain element.\n" \
+"For an empty name, calculate the overall gain range.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a gain range object\n" \
+"\n" \
+"(2) ""A convenience wrapper for getting overall TX gain range\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): chan\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+static PyObject *Uhd_get_tx_gain_range_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     gain_range_t ret;
     try {
@@ -1144,15 +1544,15 @@ static PyObject *_get_tx_gain_range_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_get_tx_gain_range_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_get_tx_gain_range_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     gain_range_t ret;
     try {
@@ -1174,14 +1574,21 @@ PyObject *Uhd_get_tx_gain_range(Uhd *self, PyObject *args) {
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _get_tx_gain_range_0(self, args);
+        return Uhd_get_tx_gain_range_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return _get_tx_gain_range_1(self, args);
+        return Uhd_get_tx_gain_range_1(self, args);
     }
-    return _get_tx_gain_range_0(self, args);
+    return Uhd_get_tx_gain_range_0(self, args);
 }
 
+#define DOC_GET_TX_NUM_CHANNELS \
+"Get the number of TX channels in this configuration.\n" \
+"This is the number of USRPs times the number of TX channels per board,\n" \
+"where the number of TX channels per board is homogeneous among all USRPs.\n" \
+"\n" \
+"Returns:\n" \
+"    int: value\n"
 PyObject *Uhd_get_tx_num_channels(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -1199,15 +1606,23 @@ PyObject *Uhd_get_tx_num_channels(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_RATE \
+"Gets the TX sample rate.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the rate in Sps\n"
 PyObject *Uhd_get_tx_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     double ret;
     try {
@@ -1223,15 +1638,23 @@ PyObject *Uhd_get_tx_rate(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_RATES \
+"Get a range of possible TX rates.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: the meta range of rates\n"
 PyObject *Uhd_get_tx_rates(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     meta_range_t ret;
     try {
@@ -1247,15 +1670,23 @@ PyObject *Uhd_get_tx_rates(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_SENSOR_NAMES \
+"Get a list of possible TX frontend sensor names.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of sensor names\n"
 PyObject *Uhd_get_tx_sensor_names(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::vector<std::string> ret;
     try {
@@ -1271,15 +1702,23 @@ PyObject *Uhd_get_tx_sensor_names(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_SUBDEV_NAME \
+"Get the name of the TX frontend.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the frontend name\n"
 PyObject *Uhd_get_tx_subdev_name(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     std::string ret;
     try {
@@ -1295,15 +1734,23 @@ PyObject *Uhd_get_tx_subdev_name(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_SUBDEV_SPEC \
+"Get the TX frontend specification.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the frontend specification in use\n"
 PyObject *Uhd_get_tx_subdev_spec(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> mboard;
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     uhd::usrp::subdev_spec_t ret;
     try {
@@ -1319,15 +1766,25 @@ PyObject *Uhd_get_tx_subdev_spec(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_USRP_RX_INFO \
+"Returns identifying information about this USRP's configuration.\n" \
+"Returns motherboard ID, name, and serial.\n" \
+"Returns daughterboard RX ID, subdev name and spec, serial, and antenna.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: RX info\n"
 PyObject *Uhd_get_usrp_rx_info(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     dict<std::string, std::string> ret;
     try {
@@ -1343,15 +1800,25 @@ PyObject *Uhd_get_usrp_rx_info(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_USRP_TX_INFO \
+"Returns identifying information about this USRP's configuration.\n" \
+"Returns motherboard ID, name, and serial.\n" \
+"Returns daughterboard TX ID, subdev name and spec, serial, and antenna.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: TX info\n"
 PyObject *Uhd_get_usrp_tx_info(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [0...1].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
     Expect<size_t> chan;
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     dict<std::string, std::string> ret;
     try {
@@ -1367,22 +1834,32 @@ PyObject *Uhd_get_usrp_tx_info(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_READ_REGISTER \
+"Read a low-level register field from a register in the USRP hardware\n" \
+"\n" \
+"Args:\n" \
+"    path (str): the full path to the register\n" \
+"    field (int): the identifier of bitfield to be read\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    int: the value of the register field\n"
 PyObject *Uhd_read_register(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [2...3].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
 
     Expect<std::string> path;
     if (!(path = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", path.what());
+        return PyErr_Format(PyExc_TypeError, "path: %s", path.what());
     Expect<uint32_t> field;
     if (!(field = to<uint32_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", field.what());
+        return PyErr_Format(PyExc_TypeError, "field: %s", field.what());
 
     Expect<size_t> mboard;
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     uint64_t ret;
     try {
@@ -1398,19 +1875,27 @@ PyObject *Uhd_read_register(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_SET_CLOCK_SOURCE \
+"Set the clock source for the usrp device.\n" \
+"This sets the source for a 10 MHz reference clock.\n" \
+"Typical options for source: internal, external, MIMO.\n" \
+"\n" \
+"Args:\n" \
+"    source (str): a string representing the clock source\n" \
+"    mboard (int, optional): which motherboard to set the config\n"
 PyObject *Uhd_set_clock_source(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> source;
     if (!(source = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", source.what());
+        return PyErr_Format(PyExc_TypeError, "source: %s", source.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1426,19 +1911,28 @@ PyObject *Uhd_set_clock_source(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_CLOCK_SOURCE_OUT \
+"Send the clock source to an output connector.\n" \
+"This call is only applicable on devices with reference outputs.\n" \
+"By default, the reference output will be enabled for ease of use.\n" \
+"This call may be used to enable or disable the output.\n" \
+"\n" \
+"Args:\n" \
+"    enb (bool): true to output the clock source.\n" \
+"    mboard (int, optional): which motherboard to set\n"
 PyObject *Uhd_set_clock_source_out(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<bool> enb;
     if (!(enb = to<bool>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", enb.what());
+        return PyErr_Format(PyExc_TypeError, "enb: %s", enb.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1454,29 +1948,46 @@ PyObject *Uhd_set_clock_source_out(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_GPIO_ATTR \
+"Set a GPIO attribute on a particular GPIO bank.\n" \
+"Possible attribute names:\n" \
+" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
+" - DDR - 1 for output 0 for input\n" \
+" - OUT - GPIO output level (not ATR mode)\n" \
+" - ATR_0X - ATR idle state\n" \
+" - ATR_RX - ATR receive only state\n" \
+" - ATR_TX - ATR transmit only state\n" \
+" - ATR_XX - ATR full duplex state\n" \
+"\n" \
+"Args:\n" \
+"    bank (str): the name of a GPIO bank\n" \
+"    attr (str): the name of a GPIO attribute\n" \
+"    value (int): the new value for this GPIO bank\n" \
+"    mask (int, optional): the bit mask to effect which pins are changed\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Uhd_set_gpio_attr(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 5)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [3...5].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 3 to 5.", nargs);
 
     Expect<std::string> bank;
     if (!(bank = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", bank.what());
+        return PyErr_Format(PyExc_TypeError, "bank: %s", bank.what());
     Expect<std::string> attr;
     if (!(attr = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", attr.what());
+        return PyErr_Format(PyExc_TypeError, "attr: %s", attr.what());
     Expect<uint32_t> value;
     if (!(value = to<uint32_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", value.what());
+        return PyErr_Format(PyExc_TypeError, "value: %s", value.what());
 
     Expect<uint32_t> mask;
     Expect<size_t> mboard;
 
     if (nargs > 3 && !(mask = to<uint32_t>(PyTuple_GetItem(args, 3))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 4: %s", mask.what());
+        return PyErr_Format(PyExc_TypeError, "mask: %s", mask.what());
     if (nargs > 4 && !(mboard = to<size_t>(PyTuple_GetItem(args, 4))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 5: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1494,19 +2005,33 @@ PyObject *Uhd_set_gpio_attr(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_MASTER_CLOCK_RATE \
+"Set the master clock rate.\n" \
+"This controls the rate of the clock that feeds the FPGA DSP.\n" \
+"On some devices, this re-tunes the clock to the specified rate.\n" \
+"If the specified rate is not available, this method will throw.\n" \
+"On other devices, this method notifies the software of the rate,\n" \
+"but requires the the user has made the necessary hardware change.\n" \
+"If the device has an 'auto clock rate' setting (e.g. B200, see also\n" \
+"b200_auto_mcr), this will get disabled and the clock rate will be\n" \
+"fixed to rate.\n" \
+"\n" \
+"Args:\n" \
+"    rate (float): the new master clock rate in Hz\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Uhd_set_master_clock_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> rate;
     if (!(rate = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", rate.what());
+        return PyErr_Format(PyExc_TypeError, "rate: %s", rate.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1522,19 +2047,31 @@ PyObject *Uhd_set_master_clock_rate(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_NORMALIZED_RX_GAIN \
+"Set the normalized RX gain value.\n" \
+"The normalized gain is a value in [0, 1], where 0 is the\n" \
+"smallest gain value available, and 1 is the largest, independent\n" \
+"of the device. In between, gains are linearly interpolated.\n" \
+"Check the individual device manual for notes on the gain range.\n" \
+"Note that it is not possible to specify a gain name for\n" \
+"this function, it will always set the overall gain.\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): the normalized gain value\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_normalized_rx_gain(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1550,19 +2087,27 @@ PyObject *Uhd_set_normalized_rx_gain(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_NORMALIZED_TX_GAIN \
+"Set the normalized TX gain value.\n" \
+"See set_normalized_rx_gain() for a discussion on normalized\n" \
+"gains.\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): the normalized gain value\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_normalized_tx_gain(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1578,19 +2123,28 @@ PyObject *Uhd_set_normalized_tx_gain(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_RX_AGC \
+"Enable or disable the RX AGC module.\n" \
+"Once this module is enabled manual gain settings will be ignored.\n" \
+"The AGC will start in a default configuration which should be good for most use cases.\n" \
+"Device specific configuration parameters can be found in the property tree.\n" \
+"\n" \
+"Args:\n" \
+"    enable (bool): Enable or Disable the AGC\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_rx_agc(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<bool> enable;
     if (!(enable = to<bool>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", enable.what());
+        return PyErr_Format(PyExc_TypeError, "enable: %s", enable.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1606,19 +2160,25 @@ PyObject *Uhd_set_rx_agc(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_RX_ANTENNA \
+"Select the RX antenna on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    ant (str): the antenna name\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_rx_antenna(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> ant;
     if (!(ant = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", ant.what());
+        return PyErr_Format(PyExc_TypeError, "ant: %s", ant.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1634,19 +2194,25 @@ PyObject *Uhd_set_rx_antenna(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_RX_BANDWIDTH \
+"Set the RX bandwidth on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    bandwidth (float): the bandwidth in Hz\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_rx_bandwidth(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> bandwidth;
     if (!(bandwidth = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", bandwidth.what());
+        return PyErr_Format(PyExc_TypeError, "bandwidth: %s", bandwidth.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1662,19 +2228,38 @@ PyObject *Uhd_set_rx_bandwidth(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *_set_rx_dc_offset_0(Uhd *self, PyObject *args) {
+#define DOC_SET_RX_DC_OFFSET \
+"(1) ""Enable/disable the automatic RX DC offset correction.\n" \
+"The automatic correction subtracts out the long-run average.\n" \
+"When disabled, the averaging option operation is halted.\n" \
+"Once halted, the average value will be held constant\n" \
+"until the user re-enables the automatic correction\n" \
+"or overrides the value by manually setting the offset.\n" \
+"\n" \
+"Args:\n" \
+"    enb (bool): true to enable automatic DC offset correction\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"(2) ""Set a constant RX DC offset value.\n" \
+"The value is complex to control both I and Q.\n" \
+"Only set this when automatic correction is disabled.\n" \
+"\n" \
+"Args:\n" \
+"    offset (complex): the dc offset (1.0 is full-scale)\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
+static PyObject *Uhd_set_rx_dc_offset_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<bool> enb;
     if (!(enb = to<bool>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", enb.what());
+        return PyErr_Format(PyExc_TypeError, "enb: %s", enb.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1690,19 +2275,19 @@ static PyObject *_set_rx_dc_offset_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *_set_rx_dc_offset_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_set_rx_dc_offset_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::complex<double>> offset;
     if (!(offset = to<std::complex<double>>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", offset.what());
+        return PyErr_Format(PyExc_TypeError, "offset: %s", offset.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1724,28 +2309,37 @@ PyObject *Uhd_set_rx_dc_offset(Uhd *self, PyObject *args) {
     if (nargs >= 1 && nargs <= 2
         && is<bool>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _set_rx_dc_offset_0(self, args);
+        return Uhd_set_rx_dc_offset_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<std::complex<double>>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _set_rx_dc_offset_1(self, args);
+        return Uhd_set_rx_dc_offset_1(self, args);
     }
-    return _set_rx_dc_offset_0(self, args);
+    return Uhd_set_rx_dc_offset_0(self, args);
 }
 
+#define DOC_SET_RX_FREQ \
+"Set the RX center frequency.\n" \
+"\n" \
+"Args:\n" \
+"    tune_request (float, dict): tune request instructions\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a tune result object\n"
 PyObject *Uhd_set_rx_freq(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<tune_request_t> tune_request;
     if (!(tune_request = to<tune_request_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", tune_request.what());
+        return PyErr_Format(PyExc_TypeError, "tune_request: %s", tune_request.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     tune_result_t ret;
     try {
@@ -1761,22 +2355,36 @@ PyObject *Uhd_set_rx_freq(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_set_rx_gain_0(Uhd *self, PyObject *args) {
+#define DOC_SET_RX_GAIN \
+"(1) ""Set the RX gain value for the specified gain element.\n" \
+"For an empty name, distribute across all gain elements.\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): the gain in dB\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"(2) ""A convenience wrapper for setting overall RX gain\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): gain\n" \
+"    chan (int, optional): chan\n"
+static PyObject *Uhd_set_rx_gain_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [2...3].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1792,19 +2400,19 @@ static PyObject *_set_rx_gain_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *_set_rx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_set_rx_gain_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1827,16 +2435,29 @@ PyObject *Uhd_set_rx_gain(Uhd *self, PyObject *args) {
         && is<double>(PyTuple_GetItem(args, 0))
         && is<std::string>(PyTuple_GetItem(args, 1))
         && (nargs <= 2 || is<size_t>(PyTuple_GetItem(args, 2)))) {
-        return _set_rx_gain_0(self, args);
+        return Uhd_set_rx_gain_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<double>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _set_rx_gain_1(self, args);
+        return Uhd_set_rx_gain_1(self, args);
     }
-    return _set_rx_gain_0(self, args);
+    return Uhd_set_rx_gain_0(self, args);
 }
 
-static PyObject *_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
+#define DOC_SET_RX_IQ_BALANCE \
+"(1) ""Enable/disable the automatic IQ imbalance correction.\n" \
+"\n" \
+"Args:\n" \
+"    enb (bool): true to enable automatic IQ balance correction\n" \
+"    chan (int): the channel index 0 to N-1\n" \
+"\n" \
+"(2) ""Set the RX frontend IQ imbalance correction.\n" \
+"Use this to adjust the magnitude and phase of I and Q.\n" \
+"\n" \
+"Args:\n" \
+"    correction (complex): the complex correction (1.0 is full-scale)\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
+static PyObject *Uhd_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 2)
@@ -1844,10 +2465,10 @@ static PyObject *_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
 
     Expect<bool> enb;
     if (!(enb = to<bool>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", enb.what());
+        return PyErr_Format(PyExc_TypeError, "enb: %s", enb.what());
     Expect<size_t> chan;
     if (!(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1860,19 +2481,19 @@ static PyObject *_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *_set_rx_iq_balance_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_set_rx_iq_balance_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::complex<double>> correction;
     if (!(correction = to<std::complex<double>>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", correction.what());
+        return PyErr_Format(PyExc_TypeError, "correction: %s", correction.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1894,28 +2515,34 @@ PyObject *Uhd_set_rx_iq_balance(Uhd *self, PyObject *args) {
     if (nargs >= 2 && nargs <= 2
         && is<bool>(PyTuple_GetItem(args, 0))
         && is<size_t>(PyTuple_GetItem(args, 1))) {
-        return _set_rx_iq_balance_0(self, args);
+        return Uhd_set_rx_iq_balance_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<std::complex<double>>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _set_rx_iq_balance_1(self, args);
+        return Uhd_set_rx_iq_balance_1(self, args);
     }
-    return _set_rx_iq_balance_0(self, args);
+    return Uhd_set_rx_iq_balance_0(self, args);
 }
 
+#define DOC_SET_RX_RATE \
+"Set the RX sample rate.\n" \
+"\n" \
+"Args:\n" \
+"    rate (float): the rate in Sps\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_rx_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> rate;
     if (!(rate = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", rate.what());
+        return PyErr_Format(PyExc_TypeError, "rate: %s", rate.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1931,19 +2558,28 @@ PyObject *Uhd_set_rx_rate(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_RX_SUBDEV_SPEC \
+"Set the RX frontend specification:\n" \
+"The subdev spec maps a physical part of a daughter-board to a channel number.\n" \
+"Set the subdev spec before calling into any methods with a channel number.\n" \
+"The subdev spec must be the same size across all motherboards.\n" \
+"\n" \
+"Args:\n" \
+"    spec (str): the new frontend specification\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<uhd::usrp::subdev_spec_t> spec;
     if (!(spec = to<uhd::usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", spec.what());
+        return PyErr_Format(PyExc_TypeError, "spec: %s", spec.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1959,19 +2595,28 @@ PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TIME_SOURCE \
+"Set the time source for the usrp device.\n" \
+"This sets the method of time synchronization,\n" \
+"typically a pulse per second or an encoded time.\n" \
+"Typical options for source: external, MIMO.\n" \
+"\n" \
+"Args:\n" \
+"    source (str): a string representing the time source\n" \
+"    mboard (int, optional): which motherboard to set the config\n"
 PyObject *Uhd_set_time_source(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> source;
     if (!(source = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", source.what());
+        return PyErr_Format(PyExc_TypeError, "source: %s", source.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -1987,19 +2632,28 @@ PyObject *Uhd_set_time_source(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TIME_SOURCE_OUT \
+"Send the time source to an output connector.\n" \
+"This call is only applicable on devices with PPS outputs.\n" \
+"By default, the PPS output will be enabled for ease of use.\n" \
+"This call may be used to enable or disable the output.\n" \
+"\n" \
+"Args:\n" \
+"    enb (bool): true to output the time source.\n" \
+"    mboard (int, optional): which motherboard to set\n"
 PyObject *Uhd_set_time_source_out(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<bool> enb;
     if (!(enb = to<bool>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", enb.what());
+        return PyErr_Format(PyExc_TypeError, "enb: %s", enb.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2015,19 +2669,25 @@ PyObject *Uhd_set_time_source_out(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_ANTENNA \
+"Select the TX antenna on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    ant (str): the antenna name\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_tx_antenna(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> ant;
     if (!(ant = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", ant.what());
+        return PyErr_Format(PyExc_TypeError, "ant: %s", ant.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2043,19 +2703,25 @@ PyObject *Uhd_set_tx_antenna(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_BANDWIDTH \
+"Set the TX bandwidth on the frontend.\n" \
+"\n" \
+"Args:\n" \
+"    bandwidth (float): the bandwidth in Hz\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_tx_bandwidth(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> bandwidth;
     if (!(bandwidth = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", bandwidth.what());
+        return PyErr_Format(PyExc_TypeError, "bandwidth: %s", bandwidth.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2071,19 +2737,26 @@ PyObject *Uhd_set_tx_bandwidth(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_DC_OFFSET \
+"Set a constant TX DC offset value.\n" \
+"The value is complex to control both I and Q.\n" \
+"\n" \
+"Args:\n" \
+"    offset (complex): the dc offset (1.0 is full-scale)\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_tx_dc_offset(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::complex<double>> offset;
     if (!(offset = to<std::complex<double>>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", offset.what());
+        return PyErr_Format(PyExc_TypeError, "offset: %s", offset.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2099,19 +2772,28 @@ PyObject *Uhd_set_tx_dc_offset(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_FREQ \
+"Set the TX center frequency.\n" \
+"\n" \
+"Args:\n" \
+"    tune_request (float, dict): tune request instructions\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a tune result object\n"
 PyObject *Uhd_set_tx_freq(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<tune_request_t> tune_request;
     if (!(tune_request = to<tune_request_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", tune_request.what());
+        return PyErr_Format(PyExc_TypeError, "tune_request: %s", tune_request.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     tune_result_t ret;
     try {
@@ -2127,22 +2809,36 @@ PyObject *Uhd_set_tx_freq(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *_set_tx_gain_0(Uhd *self, PyObject *args) {
+#define DOC_SET_TX_GAIN \
+"(1) ""Set the TX gain value for the specified gain element.\n" \
+"For an empty name, distribute across all gain elements.\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): the gain in dB\n" \
+"    name (str): the name of the gain element\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"(2) ""A convenience wrapper for setting overall TX gain\n" \
+"\n" \
+"Args:\n" \
+"    gain (float): gain\n" \
+"    chan (int, optional): chan\n"
+static PyObject *Uhd_set_tx_gain_0(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [2...3].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
     Expect<std::string> name;
     if (!(name = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", name.what());
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
 
     Expect<size_t> chan;
     if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2158,19 +2854,19 @@ static PyObject *_set_tx_gain_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *_set_tx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Uhd_set_tx_gain_1(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> gain;
     if (!(gain = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", gain.what());
+        return PyErr_Format(PyExc_TypeError, "gain: %s", gain.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2193,28 +2889,35 @@ PyObject *Uhd_set_tx_gain(Uhd *self, PyObject *args) {
         && is<double>(PyTuple_GetItem(args, 0))
         && is<std::string>(PyTuple_GetItem(args, 1))
         && (nargs <= 2 || is<size_t>(PyTuple_GetItem(args, 2)))) {
-        return _set_tx_gain_0(self, args);
+        return Uhd_set_tx_gain_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<double>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return _set_tx_gain_1(self, args);
+        return Uhd_set_tx_gain_1(self, args);
     }
-    return _set_tx_gain_0(self, args);
+    return Uhd_set_tx_gain_0(self, args);
 }
 
+#define DOC_SET_TX_IQ_BALANCE \
+"Set the TX frontend IQ imbalance correction.\n" \
+"Use this to adjust the magnitude and phase of I and Q.\n" \
+"\n" \
+"Args:\n" \
+"    correction (complex): the complex correction (1.0 is full-scale)\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_tx_iq_balance(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::complex<double>> correction;
     if (!(correction = to<std::complex<double>>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", correction.what());
+        return PyErr_Format(PyExc_TypeError, "correction: %s", correction.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2230,19 +2933,25 @@ PyObject *Uhd_set_tx_iq_balance(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_RATE \
+"Set the TX sample rate.\n" \
+"\n" \
+"Args:\n" \
+"    rate (float): the rate in Sps\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Uhd_set_tx_rate(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<double> rate;
     if (!(rate = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", rate.what());
+        return PyErr_Format(PyExc_TypeError, "rate: %s", rate.what());
 
     Expect<size_t> chan;
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", chan.what());
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2258,19 +2967,28 @@ PyObject *Uhd_set_tx_rate(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_SUBDEV_SPEC \
+"Set the TX frontend specification:\n" \
+"The subdev spec maps a physical part of a daughter-board to a channel number.\n" \
+"Set the subdev spec before calling into any methods with a channel number.\n" \
+"The subdev spec must be the same size across all motherboards.\n" \
+"\n" \
+"Args:\n" \
+"    spec (str): the new frontend specification\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Uhd_set_tx_subdev_spec(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [1...2].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<uhd::usrp::subdev_spec_t> spec;
     if (!(spec = to<uhd::usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", spec.what());
+        return PyErr_Format(PyExc_TypeError, "spec: %s", spec.what());
 
     Expect<size_t> mboard;
     if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2286,22 +3004,30 @@ PyObject *Uhd_set_tx_subdev_spec(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_USER_REGISTER \
+"Perform write on the user configuration register bus. These only exist if\n" \
+"the user has implemented custom setting registers in the device FPGA.\n" \
+"\n" \
+"Args:\n" \
+"    addr (int): 8-bit register address\n" \
+"    data (int): 32-bit register value\n" \
+"    mboard (int, optional): which motherboard to set the user register\n"
 PyObject *Uhd_set_user_register(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [2...3].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
 
     Expect<uint8_t> addr;
     if (!(addr = to<uint8_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", addr.what());
+        return PyErr_Format(PyExc_TypeError, "addr: %s", addr.what());
     Expect<uint32_t> data;
     if (!(data = to<uint32_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", data.what());
+        return PyErr_Format(PyExc_TypeError, "data: %s", data.what());
 
     Expect<size_t> mboard;
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2317,25 +3043,33 @@ PyObject *Uhd_set_user_register(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_WRITE_REGISTER \
+"Write a low-level register field for a register in the USRP hardware\n" \
+"\n" \
+"Args:\n" \
+"    path (str): the full path to the register\n" \
+"    field (int): the identifier of bitfield to be written (all other bits remain unchanged)\n" \
+"    value (int): the value to write to the register field\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Uhd_write_register(Uhd *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 4)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected [3...4].", nargs);
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 3 to 4.", nargs);
 
     Expect<std::string> path;
     if (!(path = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 1: %s", path.what());
+        return PyErr_Format(PyExc_TypeError, "path: %s", path.what());
     Expect<uint32_t> field;
     if (!(field = to<uint32_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 2: %s", field.what());
+        return PyErr_Format(PyExc_TypeError, "field: %s", field.what());
     Expect<uint64_t> value;
     if (!(value = to<uint64_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 3: %s", value.what());
+        return PyErr_Format(PyExc_TypeError, "value: %s", value.what());
 
     Expect<size_t> mboard;
     if (nargs > 3 && !(mboard = to<size_t>(PyTuple_GetItem(args, 3))))
-        return PyErr_Format(PyExc_TypeError, "Invalid type for argument # 4: %s", mboard.what());
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
@@ -2352,85 +3086,85 @@ PyObject *Uhd_write_register(Uhd *self, PyObject *args) {
 }
 
 const std::vector<PyMethodDef> Uhd_gen_methods {
-    {"clear_command_time", (PyCFunction)Uhd_clear_command_time, METH_VARARGS, ""},
-    {"enumerate_registers", (PyCFunction)Uhd_enumerate_registers, METH_VARARGS, ""},
-    {"get_clock_source", (PyCFunction)Uhd_get_clock_source, METH_VARARGS, ""},
-    {"get_clock_sources", (PyCFunction)Uhd_get_clock_sources, METH_VARARGS, ""},
-    {"get_fe_rx_freq_range", (PyCFunction)Uhd_get_fe_rx_freq_range, METH_VARARGS, ""},
-    {"get_fe_tx_freq_range", (PyCFunction)Uhd_get_fe_tx_freq_range, METH_VARARGS, ""},
-    {"get_filter_names", (PyCFunction)Uhd_get_filter_names, METH_VARARGS, ""},
-    {"get_gpio_attr", (PyCFunction)Uhd_get_gpio_attr, METH_VARARGS, ""},
-    {"get_gpio_banks", (PyCFunction)Uhd_get_gpio_banks, METH_VARARGS, ""},
-    {"get_master_clock_rate", (PyCFunction)Uhd_get_master_clock_rate, METH_VARARGS, ""},
-    {"get_mboard_name", (PyCFunction)Uhd_get_mboard_name, METH_VARARGS, ""},
-    {"get_mboard_sensor_names", (PyCFunction)Uhd_get_mboard_sensor_names, METH_VARARGS, ""},
-    {"get_normalized_rx_gain", (PyCFunction)Uhd_get_normalized_rx_gain, METH_VARARGS, ""},
-    {"get_normalized_tx_gain", (PyCFunction)Uhd_get_normalized_tx_gain, METH_VARARGS, ""},
-    {"get_num_mboards", (PyCFunction)Uhd_get_num_mboards, METH_VARARGS, ""},
-    {"get_pp_string", (PyCFunction)Uhd_get_pp_string, METH_VARARGS, ""},
-    {"get_rx_antenna", (PyCFunction)Uhd_get_rx_antenna, METH_VARARGS, ""},
-    {"get_rx_antennas", (PyCFunction)Uhd_get_rx_antennas, METH_VARARGS, ""},
-    {"get_rx_bandwidth", (PyCFunction)Uhd_get_rx_bandwidth, METH_VARARGS, ""},
-    {"get_rx_bandwidth_range", (PyCFunction)Uhd_get_rx_bandwidth_range, METH_VARARGS, ""},
-    {"get_rx_freq", (PyCFunction)Uhd_get_rx_freq, METH_VARARGS, ""},
-    {"get_rx_freq_range", (PyCFunction)Uhd_get_rx_freq_range, METH_VARARGS, ""},
-    {"get_rx_gain", (PyCFunction)Uhd_get_rx_gain, METH_VARARGS, ""},
-    {"get_rx_gain_names", (PyCFunction)Uhd_get_rx_gain_names, METH_VARARGS, ""},
-    {"get_rx_gain_range", (PyCFunction)Uhd_get_rx_gain_range, METH_VARARGS, ""},
-    {"get_rx_num_channels", (PyCFunction)Uhd_get_rx_num_channels, METH_VARARGS, ""},
-    {"get_rx_rate", (PyCFunction)Uhd_get_rx_rate, METH_VARARGS, ""},
-    {"get_rx_rates", (PyCFunction)Uhd_get_rx_rates, METH_VARARGS, ""},
-    {"get_rx_sensor_names", (PyCFunction)Uhd_get_rx_sensor_names, METH_VARARGS, ""},
-    {"get_rx_subdev_name", (PyCFunction)Uhd_get_rx_subdev_name, METH_VARARGS, ""},
-    {"get_rx_subdev_spec", (PyCFunction)Uhd_get_rx_subdev_spec, METH_VARARGS, ""},
-    {"get_time_source", (PyCFunction)Uhd_get_time_source, METH_VARARGS, ""},
-    {"get_time_sources", (PyCFunction)Uhd_get_time_sources, METH_VARARGS, ""},
-    {"get_time_synchronized", (PyCFunction)Uhd_get_time_synchronized, METH_VARARGS, ""},
-    {"get_tx_antenna", (PyCFunction)Uhd_get_tx_antenna, METH_VARARGS, ""},
-    {"get_tx_antennas", (PyCFunction)Uhd_get_tx_antennas, METH_VARARGS, ""},
-    {"get_tx_bandwidth", (PyCFunction)Uhd_get_tx_bandwidth, METH_VARARGS, ""},
-    {"get_tx_bandwidth_range", (PyCFunction)Uhd_get_tx_bandwidth_range, METH_VARARGS, ""},
-    {"get_tx_freq", (PyCFunction)Uhd_get_tx_freq, METH_VARARGS, ""},
-    {"get_tx_freq_range", (PyCFunction)Uhd_get_tx_freq_range, METH_VARARGS, ""},
-    {"get_tx_gain", (PyCFunction)Uhd_get_tx_gain, METH_VARARGS, ""},
-    {"get_tx_gain_names", (PyCFunction)Uhd_get_tx_gain_names, METH_VARARGS, ""},
-    {"get_tx_gain_range", (PyCFunction)Uhd_get_tx_gain_range, METH_VARARGS, ""},
-    {"get_tx_num_channels", (PyCFunction)Uhd_get_tx_num_channels, METH_VARARGS, ""},
-    {"get_tx_rate", (PyCFunction)Uhd_get_tx_rate, METH_VARARGS, ""},
-    {"get_tx_rates", (PyCFunction)Uhd_get_tx_rates, METH_VARARGS, ""},
-    {"get_tx_sensor_names", (PyCFunction)Uhd_get_tx_sensor_names, METH_VARARGS, ""},
-    {"get_tx_subdev_name", (PyCFunction)Uhd_get_tx_subdev_name, METH_VARARGS, ""},
-    {"get_tx_subdev_spec", (PyCFunction)Uhd_get_tx_subdev_spec, METH_VARARGS, ""},
-    {"get_usrp_rx_info", (PyCFunction)Uhd_get_usrp_rx_info, METH_VARARGS, ""},
-    {"get_usrp_tx_info", (PyCFunction)Uhd_get_usrp_tx_info, METH_VARARGS, ""},
-    {"read_register", (PyCFunction)Uhd_read_register, METH_VARARGS, ""},
-    {"set_clock_source", (PyCFunction)Uhd_set_clock_source, METH_VARARGS, ""},
-    {"set_clock_source_out", (PyCFunction)Uhd_set_clock_source_out, METH_VARARGS, ""},
-    {"set_gpio_attr", (PyCFunction)Uhd_set_gpio_attr, METH_VARARGS, ""},
-    {"set_master_clock_rate", (PyCFunction)Uhd_set_master_clock_rate, METH_VARARGS, ""},
-    {"set_normalized_rx_gain", (PyCFunction)Uhd_set_normalized_rx_gain, METH_VARARGS, ""},
-    {"set_normalized_tx_gain", (PyCFunction)Uhd_set_normalized_tx_gain, METH_VARARGS, ""},
-    {"set_rx_agc", (PyCFunction)Uhd_set_rx_agc, METH_VARARGS, ""},
-    {"set_rx_antenna", (PyCFunction)Uhd_set_rx_antenna, METH_VARARGS, ""},
-    {"set_rx_bandwidth", (PyCFunction)Uhd_set_rx_bandwidth, METH_VARARGS, ""},
-    {"set_rx_dc_offset", (PyCFunction)Uhd_set_rx_dc_offset, METH_VARARGS, ""},
-    {"set_rx_freq", (PyCFunction)Uhd_set_rx_freq, METH_VARARGS, ""},
-    {"set_rx_gain", (PyCFunction)Uhd_set_rx_gain, METH_VARARGS, ""},
-    {"set_rx_iq_balance", (PyCFunction)Uhd_set_rx_iq_balance, METH_VARARGS, ""},
-    {"set_rx_rate", (PyCFunction)Uhd_set_rx_rate, METH_VARARGS, ""},
-    {"set_rx_subdev_spec", (PyCFunction)Uhd_set_rx_subdev_spec, METH_VARARGS, ""},
-    {"set_time_source", (PyCFunction)Uhd_set_time_source, METH_VARARGS, ""},
-    {"set_time_source_out", (PyCFunction)Uhd_set_time_source_out, METH_VARARGS, ""},
-    {"set_tx_antenna", (PyCFunction)Uhd_set_tx_antenna, METH_VARARGS, ""},
-    {"set_tx_bandwidth", (PyCFunction)Uhd_set_tx_bandwidth, METH_VARARGS, ""},
-    {"set_tx_dc_offset", (PyCFunction)Uhd_set_tx_dc_offset, METH_VARARGS, ""},
-    {"set_tx_freq", (PyCFunction)Uhd_set_tx_freq, METH_VARARGS, ""},
-    {"set_tx_gain", (PyCFunction)Uhd_set_tx_gain, METH_VARARGS, ""},
-    {"set_tx_iq_balance", (PyCFunction)Uhd_set_tx_iq_balance, METH_VARARGS, ""},
-    {"set_tx_rate", (PyCFunction)Uhd_set_tx_rate, METH_VARARGS, ""},
-    {"set_tx_subdev_spec", (PyCFunction)Uhd_set_tx_subdev_spec, METH_VARARGS, ""},
-    {"set_user_register", (PyCFunction)Uhd_set_user_register, METH_VARARGS, ""},
-    {"write_register", (PyCFunction)Uhd_write_register, METH_VARARGS, ""},
+    {"clear_command_time", (PyCFunction)Uhd_clear_command_time, METH_VARARGS, DOC_CLEAR_COMMAND_TIME},
+    {"enumerate_registers", (PyCFunction)Uhd_enumerate_registers, METH_VARARGS, DOC_ENUMERATE_REGISTERS},
+    {"get_clock_source", (PyCFunction)Uhd_get_clock_source, METH_VARARGS, DOC_GET_CLOCK_SOURCE},
+    {"get_clock_sources", (PyCFunction)Uhd_get_clock_sources, METH_VARARGS, DOC_GET_CLOCK_SOURCES},
+    {"get_fe_rx_freq_range", (PyCFunction)Uhd_get_fe_rx_freq_range, METH_VARARGS, DOC_GET_FE_RX_FREQ_RANGE},
+    {"get_fe_tx_freq_range", (PyCFunction)Uhd_get_fe_tx_freq_range, METH_VARARGS, DOC_GET_FE_TX_FREQ_RANGE},
+    {"get_filter_names", (PyCFunction)Uhd_get_filter_names, METH_VARARGS, DOC_GET_FILTER_NAMES},
+    {"get_gpio_attr", (PyCFunction)Uhd_get_gpio_attr, METH_VARARGS, DOC_GET_GPIO_ATTR},
+    {"get_gpio_banks", (PyCFunction)Uhd_get_gpio_banks, METH_VARARGS, DOC_GET_GPIO_BANKS},
+    {"get_master_clock_rate", (PyCFunction)Uhd_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
+    {"get_mboard_name", (PyCFunction)Uhd_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
+    {"get_mboard_sensor_names", (PyCFunction)Uhd_get_mboard_sensor_names, METH_VARARGS, DOC_GET_MBOARD_SENSOR_NAMES},
+    {"get_normalized_rx_gain", (PyCFunction)Uhd_get_normalized_rx_gain, METH_VARARGS, DOC_GET_NORMALIZED_RX_GAIN},
+    {"get_normalized_tx_gain", (PyCFunction)Uhd_get_normalized_tx_gain, METH_VARARGS, DOC_GET_NORMALIZED_TX_GAIN},
+    {"get_num_mboards", (PyCFunction)Uhd_get_num_mboards, METH_VARARGS, DOC_GET_NUM_MBOARDS},
+    {"get_pp_string", (PyCFunction)Uhd_get_pp_string, METH_VARARGS, DOC_GET_PP_STRING},
+    {"get_rx_antenna", (PyCFunction)Uhd_get_rx_antenna, METH_VARARGS, DOC_GET_RX_ANTENNA},
+    {"get_rx_antennas", (PyCFunction)Uhd_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
+    {"get_rx_bandwidth", (PyCFunction)Uhd_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
+    {"get_rx_bandwidth_range", (PyCFunction)Uhd_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
+    {"get_rx_freq", (PyCFunction)Uhd_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
+    {"get_rx_freq_range", (PyCFunction)Uhd_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
+    {"get_rx_gain", (PyCFunction)Uhd_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
+    {"get_rx_gain_names", (PyCFunction)Uhd_get_rx_gain_names, METH_VARARGS, DOC_GET_RX_GAIN_NAMES},
+    {"get_rx_gain_range", (PyCFunction)Uhd_get_rx_gain_range, METH_VARARGS, DOC_GET_RX_GAIN_RANGE},
+    {"get_rx_num_channels", (PyCFunction)Uhd_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
+    {"get_rx_rate", (PyCFunction)Uhd_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
+    {"get_rx_rates", (PyCFunction)Uhd_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
+    {"get_rx_sensor_names", (PyCFunction)Uhd_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
+    {"get_rx_subdev_name", (PyCFunction)Uhd_get_rx_subdev_name, METH_VARARGS, DOC_GET_RX_SUBDEV_NAME},
+    {"get_rx_subdev_spec", (PyCFunction)Uhd_get_rx_subdev_spec, METH_VARARGS, DOC_GET_RX_SUBDEV_SPEC},
+    {"get_time_source", (PyCFunction)Uhd_get_time_source, METH_VARARGS, DOC_GET_TIME_SOURCE},
+    {"get_time_sources", (PyCFunction)Uhd_get_time_sources, METH_VARARGS, DOC_GET_TIME_SOURCES},
+    {"get_time_synchronized", (PyCFunction)Uhd_get_time_synchronized, METH_VARARGS, DOC_GET_TIME_SYNCHRONIZED},
+    {"get_tx_antenna", (PyCFunction)Uhd_get_tx_antenna, METH_VARARGS, DOC_GET_TX_ANTENNA},
+    {"get_tx_antennas", (PyCFunction)Uhd_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
+    {"get_tx_bandwidth", (PyCFunction)Uhd_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
+    {"get_tx_bandwidth_range", (PyCFunction)Uhd_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
+    {"get_tx_freq", (PyCFunction)Uhd_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
+    {"get_tx_freq_range", (PyCFunction)Uhd_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
+    {"get_tx_gain", (PyCFunction)Uhd_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
+    {"get_tx_gain_names", (PyCFunction)Uhd_get_tx_gain_names, METH_VARARGS, DOC_GET_TX_GAIN_NAMES},
+    {"get_tx_gain_range", (PyCFunction)Uhd_get_tx_gain_range, METH_VARARGS, DOC_GET_TX_GAIN_RANGE},
+    {"get_tx_num_channels", (PyCFunction)Uhd_get_tx_num_channels, METH_VARARGS, DOC_GET_TX_NUM_CHANNELS},
+    {"get_tx_rate", (PyCFunction)Uhd_get_tx_rate, METH_VARARGS, DOC_GET_TX_RATE},
+    {"get_tx_rates", (PyCFunction)Uhd_get_tx_rates, METH_VARARGS, DOC_GET_TX_RATES},
+    {"get_tx_sensor_names", (PyCFunction)Uhd_get_tx_sensor_names, METH_VARARGS, DOC_GET_TX_SENSOR_NAMES},
+    {"get_tx_subdev_name", (PyCFunction)Uhd_get_tx_subdev_name, METH_VARARGS, DOC_GET_TX_SUBDEV_NAME},
+    {"get_tx_subdev_spec", (PyCFunction)Uhd_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
+    {"get_usrp_rx_info", (PyCFunction)Uhd_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
+    {"get_usrp_tx_info", (PyCFunction)Uhd_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
+    {"read_register", (PyCFunction)Uhd_read_register, METH_VARARGS, DOC_READ_REGISTER},
+    {"set_clock_source", (PyCFunction)Uhd_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
+    {"set_clock_source_out", (PyCFunction)Uhd_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
+    {"set_gpio_attr", (PyCFunction)Uhd_set_gpio_attr, METH_VARARGS, DOC_SET_GPIO_ATTR},
+    {"set_master_clock_rate", (PyCFunction)Uhd_set_master_clock_rate, METH_VARARGS, DOC_SET_MASTER_CLOCK_RATE},
+    {"set_normalized_rx_gain", (PyCFunction)Uhd_set_normalized_rx_gain, METH_VARARGS, DOC_SET_NORMALIZED_RX_GAIN},
+    {"set_normalized_tx_gain", (PyCFunction)Uhd_set_normalized_tx_gain, METH_VARARGS, DOC_SET_NORMALIZED_TX_GAIN},
+    {"set_rx_agc", (PyCFunction)Uhd_set_rx_agc, METH_VARARGS, DOC_SET_RX_AGC},
+    {"set_rx_antenna", (PyCFunction)Uhd_set_rx_antenna, METH_VARARGS, DOC_SET_RX_ANTENNA},
+    {"set_rx_bandwidth", (PyCFunction)Uhd_set_rx_bandwidth, METH_VARARGS, DOC_SET_RX_BANDWIDTH},
+    {"set_rx_dc_offset", (PyCFunction)Uhd_set_rx_dc_offset, METH_VARARGS, DOC_SET_RX_DC_OFFSET},
+    {"set_rx_freq", (PyCFunction)Uhd_set_rx_freq, METH_VARARGS, DOC_SET_RX_FREQ},
+    {"set_rx_gain", (PyCFunction)Uhd_set_rx_gain, METH_VARARGS, DOC_SET_RX_GAIN},
+    {"set_rx_iq_balance", (PyCFunction)Uhd_set_rx_iq_balance, METH_VARARGS, DOC_SET_RX_IQ_BALANCE},
+    {"set_rx_rate", (PyCFunction)Uhd_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
+    {"set_rx_subdev_spec", (PyCFunction)Uhd_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
+    {"set_time_source", (PyCFunction)Uhd_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},
+    {"set_time_source_out", (PyCFunction)Uhd_set_time_source_out, METH_VARARGS, DOC_SET_TIME_SOURCE_OUT},
+    {"set_tx_antenna", (PyCFunction)Uhd_set_tx_antenna, METH_VARARGS, DOC_SET_TX_ANTENNA},
+    {"set_tx_bandwidth", (PyCFunction)Uhd_set_tx_bandwidth, METH_VARARGS, DOC_SET_TX_BANDWIDTH},
+    {"set_tx_dc_offset", (PyCFunction)Uhd_set_tx_dc_offset, METH_VARARGS, DOC_SET_TX_DC_OFFSET},
+    {"set_tx_freq", (PyCFunction)Uhd_set_tx_freq, METH_VARARGS, DOC_SET_TX_FREQ},
+    {"set_tx_gain", (PyCFunction)Uhd_set_tx_gain, METH_VARARGS, DOC_SET_TX_GAIN},
+    {"set_tx_iq_balance", (PyCFunction)Uhd_set_tx_iq_balance, METH_VARARGS, DOC_SET_TX_IQ_BALANCE},
+    {"set_tx_rate", (PyCFunction)Uhd_set_tx_rate, METH_VARARGS, DOC_SET_TX_RATE},
+    {"set_tx_subdev_spec", (PyCFunction)Uhd_set_tx_subdev_spec, METH_VARARGS, DOC_SET_TX_SUBDEV_SPEC},
+    {"set_user_register", (PyCFunction)Uhd_set_user_register, METH_VARARGS, DOC_SET_USER_REGISTER},
+    {"write_register", (PyCFunction)Uhd_write_register, METH_VARARGS, DOC_WRITE_REGISTER},
 };
 
 }
