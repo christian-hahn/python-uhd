@@ -35,7 +35,7 @@ ReceiveWorker::~ReceiveWorker() {
     }
 }
 
-std::future<void> ReceiveWorker::request(ReceiveRequestType type, size_t num_samps, std::vector<size_t> &&channels,
+std::future<void> ReceiveWorker::request(ReceiveRequestType type, size_t num_samps, std::vector<long unsigned int> &&channels,
                                          double seconds_in_future, double timeout) {
 
     std::unique_ptr<ReceiveRequest> request = std::unique_ptr<ReceiveRequest>(new ReceiveRequest(type, num_samps, std::move(channels),

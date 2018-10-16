@@ -20,8 +20,10 @@ uhd = Extension(
     extra_compile_args=['-std=c++11'],
     sources=[
         'uhd/uhd.cpp',
+        'uhd/uhd_object.cpp',
         'uhd/uhd_types.cpp',
         'uhd/uhd_rx.cpp',
+        'uhd/uhd_timespec.cpp',
     ],
 )
 

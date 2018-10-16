@@ -1,16 +1,9 @@
-#include <limits>
-
 #include <Python.h>
 
-#include <uhd/usrp/multi_usrp.hpp>
-#include <uhd/usrp/subdev_spec.hpp>
 #include <uhd/exception.hpp>
-#include <uhd/types/dict.hpp>
-#include <uhd/types/tune_request.hpp>
 
-#include "uhd.hpp"
 #include "uhd_types.hpp"
-#include "uhd_expect.hpp"
+#include "uhd_timespec.hpp"
 
 namespace uhd {
 
@@ -39,6 +32,26 @@ bool is<uint32_t>(PyObject *obj) {
 
 template<>
 bool is<uint64_t>(PyObject *obj) {
+    return static_cast<bool>(PyLong_CheckExact(obj));
+}
+
+template<>
+bool is<int8_t>(PyObject *obj) {
+    return static_cast<bool>(PyLong_CheckExact(obj));
+}
+
+template<>
+bool is<int16_t>(PyObject *obj) {
+    return static_cast<bool>(PyLong_CheckExact(obj));
+}
+
+template<>
+bool is<int32_t>(PyObject *obj) {
+    return static_cast<bool>(PyLong_CheckExact(obj));
+}
+
+template<>
+bool is<int64_t>(PyObject *obj) {
     return static_cast<bool>(PyLong_CheckExact(obj));
 }
 
@@ -125,6 +138,16 @@ bool is<usrp::subdev_spec_t>(PyObject *obj) {
     return is<std::string>(obj);
 }
 
+template<>
+bool is<time_spec_t>(PyObject *obj) {
+    if (PyFloat_CheckExact(obj)) {
+        return true;
+    } else if (PyObject_TypeCheck(obj, &TimeSpecType)) {
+        return true;
+    }
+    return false;
+}
+
 /******************************************************************************/
 /** Functions to translate to <T> from PyObject. **/
 
@@ -138,7 +161,19 @@ Expect<bool> to<bool>(PyObject *arg) {
 template <typename T>
 static Expect<T> toUnsignedInt(PyObject *arg) {
     if (is<T>(arg))
-        return static_cast<T>(PyLong_AsUnsignedLongMask(arg));
+        return static_cast<T>(PyLong_AsUnsignedLongLongMask(arg));
+    return Error("Expected integer.");
+}
+
+template <typename T>
+static Expect<T> toSignedInt(PyObject *arg) {
+    if (is<T>(arg)) {
+        int overflow;
+        T value = static_cast<T>(PyLong_AsLongLongAndOverflow(arg, &overflow));
+        if (overflow)
+            return Error("Integer out-of-range.");
+        return value;
+    }
     return Error("Expected integer.");
 }
 
@@ -160,6 +195,26 @@ Expect<uint32_t> to<uint32_t>(PyObject *arg) {
 template<>
 Expect<uint64_t> to<uint64_t>(PyObject *arg) {
     return toUnsignedInt<uint64_t>(arg);
+}
+
+template<>
+Expect<int8_t> to<int8_t>(PyObject *arg) {
+    return toSignedInt<int8_t>(arg);
+}
+
+template<>
+Expect<int16_t> to<int16_t>(PyObject *arg) {
+    return toSignedInt<int16_t>(arg);
+}
+
+template<>
+Expect<int32_t> to<int32_t>(PyObject *arg) {
+    return toSignedInt<int32_t>(arg);
+}
+
+template<>
+Expect<int64_t> to<int64_t>(PyObject *arg) {
+    return toSignedInt<int64_t>(arg);
 }
 
 template<>
@@ -306,6 +361,16 @@ Expect<usrp::subdev_spec_t> to<usrp::subdev_spec_t>(PyObject *arg) {
     return Error("Expected string.");
 }
 
+template<>
+Expect<time_spec_t> to<time_spec_t>(PyObject *arg) {
+    if (PyFloat_CheckExact(arg)) {
+        return time_spec_t(PyFloat_AsDouble(arg));
+    } else if (PyObject_TypeCheck(arg, &TimeSpecType)) {
+        return reinterpret_cast<TimeSpec *>(arg)->_time_spec;
+    }
+    return Error("Expected float or dict with {'integer': <int>, 'fractional': <float>}.");
+}
+
 /******************************************************************************/
 /** Functions to translate from <T> to PyObject. **/
 
@@ -316,19 +381,35 @@ PyObject *from(const bool value) {
 }
 
 PyObject *from(const uint8_t value) {
-    return PyLong_FromLong(value);
+    return PyLong_FromUnsignedLong(value);
 }
 
 PyObject *from(const uint16_t value) {
-    return PyLong_FromLong(value);
+    return PyLong_FromUnsignedLong(value);
 }
 
 PyObject *from(const uint32_t value) {
-    return PyLong_FromLong(value);
+    return PyLong_FromUnsignedLong(value);
 }
 
 PyObject *from(const uint64_t value) {
+    return PyLong_FromUnsignedLongLong(value);
+}
+
+PyObject *from(const int8_t value) {
     return PyLong_FromLong(value);
+}
+
+PyObject *from(const int16_t value) {
+    return PyLong_FromLong(value);
+}
+
+PyObject *from(const int32_t value) {
+    return PyLong_FromLong(value);
+}
+
+PyObject *from(const int64_t value) {
+    return PyLong_FromLongLong(value);
 }
 
 PyObject *from(const double value) {
@@ -341,6 +422,19 @@ PyObject *from(const std::string &value) {
 
 inline static bool dict_insert_string_float(PyObject *dict, const char *key, const double &val) {
     PyObject *pval = PyFloat_FromDouble(val);
+    if (pval) {
+        if (PyDict_SetItemString(dict, key, pval)) {
+            Py_DECREF(pval);
+            return false;
+        }
+        Py_DECREF(pval);
+        return true;
+    }
+    return false;
+}
+
+inline static bool dict_insert_string_long_long(PyObject *dict, const char *key, const long long &val) {
+    PyObject *pval = PyLong_FromLongLong(val);
     if (pval) {
         if (PyDict_SetItemString(dict, key, pval)) {
             Py_DECREF(pval);
@@ -423,6 +517,13 @@ PyObject *from(const meta_range_t &value) {
         return PyErr_Format(PyExc_ValueError, "Failed to create dict: error on insert.");
     }
     return PyErr_Format(PyExc_ValueError, "Failed to create dict.");
+}
+
+PyObject *from(const time_spec_t &value) {
+    PyObject *ret = reinterpret_cast<PyObject *>(TimeSpec_from_time_spec_t(value));
+    if (!ret)
+        return PyErr_Format(PyExc_ValueError, "Failed to create TimeSpec.");
+    return ret;
 }
 
 }

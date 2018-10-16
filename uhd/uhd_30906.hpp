@@ -11,9 +11,9 @@
 
 #include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
-#include <uhd/types/dict.hpp>
 
 #include "uhd.hpp"
+#include "uhd_object.hpp"
 #include "uhd_types.hpp"
 
 namespace uhd {
@@ -1089,13 +1089,77 @@ PyObject *Uhd_get_rx_subdev_spec(Uhd *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    uhd::usrp::subdev_spec_t ret;
+    usrp::subdev_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         if (nargs == 1)
             ret = self->dev->get_rx_subdev_spec(mboard.get());
         else
             ret = self->dev->get_rx_subdev_spec();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_TIME_LAST_PPS \
+"Get the time when the last pps pulse occurred.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): which motherboard to query\n" \
+"\n" \
+"Returns:\n" \
+"    TimeSpec: a timespec representing the last pps\n"
+PyObject *Uhd_get_time_last_pps(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> mboard;
+    if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    time_spec_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_time_last_pps(mboard.get());
+        else
+            ret = self->dev->get_time_last_pps();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_TIME_NOW \
+"Get the current time in the usrp time registers.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): which motherboard to query\n" \
+"\n" \
+"Returns:\n" \
+"    TimeSpec: a timespec representing current usrp time\n"
+PyObject *Uhd_get_time_now(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> mboard;
+    if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    time_spec_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_time_now(mboard.get());
+        else
+            ret = self->dev->get_time_now();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -1752,7 +1816,7 @@ PyObject *Uhd_get_tx_subdev_spec(Uhd *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    uhd::usrp::subdev_spec_t ret;
+    usrp::subdev_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         if (nargs == 1)
@@ -1940,6 +2004,43 @@ PyObject *Uhd_set_clock_source_out(Uhd *self, PyObject *args) {
             self->dev->set_clock_source_out(enb.get(), mboard.get());
         else
             self->dev->set_clock_source_out(enb.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_COMMAND_TIME \
+"Set the time at which the control commands will take effect.\n" \
+"A timed command will back-pressure all subsequent timed commands,\n" \
+"assuming that the subsequent commands occur within the time-window.\n" \
+"If the time spec is late, the command will be activated upon arrival.\n" \
+"\n" \
+"Args:\n" \
+"    time_spec (float, TimeSpec): the time at which the next command will activate\n" \
+"    mboard (int, optional): which motherboard to set the config\n"
+PyObject *Uhd_set_command_time(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<time_spec_t> time_spec;
+    if (!(time_spec = to<time_spec_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "time_spec: %s", time_spec.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_command_time(time_spec.get(), mboard.get());
+        else
+            self->dev->set_command_time(time_spec.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2577,8 +2678,8 @@ PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
     if (nargs < 1 || nargs > 2)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
-    Expect<uhd::usrp::subdev_spec_t> spec;
-    if (!(spec = to<uhd::usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
+    Expect<usrp::subdev_spec_t> spec;
+    if (!(spec = to<usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "spec: %s", spec.what());
 
     Expect<size_t> mboard;
@@ -2591,6 +2692,83 @@ PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
             self->dev->set_rx_subdev_spec(spec.get(), mboard.get());
         else
             self->dev->set_rx_subdev_spec(spec.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_TIME_NEXT_PPS \
+"Set the time registers on the usrp at the next pps tick.\n" \
+"The values will not be latched in until the pulse occurs.\n" \
+"It is recommended that the user sleep(1) after calling to ensure\n" \
+"that the time registers will be in a known state prior to use.\n" \
+"Note: Because this call sets the time on the \"next\" pps,\n" \
+"the seconds in the time spec should be current seconds + 1.\n" \
+"\n" \
+"Args:\n" \
+"    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
+PyObject *Uhd_set_time_next_pps(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<time_spec_t> time_spec;
+    if (!(time_spec = to<time_spec_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "time_spec: %s", time_spec.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_time_next_pps(time_spec.get(), mboard.get());
+        else
+            self->dev->set_time_next_pps(time_spec.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_TIME_NOW \
+"Sets the time registers on the usrp immediately.\n" \
+"If only one MIMO master is present in your configuration, set_time_now is\n" \
+"safe to use because the slave's time automatically follows the master's time.\n" \
+"Otherwise, this call cannot set the time synchronously across multiple devices.\n" \
+"Please use the set_time_next_pps or set_time_unknown_pps calls with a PPS signal.\n" \
+"\n" \
+"Args:\n" \
+"    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
+PyObject *Uhd_set_time_now(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<time_spec_t> time_spec;
+    if (!(time_spec = to<time_spec_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "time_spec: %s", time_spec.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_time_now(time_spec.get(), mboard.get());
+        else
+            self->dev->set_time_now(time_spec.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2665,6 +2843,39 @@ PyObject *Uhd_set_time_source_out(Uhd *self, PyObject *args) {
             self->dev->set_time_source_out(enb.get(), mboard.get());
         else
             self->dev->set_time_source_out(enb.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_TIME_UNKNOWN_PPS \
+"Synchronize the times across all motherboards in this configuration.\n" \
+"Use this method to sync the times when the edge of the PPS is unknown.\n" \
+"Ex: Host machine is not attached to serial port of GPSDO\n" \
+"and can therefore not query the GPSDO for the PPS edge.\n" \
+"This is a 2-step process, and will take at most 2 seconds to complete.\n" \
+"Upon completion, the times will be synchronized to the time provided.\n" \
+"- Step1: wait for the last pps time to transition to catch the edge\n" \
+"- Step2: set the time at the next pps (synchronous for all boards)\n" \
+"\n" \
+"Args:\n" \
+"    time_spec (float, TimeSpec): the time to latch at the next pps after catching the edge\n"
+PyObject *Uhd_set_time_unknown_pps(Uhd *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
+
+    Expect<time_spec_t> time_spec;
+    if (!(time_spec = to<time_spec_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "time_spec: %s", time_spec.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        self->dev->set_time_unknown_pps(time_spec.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2986,8 +3197,8 @@ PyObject *Uhd_set_tx_subdev_spec(Uhd *self, PyObject *args) {
     if (nargs < 1 || nargs > 2)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
-    Expect<uhd::usrp::subdev_spec_t> spec;
-    if (!(spec = to<uhd::usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
+    Expect<usrp::subdev_spec_t> spec;
+    if (!(spec = to<usrp::subdev_spec_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "spec: %s", spec.what());
 
     Expect<size_t> mboard;
@@ -3121,6 +3332,8 @@ const std::vector<PyMethodDef> Uhd_gen_methods {
     {"get_rx_sensor_names", (PyCFunction)Uhd_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
     {"get_rx_subdev_name", (PyCFunction)Uhd_get_rx_subdev_name, METH_VARARGS, DOC_GET_RX_SUBDEV_NAME},
     {"get_rx_subdev_spec", (PyCFunction)Uhd_get_rx_subdev_spec, METH_VARARGS, DOC_GET_RX_SUBDEV_SPEC},
+    {"get_time_last_pps", (PyCFunction)Uhd_get_time_last_pps, METH_VARARGS, DOC_GET_TIME_LAST_PPS},
+    {"get_time_now", (PyCFunction)Uhd_get_time_now, METH_VARARGS, DOC_GET_TIME_NOW},
     {"get_time_source", (PyCFunction)Uhd_get_time_source, METH_VARARGS, DOC_GET_TIME_SOURCE},
     {"get_time_sources", (PyCFunction)Uhd_get_time_sources, METH_VARARGS, DOC_GET_TIME_SOURCES},
     {"get_time_synchronized", (PyCFunction)Uhd_get_time_synchronized, METH_VARARGS, DOC_GET_TIME_SYNCHRONIZED},
@@ -3144,6 +3357,7 @@ const std::vector<PyMethodDef> Uhd_gen_methods {
     {"read_register", (PyCFunction)Uhd_read_register, METH_VARARGS, DOC_READ_REGISTER},
     {"set_clock_source", (PyCFunction)Uhd_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
     {"set_clock_source_out", (PyCFunction)Uhd_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
+    {"set_command_time", (PyCFunction)Uhd_set_command_time, METH_VARARGS, DOC_SET_COMMAND_TIME},
     {"set_gpio_attr", (PyCFunction)Uhd_set_gpio_attr, METH_VARARGS, DOC_SET_GPIO_ATTR},
     {"set_master_clock_rate", (PyCFunction)Uhd_set_master_clock_rate, METH_VARARGS, DOC_SET_MASTER_CLOCK_RATE},
     {"set_normalized_rx_gain", (PyCFunction)Uhd_set_normalized_rx_gain, METH_VARARGS, DOC_SET_NORMALIZED_RX_GAIN},
@@ -3157,8 +3371,11 @@ const std::vector<PyMethodDef> Uhd_gen_methods {
     {"set_rx_iq_balance", (PyCFunction)Uhd_set_rx_iq_balance, METH_VARARGS, DOC_SET_RX_IQ_BALANCE},
     {"set_rx_rate", (PyCFunction)Uhd_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
     {"set_rx_subdev_spec", (PyCFunction)Uhd_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
+    {"set_time_next_pps", (PyCFunction)Uhd_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},
+    {"set_time_now", (PyCFunction)Uhd_set_time_now, METH_VARARGS, DOC_SET_TIME_NOW},
     {"set_time_source", (PyCFunction)Uhd_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},
     {"set_time_source_out", (PyCFunction)Uhd_set_time_source_out, METH_VARARGS, DOC_SET_TIME_SOURCE_OUT},
+    {"set_time_unknown_pps", (PyCFunction)Uhd_set_time_unknown_pps, METH_VARARGS, DOC_SET_TIME_UNKNOWN_PPS},
     {"set_tx_antenna", (PyCFunction)Uhd_set_tx_antenna, METH_VARARGS, DOC_SET_TX_ANTENNA},
     {"set_tx_bandwidth", (PyCFunction)Uhd_set_tx_bandwidth, METH_VARARGS, DOC_SET_TX_BANDWIDTH},
     {"set_tx_dc_offset", (PyCFunction)Uhd_set_tx_dc_offset, METH_VARARGS, DOC_SET_TX_DC_OFFSET},
