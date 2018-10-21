@@ -19,10 +19,6 @@
 #include "uhd_expect.hpp"
 #include "uhd_rx.hpp"
 
-#include "uhd_30802.hpp"
-#include "uhd_30803.hpp"
-#include "uhd_30804.hpp"
-#include "uhd_30805.hpp"
 #include "uhd_30900.hpp"
 #include "uhd_30901.hpp"
 #include "uhd_30902.hpp"

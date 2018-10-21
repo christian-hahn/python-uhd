@@ -6,7 +6,7 @@ python-uhd is a Python C-extension that wraps the USRP hardware driver: facilita
 
 ## Prerequisites
 
-Install USRP Hardware Driver (UHD) software. There are several ways to achieve this. uhd-python has been tested and is compatible with the latest UHD releases including versions >= 3.8.2.
+Install USRP Hardware Driver (UHD) software. There are several ways to achieve this. uhd-python has been tested and is compatible with the latest UHD releases including versions >= 3.9.0.
 
 In Ubuntu, using package manager:
 ``` text
