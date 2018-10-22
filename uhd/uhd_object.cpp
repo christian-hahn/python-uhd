@@ -86,7 +86,7 @@ static PyObject *_get_receive(Uhd *self) {
 
     Expect<ReceiveResult> _result;
     if (!(_result = self->receiver->read()))
-        return PyErr_Format(PyExc_RuntimeError, "Error on receive: %s", _result.what());
+        return PyErr_Format(UhdError, "Error on receive: %s", _result.what());
     ReceiveResult &result = _result.get();
 
     const size_t num_channels = result.bufs.size();
