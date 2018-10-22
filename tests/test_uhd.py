@@ -73,6 +73,20 @@ class UhdTestCase(unittest.TestCase):
                 self.assertEqual(ret, value)
             self.assertIsInstance(ret, type(values[0]))
 
+    def test_version(self):
+        version_abi = uhd.VERSION_ABI
+        version_long = uhd.VERSION_LONG
+        version = uhd.VERSION
+        print('Got \'version_abi\' = {}'.format(version_abi))
+        print('Got \'version_long\' = {}'.format(version_long))
+        print('Got \'version\' = {}'.format(version))
+        self.assertIsInstance(version_abi, str)
+        self.assertTrue(len(version_abi) > 0)
+        self.assertIsInstance(version_long, str)
+        self.assertTrue(len(version_long) > 0)
+        self.assertIsInstance(version, int)
+        self.assertTrue(version > 0)
+
     def test_clock_sources(self):
         """Test set/get clock sources methods."""
         sources = self.dut.get_clock_sources(0)
@@ -373,8 +387,7 @@ class UhdTestCase(unittest.TestCase):
                         self.assertTrue(all(len(i) == num_samps for i in samps))
                     except uhd.UhdError as e:
                         self.fail('Failed to receive (channels = {}, num_samps '
-                                  '= {}): {}'.format(channels, num_samps,
-                                   e.message))
+                                  '= {}): {}'.format(channels, num_samps, str(e)))
 
 
 if __name__ == '__main__':
