@@ -37,7 +37,7 @@ static int TimeSpec_init(TimeSpec *self, PyObject *args) {
             secs: the real-valued seconds count (default = 0) **/
         Expect<double> secs;
         if (!(secs = to<double>(PyTuple_GetItem(args, 0)))) {
-            PyErr_Format(PyExc_TypeError, "[0] secs: %s", secs.what());
+            PyErr_Format(PyExc_TypeError, "(0) secs: %s", secs.what());
             return -1;
         }
         self->_time_spec = time_spec_t(secs.get());
@@ -47,12 +47,12 @@ static int TimeSpec_init(TimeSpec *self, PyObject *args) {
             frac_secs: the fractional seconds count (default = 0) **/
         Expect<long> full_secs;
         if (!(full_secs = to<long>(PyTuple_GetItem(args, 0)))) {
-            PyErr_Format(PyExc_TypeError, "[0] full_secs: %s", full_secs.what());
+            PyErr_Format(PyExc_TypeError, "(0) full_secs: %s", full_secs.what());
             return -1;
         }
         Expect<double> frac_secs;
         if (!(frac_secs = to<double>(PyTuple_GetItem(args, 1)))) {
-            PyErr_Format(PyExc_TypeError, "[1] frac_secs: %s", frac_secs.what());
+            PyErr_Format(PyExc_TypeError, "(1) frac_secs: %s", frac_secs.what());
             return -1;
         }
         self->_time_spec = time_spec_t(full_secs.get(), frac_secs.get());
@@ -64,17 +64,17 @@ static int TimeSpec_init(TimeSpec *self, PyObject *args) {
             tick_rate: the number of ticks per second **/
         Expect<long> full_secs;
         if (!(full_secs = to<long>(PyTuple_GetItem(args, 0)))) {
-            PyErr_Format(PyExc_TypeError, "[0] full_secs: %s", full_secs.what());
+            PyErr_Format(PyExc_TypeError, "(0) full_secs: %s", full_secs.what());
             return -1;
         }
         Expect<long> tick_count;
         if (!(tick_count = to<long>(PyTuple_GetItem(args, 1)))) {
-            PyErr_Format(PyExc_TypeError, "[1] tick_count: %s", tick_count.what());
+            PyErr_Format(PyExc_TypeError, "(1) tick_count: %s", tick_count.what());
             return -1;
         }
         Expect<double> tick_rate;
         if (!(tick_rate = to<double>(PyTuple_GetItem(args, 2)))) {
-            PyErr_Format(PyExc_TypeError, "[2] tick_rate: %s", tick_rate.what());
+            PyErr_Format(PyExc_TypeError, "(2) tick_rate: %s", tick_rate.what());
             return -1;
         }
         self->_time_spec = time_spec_t(full_secs.get(), tick_count.get(), tick_rate.get());
@@ -108,7 +108,7 @@ PyObject *TimeSpec_get_tick_count(TimeSpec *self, PyObject *args) {
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
     Expect<double> tick_rate;
     if (!(tick_rate = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "[0] tick_rate: %s", tick_rate.what());
+        return PyErr_Format(PyExc_TypeError, "(0) tick_rate: %s", tick_rate.what());
     return from(self->_time_spec.get_tick_count(tick_rate.get()));
 }
 
@@ -127,7 +127,7 @@ PyObject *TimeSpec_to_ticks(TimeSpec *self, PyObject *args) {
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
     Expect<double> tick_rate;
     if (!(tick_rate = to<double>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "[0] tick_rate: %s", tick_rate.what());
+        return PyErr_Format(PyExc_TypeError, "(0) tick_rate: %s", tick_rate.what());
     return from(static_cast<int64_t>(self->_time_spec.to_ticks(tick_rate.get())));
 }
 

@@ -10,189 +10,251 @@
 #include <uhd/utils/thread_priority.hpp>
 
 #include "uhd_types.hpp"
-#include "uhd_expect.hpp"
 #include "uhd_rx.hpp"
 
 namespace uhd {
 
-ReceiveWorker::ReceiveWorker(uhd::usrp::multi_usrp::sptr dev, std::mutex &dev_lock) : dev(dev), dev_lock(dev_lock) {
-    _streaming = false;
-    _receiving = false;
-}
+ReceiveWorker::ReceiveWorker(uhd::usrp::multi_usrp::sptr dev, std::mutex &dev_lock) : _dev(dev), _dev_lock(dev_lock), _receiving(false) {}
 
 ReceiveWorker::~ReceiveWorker() {
-    std::future<void> accepted = request(ReceiveRequestType::Exit, 0, {});
+    std::future<void> accepted = make_request(ReceiveRequestType::Exit);
     accepted.wait();
-    thread.join();
+    _thread.join();
 
-    /** Reclaim results **/
-    while (!results.empty()) {
-        Expect<ReceiveResult> result;
-        if ((result = results.pop())) {
-            for (auto &b : result.get().bufs)
-                free(b);
+    /** Drain results queue **/
+    {
+        std::lock_guard<std::mutex> lg(_results_lock);
+        while (!_results_queue.empty()) {
+            ReceiveResult *result = _results_queue.front();
+            _results_queue.pop();
+            for (auto &ptr : result->bufs)
+                free(ptr);
+            delete result;
         }
     }
 }
 
-std::future<void> ReceiveWorker::request(ReceiveRequestType type, size_t num_samps, std::vector<long unsigned int> &&channels,
-                                         double seconds_in_future, double timeout) {
-
-    std::unique_ptr<ReceiveRequest> request = std::unique_ptr<ReceiveRequest>(new ReceiveRequest(type, num_samps, std::move(channels),
-                                                                              seconds_in_future, timeout));
+std::future<void> ReceiveWorker::make_request(const ReceiveRequestType type) {
+    ReceiveRequest *request = new ReceiveRequest(type);
     std::future<void> accepted = request->accepted.get_future();
-    requests.push(std::move(request));
+    /** Push into requests queue **/
+    {
+        std::lock_guard<std::mutex> lg(_requests_lock);
+        _requests_queue.push(request);
+        _requests_notify.notify_one();
+    }
     return accepted;
 }
 
-Expect<ReceiveResult> ReceiveWorker::read() {
+std::future<void> ReceiveWorker::make_request(const ReceiveRequestType type, const size_t num_samps,
+                                              std::vector<long unsigned int> &&channels,
+                                              const double seconds_in_future, const double timeout) {
+    ReceiveRequest *request = new ReceiveRequest(type, num_samps, std::move(channels),
+                                                 seconds_in_future, timeout);
+    std::future<void> accepted = request->accepted.get_future();
+    /** Push into requests queue **/
+    {
+        std::lock_guard<std::mutex> lg(_requests_lock);
+        _requests_queue.push(request);
+        _requests_notify.notify_one();
+    }
+    return accepted;
+}
 
-    if (results.empty() && _receiving == false)
-        return Error("Not streaming, or no data available.");
-
-    return results.pop();
+ReceiveResult *ReceiveWorker::get_result() {
+    std::unique_lock<std::mutex> lg(_results_lock);
+    while (_results_queue.empty()) {
+        if (!_receiving)
+            return new ReceiveResult("Not streaming, or no data available.");
+        _results_notify.wait(lg);
+    }
+    ReceiveResult *result = _results_queue.front();
+    _results_queue.pop();
+    return result;
 }
 
 void ReceiveWorker::init() {
-    thread = std::thread(&ReceiveWorker::worker, this);
+    _thread = std::thread(&ReceiveWorker::_worker, this);
 }
 
-void ReceiveWorker::worker() {
+void ReceiveWorker::_worker() {
 
     uhd::set_thread_priority_safe(1.0, true);
 
-    _streaming = false;
     _receiving = false;
 
     while (true) {
 
-        _receiving = false;
+        /** Get new request **/
+        ReceiveRequest *req;
+        {
+            std::unique_lock<std::mutex> lg(_requests_lock);
+            while (_requests_queue.empty())
+                _requests_notify.wait(lg);
+            req = _requests_queue.front();
+            _requests_queue.pop();
+        }
 
-        /** Get request **/
-        std::unique_ptr<ReceiveRequest> req = requests.pop();
-
-        /** Reclaim results **/
-        while (!results.empty()) {
-            Expect<ReceiveResult> result;
-            if ((result = results.pop())) {
-                for (auto &b : result.get().bufs)
-                    free(b);
+        /** Drain results queue **/
+        {
+            std::lock_guard<std::mutex> lg(_results_lock);
+            while (!_results_queue.empty()) {
+                ReceiveResult *result = _results_queue.front();
+                _results_queue.pop();
+                for (auto &ptr : result->bufs)
+                    free(ptr);
+                delete result;
             }
         }
 
-        if (req->type == ReceiveRequestType::Single ||
-            req->type == ReceiveRequestType::Continuous)
+        const ReceiveRequestType req_type = req->type;
+
+        if (req_type == ReceiveRequestType::Single ||
+            req_type == ReceiveRequestType::Continuous ||
+            req_type == ReceiveRequestType::Recycle) {
             _receiving = true;
-
-        /** Accept request **/
-        req->accepted.set_value();
-
-        if (req->type == ReceiveRequestType::Stop)
+            req->accepted.set_value();
+        } else if (req_type == ReceiveRequestType::Stop) {
+            req->accepted.set_value();
+            delete req;
             continue;
-        else if (req->type == ReceiveRequestType::Exit)
+        } else if (req_type == ReceiveRequestType::Exit) {
+            req->accepted.set_value();
+            delete req;
             break;
+        }
 
         const size_t num_channels = req->channels.size();
         const size_t num_samps = req->num_samps;
-
-        _streaming = (req->type == ReceiveRequestType::Continuous) ? true : false;
-
+        const double seconds_in_future = req->seconds_in_future;
+        const double timeout = req->timeout;
+        /** Extend the first timeout by 'seconds_in_future' **/
+        double next_timeout = timeout + seconds_in_future;
+        bool streaming = req_type == ReceiveRequestType::Continuous || req_type == ReceiveRequestType::Recycle;
         uhd::stream_args_t stream_args("fc32", "sc16");
         stream_args.channels = std::move(req->channels);
-
-        uhd::stream_cmd_t stream_cmd(_streaming ? uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS
+        /** All done with request. **/
+        delete req;
+        uhd::stream_cmd_t stream_cmd(streaming ? uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS
                                      : uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_DONE);
         uhd::rx_streamer::sptr rx_stream;
+        std::string error;
 
         try {
             /** Lock device **/
-            std::lock_guard<std::mutex> lg(dev_lock);
-
-            dev->set_time_now(uhd::time_spec_t(0.0));
-            rx_stream = dev->get_rx_stream(stream_args);
+            std::lock_guard<std::mutex> lg(_dev_lock);
+            rx_stream = _dev->get_rx_stream(stream_args);
             stream_cmd.num_samps = num_samps;
-            stream_cmd.stream_now = (req->seconds_in_future < 0.0001) ? true : false;
-            stream_cmd.time_spec = uhd::time_spec_t(req->seconds_in_future);
+            stream_cmd.stream_now = (seconds_in_future < 0.0001) ? true : false;
+            stream_cmd.time_spec = _dev->get_time_now() + uhd::time_spec_t(seconds_in_future);
             rx_stream->issue_stream_cmd(stream_cmd);
-
         } catch(const uhd::exception &e) {
-            results.push(Error("UHD exception occurred: " + std::string(e.what())));
-            continue;
+            error = "UHD exception occurred: " + std::string(e.what());
         } catch(...) {
-            results.push(Error("Unkown exception occurred."));
+            error = "Unkown exception occurred.";
+        }
+
+        if (!error.empty()) {
+            /** An error occurred **/
+            std::lock_guard<std::mutex> lg(_results_lock);
+            _results_queue.push(new ReceiveResult(std::move(error)));
+            _receiving = false;
+            _results_notify.notify_one();
             continue;
         }
 
+        ReceiveResult *result = nullptr;
+
         do {
-
-            ReceiveResult result;
-
-            result.num_samps = num_samps;
-            result.bufs = std::vector<float *>(num_channels);
-            for (auto &b : result.bufs)
-                b = reinterpret_cast<float *>(malloc(sizeof(float) * 2  * result.num_samps));
-
-            uhd::rx_metadata_t md;
+            if (!result)
+                result = new ReceiveResult(num_channels, num_samps);
 
             try {
-                size_t num_samps_recvd = rx_stream->recv(result.bufs, result.num_samps, md, req->timeout, false);
+                uhd::rx_metadata_t md;
+                size_t num_samps_recvd = rx_stream->recv(result->bufs, result->num_samps, md, next_timeout, false);
+                next_timeout = timeout;
                 (void)num_samps_recvd;
+                if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE
+                    && md.error_code != uhd::rx_metadata_t::ERROR_CODE_LATE_COMMAND) {
+                    switch (md.error_code) {
+                        case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
+                            error = "Timeout error: No packet received, implementation timed-out.";
+                            break;
+                        case uhd::rx_metadata_t::ERROR_CODE_LATE_COMMAND:
+                            error = "Late command error: A stream command was issued in the past.";
+                            break;
+                        case uhd::rx_metadata_t::ERROR_CODE_BROKEN_CHAIN:
+                            error = "Broken chain error: Expected another stream command.";
+                            break;
+                        case uhd::rx_metadata_t::ERROR_CODE_OVERFLOW:
+                            error = "Overflow error: An internal receive buffer has filled or a sequence error has been detected.";
+                            break;
+                        case uhd::rx_metadata_t::ERROR_CODE_ALIGNMENT:
+                            error = "Code alignment error: Multi-channel alignment failed.";
+                            break;
+                        case uhd::rx_metadata_t::ERROR_CODE_BAD_PACKET:
+                            error = "Bad packet error: The packet could not be parsed.";
+                            break;
+                        default:
+                            error = "Unknown error: " + md.strerror();
+                            break;
+                    }
+                }
             } catch(const uhd::exception &e) {
-                results.push(Error("UHD exception occurred: " + std::string(e.what())));
-                continue;
+                error = "UHD exception occurred: " + std::string(e.what());
             } catch(...) {
-                results.push(Error("Unkown exception occurred. "));
-                continue;
+                error = "An unknown exception occurred.";
             }
 
-            if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE
-                && md.error_code != uhd::rx_metadata_t::ERROR_CODE_LATE_COMMAND) {
-                switch (md.error_code) {
-                    case uhd::rx_metadata_t::ERROR_CODE_TIMEOUT:
-                        results.push(Error("Timeout error: No packet received, implementation timed-out."));
-                        break;
-                    case uhd::rx_metadata_t::ERROR_CODE_LATE_COMMAND:
-                        results.push(Error("Late command error: A stream command was issued in the past."));
-                        break;
-                    case uhd::rx_metadata_t::ERROR_CODE_BROKEN_CHAIN:
-                        results.push(Error("Broken chain error: Expected another stream command."));
-                        break;
-                    case uhd::rx_metadata_t::ERROR_CODE_OVERFLOW:
-                        results.push(Error("Overflow error: An internal receive buffer has filled or a sequence error has been detected."));
-                        break;
-                    case uhd::rx_metadata_t::ERROR_CODE_ALIGNMENT:
-                        results.push(Error("Code alignment error: Multi-channel alignment failed."));
-                        break;
-                    case uhd::rx_metadata_t::ERROR_CODE_BAD_PACKET:
-                        results.push(Error("Bad packet error: The packet could not be parsed."));
-                        break;
-                    default:
-                        results.push(Error("Unknown error: " + md.strerror()));
-                        break;
-                }
+            if (!error.empty()) {
                 /** An error occurred **/
-                for (auto &b : result.bufs)
-                    free(b);
-                _streaming = false;
-            } else {
-                /** No error **/
-                results.push(std::move(result));
+                for (auto &ptr : result->bufs)
+                    free(ptr);
+                result->error = std::move(error);
+                streaming = false;
             }
-        } while (requests.empty() && _streaming);
+
+            /** Push result into queue **/
+            {
+                std::lock_guard<std::mutex> lg(_results_lock);
+                _results_queue.push(result);
+                _receiving = streaming;
+                if (req_type == ReceiveRequestType::Recycle && _results_queue.size() > 1) {
+                    /** Recycle old un-claimed result **/
+                    result = _results_queue.front();
+                    _results_queue.pop();
+                } else {
+                    result = nullptr;
+                }
+                _results_notify.notify_one();
+            }
+
+            /** Check for new requests **/
+            {
+                std::lock_guard<std::mutex> lg(_requests_lock);
+                if (!_requests_queue.empty())
+                    break;
+            }
+        } while(streaming);
 
         /** Shutdown receiver **/
         stream_cmd.stream_mode = uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS;
         stream_cmd.stream_now = true;
         rx_stream->issue_stream_cmd(stream_cmd);
+
+        /** Cleanup result **/
+        if (result) {
+            for (auto &ptr : result->bufs)
+                free(ptr);
+            delete result;
+            result = nullptr;
+        }
     }
 }
 
-bool ReceiveWorker::stream_in_progress() {
-    return _streaming;
-}
-
 size_t ReceiveWorker::num_received() {
-    return results.size();
+    std::lock_guard<std::mutex> lg(_results_lock);
+    return _results_queue.size();
 }
 
 }

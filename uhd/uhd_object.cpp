@@ -60,7 +60,7 @@ static int Uhd_init(Uhd *self, PyObject *args) {
     if (nargs > 0) {
         Expect<std::string> _dev_addr;
         if (!(_dev_addr = to<std::string>(PyTuple_GetItem(args, 0)))) {
-            PyErr_Format(PyExc_TypeError, "[0] dev_addr: %s", _dev_addr.what());
+            PyErr_Format(PyExc_TypeError, "(0) dev_addr: %s", _dev_addr.what());
             return -1;
         }
         dev_addr = _dev_addr.get();
@@ -84,22 +84,30 @@ static int Uhd_init(Uhd *self, PyObject *args) {
 
 static PyObject *_get_receive(Uhd *self) {
 
-    Expect<ReceiveResult> _result;
-    if (!(_result = self->receiver->read()))
-        return PyErr_Format(UhdError, "Error on receive: %s", _result.what());
-    ReceiveResult &result = _result.get();
+    ReceiveResult *result = self->receiver->get_result();
+    if (!result->error.empty()) {
+        std::string error(std::move(result->error));
+        delete result;
+        return PyErr_Format(UhdError, "Error on receive: %s", error.c_str());
+    }
 
-    const size_t num_channels = result.bufs.size();
+    const size_t num_channels = result->bufs.size();
 
     PyObject *ret, *ele;
-    if (!(ret = PyList_New(num_channels)))
+    if (!(ret = PyList_New(num_channels))) {
+        for (auto &ptr : result->bufs)
+            free(ptr);
+        delete result;
         return PyErr_Format(PyExc_ValueError, "Failed to create list.");
-    npy_intp dims = result.num_samps;
+    }
+    npy_intp dims = result->num_samps;
     for (size_t it = 0; it < num_channels; it++) {
-        ele = PyArray_SimpleNewFromData(1, &dims, NPY_COMPLEX64, result.bufs[it]);
+        ele = PyArray_SimpleNewFromData(1, &dims, NPY_COMPLEX64, result->bufs[it]);
         PyArray_ENABLEFLAGS(reinterpret_cast<PyArrayObject *>(ele), NPY_ARRAY_OWNDATA);
         PyList_SET_ITEM(ret, it, ele);
     }
+
+    delete result;
 
     return ret;
 }
@@ -113,6 +121,7 @@ static PyObject *_get_receive(Uhd *self) {
 "    num_samps (int): number of samples\n" \
 "    channels (sequence): list of channels to receive\n" \
 "    streaming (bool, optional): is receive streaming\n" \
+"    recycle (bool, optional): recycled un-claimed results\n" \
 "    seconds_in_future (float, optional): seconds in the future to receive\n" \
 "    timeout (float, optional): timeout in seconds\n" \
 "\n" \
@@ -127,23 +136,24 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
         PyObject *p_channels = nullptr;
         /** Optional **/
         PyObject *p_streaming = nullptr;
+        PyObject *p_recycle = nullptr;
         PyObject *p_seconds_in_future = nullptr;
         PyObject *p_timeout = nullptr;
-        static const char *keywords[] = {"num_samps", "channels", "streaming",
+        static const char *keywords[] = {"num_samps", "channels", "streaming", "recycle",
                                          "seconds_in_future", "timeout", nullptr};
-        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOO", const_cast<char **>(keywords), &p_num_samps,
-                                        &p_channels, &p_streaming, &p_seconds_in_future, &p_timeout)) {
+        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOO", const_cast<char **>(keywords), &p_num_samps,
+                                        &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout)) {
             return nullptr;
         }
 
         /** num_samps **/
         Expect<size_t> num_samps;
         if (!(num_samps = to<size_t>(p_num_samps)))
-            return PyErr_Format(PyExc_TypeError, "[0] num_samps: %s", num_samps.what());
+            return PyErr_Format(PyExc_TypeError, "(0) num_samps: %s", num_samps.what());
 
         /** channels **/
         std::vector<long unsigned int> channels;
-        if (PySequence_Check(p_channels) && (p_channels = PySequence_Fast(p_channels, "[1] channels: Expected sequence.")) != nullptr
+        if (PySequence_Check(p_channels) && (p_channels = PySequence_Fast(p_channels, "(1) channels: Expected sequence.")) != nullptr
             && PySequence_Fast_GET_SIZE(p_channels)) {
             channels.resize(PySequence_Fast_GET_SIZE(p_channels));
             for (size_t it = 0; it < channels.size(); it++) {
@@ -151,12 +161,12 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
                 if (PyLong_CheckExact(elem)) {
                     channels[it] = static_cast<long unsigned int>(PyLong_AsUnsignedLongMask(elem));
                 } else {
-                    PyErr_SetString(PyExc_TypeError, "[1] channels: Expected sequence of integers.");
+                    PyErr_SetString(PyExc_TypeError, "(1) channels: Expected sequence of integers.");
                     return nullptr;
                 }
             }
         } else {
-            return PyErr_Format(PyExc_TypeError, "[1] channels: Expected sequence of non-zero length.");
+            return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of non-zero length.");
         }
 
         /** streaming (optional) **/
@@ -164,8 +174,17 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
         if (p_streaming) {
             Expect<bool> _streaming;
             if (!(_streaming = to<bool>(p_streaming)))
-                return PyErr_Format(PyExc_TypeError, "[2] streaming: %s", _streaming.what());
+                return PyErr_Format(PyExc_TypeError, "streaming: %s", _streaming.what());
             streaming = _streaming.get();
+        }
+
+        /** recycle (optional) **/
+        bool recycle = false;
+        if (p_recycle) {
+            Expect<bool> _recycle;
+            if (!(_recycle = to<bool>(p_recycle)))
+                return PyErr_Format(PyExc_TypeError, "recycle: %s", _recycle.what());
+            recycle = _recycle.get();
         }
 
         /** seconds_in_future (optional) **/
@@ -173,21 +192,30 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
         if (p_seconds_in_future) {
             Expect<double> _seconds_in_future;
             if (!(_seconds_in_future = to<double>(p_seconds_in_future)))
-                return PyErr_Format(PyExc_TypeError, "[3] seconds_in_future: %s", _seconds_in_future.what());
+                return PyErr_Format(PyExc_TypeError, "seconds_in_future: %s", _seconds_in_future.what());
             seconds_in_future = _seconds_in_future.get();
         }
 
         /** timeout (optional) **/
-        double timeout = seconds_in_future + 0.1;
+        double timeout = 0.5;
         if (p_timeout) {
             Expect<double> _timeout;
             if (!(_timeout = to<double>(p_timeout)))
-                return PyErr_Format(PyExc_TypeError, "[4] timeout: %s", _timeout.what());
+                return PyErr_Format(PyExc_TypeError, "timeout: %s", _timeout.what());
             timeout = _timeout.get();
         }
 
-        std::future<void> accepted = self->receiver->request(
-            streaming ? ReceiveRequestType::Continuous : ReceiveRequestType::Single,
+        /** Classify request type. **/
+        ReceiveRequestType req_type;
+        if (streaming && recycle)
+            req_type = ReceiveRequestType::Recycle;
+        else if (streaming)
+            req_type = ReceiveRequestType::Continuous;
+        else
+            req_type = ReceiveRequestType::Single;
+
+        std::future<void> accepted = self->receiver->make_request(
+            req_type,
             num_samps.get(),
             std::move(channels),
             seconds_in_future,
@@ -216,7 +244,7 @@ static PyObject *Uhd_num_received(Uhd *self, void *closure) {
 #define DOC_STOP_RECEIVE \
 "Stop receiving."
 static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
-    std::future<void> accepted = self->receiver->request(ReceiveRequestType::Stop);
+    std::future<void> accepted = self->receiver->make_request(ReceiveRequestType::Stop);
     accepted.wait();
     Py_INCREF(Py_None);
     return Py_None;
