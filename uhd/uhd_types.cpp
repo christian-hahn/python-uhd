@@ -227,7 +227,7 @@ Expect<double> to<double>(PyObject *arg) {
 template<>
 Expect<std::string> to<std::string>(PyObject *arg) {
     if (is<std::string>(arg)) {
-        char *str = PyUnicode_AsUTF8(arg);
+        const char *str = PyUnicode_AsUTF8(arg);
         if (str)
             return std::string(str);
         return Error("Failed to get UTF-8 string from object.");
@@ -245,7 +245,7 @@ Expect<std::complex<double>> to<std::complex<double>>(PyObject *arg) {
 template<>
 Expect<tune_request_t::policy_t> to<tune_request_t::policy_t>(PyObject *arg) {
     if (is<std::string>(arg)) {
-        char *c_str = PyUnicode_AsUTF8(arg);
+        const char *c_str = PyUnicode_AsUTF8(arg);
         if (c_str) {
             const std::string str(c_str);
             const auto &ret = std::find_if(tune_request_policies.begin(), tune_request_policies.end(),
@@ -261,7 +261,7 @@ Expect<tune_request_t::policy_t> to<tune_request_t::policy_t>(PyObject *arg) {
 template<>
 Expect<device_addr_t> to<device_addr_t>(PyObject *arg) {
     if (is<device_addr_t>(arg)) {
-        char *str = PyUnicode_AsUTF8(arg);
+        const char *str = PyUnicode_AsUTF8(arg);
         if (str) {
             try {
                 return device_addr_t(std::string(str));
@@ -348,7 +348,7 @@ Expect<tune_request_t> to<tune_request_t>(PyObject *arg) {
 template<>
 Expect<usrp::subdev_spec_t> to<usrp::subdev_spec_t>(PyObject *arg) {
     if (is<usrp::subdev_spec_t>(arg)) {
-        char *str = PyUnicode_AsUTF8(arg);
+        const char *str = PyUnicode_AsUTF8(arg);
         if (str) {
             try {
                 return usrp::subdev_spec_t(std::string(str));
