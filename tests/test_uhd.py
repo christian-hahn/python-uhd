@@ -11,7 +11,7 @@ TODO:
 
 import uhd
 import unittest
-from itertools import combinations
+from itertools import combinations, product
 import numpy as np
 from math import isclose
 
@@ -366,28 +366,35 @@ class UhdTestCase(unittest.TestCase):
         self.dut.set_master_clock_rate(16.e6)
         self.dut.set_rx_rate(1.e6)
         channels = list(range(self.dut.get_rx_num_channels()))
-        cases = [[x for x in c if x is not None] for c in combinations(
-                channels + [None] * (len(channels) - 1), len(channels))]
-        for channels in cases:
-            for num_samps in [100, 2**12, 2**16, 2**20]:
-                for streaming in [True, False]:
-                    print('Testing RX (channels = {}, num_samps = {}, '
-                          'streaming = {})'.format(channels, num_samps,
-                          streaming))
+        channels_cases = [[x for x in c if x is not None] for c in combinations(
+                          channels + [None] * (len(channels) - 1), len(channels))]
+        channels_types = (list, tuple)
+        kwargs_cases = (
+            {},
+            {'seconds_in_future': 1.0},
+            {'streaming': False},
+            {'streaming': True},
+            {'streaming': True, 'recycle': False},
+            {'streaming': True, 'recycle': True},
+        )
+        for channels_type, channels_case in product(channels_types, channels_cases):
+            channels = channels_type(channels_case)
+            for num_samps in (100, 2**12, 2**16, 2**20):
+                for kwargs in kwargs_cases:
+                    print('Testing RX (channels = {}, num_samps = {}, kwargs = {})'.format(
+                          channels, num_samps, kwargs))
                     try:
-                        if streaming:
-                            self.dut.receive(num_samps, channels,
-                                streaming=True, seconds_in_future=1.0)
+                        if kwargs.get('streaming', False):
+                            self.dut.receive(num_samps, channels, **kwargs)
                             samps = self.dut.receive()
                             self.dut.stop_receive()
                         else:
-                            samps = self.dut.receive(num_samps, list(channels))
-                            samps = self.dut.receive(num_samps, tuple(channels))
+                            samps = self.dut.receive(num_samps, channels, **kwargs)
                         self.assertEqual(len(samps), len(channels))
                         self.assertTrue(all(len(i) == num_samps for i in samps))
                     except uhd.UhdError as e:
-                        self.fail('Failed to receive (channels = {}, num_samps '
-                                  '= {}): {}'.format(channels, num_samps, str(e)))
+                        self.fail('Failed to receive (channels = {}, num_samps = {}, kwargs'
+                                  ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
 
 
 if __name__ == '__main__':
