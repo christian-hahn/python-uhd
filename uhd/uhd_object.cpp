@@ -82,11 +82,11 @@ static int Uhd_init(Uhd *self, PyObject *args) {
     return 0;
 }
 
-static PyObject *_get_receive(Uhd *self) {
+static PyObject *_get_receive(Uhd *self, const bool fresh = false) {
 
-    ReceiveResult *result = self->receiver->get_result();
-    if (!result->error.empty()) {
-        std::string error(std::move(result->error));
+    ReceiveResult *result = self->receiver->get_result(fresh);
+    if (result->error) {
+        std::string error(std::move(result->message));
         delete result;
         return PyErr_Format(UhdError, "Error on receive: %s", error.c_str());
     }
@@ -113,20 +113,29 @@ static PyObject *_get_receive(Uhd *self) {
 }
 
 #define DOC_RECEIVE \
-"Receive samples. Given at least, arguments 'num_samps' and 'channels', a new \n" \
-"receive is started. If no arguments are provided, this call must follow a \n" \
-"previous call to receive for which streaming = True." \
+"(1) Receive samples or start streaming.\n" \
 "\n" \
 "Args:\n" \
 "    num_samps (int): number of samples\n" \
 "    channels (sequence): list of channels to receive\n" \
-"    streaming (bool, optional): is receive streaming\n" \
-"    recycle (bool, optional): recycled un-claimed results\n" \
-"    seconds_in_future (float, optional): seconds in the future to receive\n" \
-"    timeout (float, optional): timeout in seconds\n" \
+"    streaming (bool, optional): is streaming receive, default is False\n" \
+"    recycle (bool, optional): recycled un-claimed results, default is False\n" \
+"    seconds_in_future (float, optional): seconds in the future to receive,\n" \
+"                                         default is 1.0\n" \
+"    timeout (float, optional): timeout in seconds, default is 0.5\n" \
 "\n" \
 "Returns:\n" \
-"    list: list of ndarrays if not streaming else None\n"
+"    list: None if streaming else list of ndarrays\n" \
+"\n" \
+"(2) Receive streaming samples. Must follow a previous call to (1) receive() for\n" \
+"    which streaming was True.\n" \
+"\n" \
+"Args:\n" \
+"    fresh (bool, optional): block until fresh samples are available. Only valid\n" \
+"                            if streaming and recycle are True. Default is False.\n" \
+"\n" \
+"Returns:\n" \
+"    list: list of ndarrays\n"
 static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
 
     if (PyTuple_Size(args)) {
@@ -226,10 +235,28 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
         if (streaming) {
             Py_INCREF(Py_None);
             return Py_None;
+        } else {
+            return _get_receive(self);
         }
-    }
+    } else {
+        /** Optional **/
+        PyObject *p_fresh = nullptr;
+        static const char *keywords[] = {"fresh", nullptr};
+        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", const_cast<char **>(keywords), &p_fresh)) {
+            return nullptr;
+        }
 
-    return _get_receive(self);
+        /** fresh (optional) **/
+        bool fresh = false;
+        if (p_fresh) {
+            Expect<bool> _fresh;
+            if (!(_fresh = to<bool>(p_fresh)))
+                return PyErr_Format(PyExc_TypeError, "fresh: %s", _fresh.what());
+            fresh = _fresh.get();
+        }
+
+        return _get_receive(self, fresh);
+    }
 }
 
 #define DOC_NUM_RECEIVED \

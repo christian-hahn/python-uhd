@@ -61,16 +61,33 @@ std::future<void> ReceiveWorker::make_request(const ReceiveRequestType type, con
     return accepted;
 }
 
-ReceiveResult *ReceiveWorker::get_result() {
+ReceiveResult *ReceiveWorker::get_result(const bool fresh) {
+
+    time_spec_t now;
+    if (fresh) {
+        /** Lock device **/
+        std::lock_guard<std::mutex> lg(_dev_lock);
+        /** Get the time now **/
+        now = _dev->get_time_now();
+    }
+
     std::unique_lock<std::mutex> lg(_results_lock);
-    while (_results_queue.empty()) {
+    while (true) {
+        if (!_results_queue.empty()) {
+            ReceiveResult *result = _results_queue.front();
+            /** If we don't care if fresh, or if timestamp of result is greater than now.
+                Since, when recycling, there is never more than 1 result in queue, if the
+                timestamp of the result at the front of the queue is not greater than now,
+                then wait until this result is re-claimed, and a new result is pushed. **/
+            if (!fresh || result->error || result->start > now) {
+                _results_queue.pop();
+                return result;
+            }
+        }
         if (!_receiving)
             return new ReceiveResult("Not streaming, or no data available.");
         _results_notify.wait(lg);
     }
-    ReceiveResult *result = _results_queue.front();
-    _results_queue.pop();
-    return result;
 }
 
 void ReceiveWorker::init() {
@@ -199,6 +216,8 @@ void ReceiveWorker::_worker() {
                             error = "Unknown error: " + md.strerror();
                             break;
                     }
+                } else {
+                    result->start = md.time_spec;
                 }
             } catch(const uhd::exception &e) {
                 error = "UHD exception occurred: " + std::string(e.what());
@@ -210,7 +229,8 @@ void ReceiveWorker::_worker() {
                 /** An error occurred **/
                 for (auto &ptr : result->bufs)
                     free(ptr);
-                result->error = std::move(error);
+                result->message = std::move(error);
+                result->error = true;
                 streaming = false;
             }
 

@@ -34,14 +34,16 @@ struct ReceiveRequest {
 };
 
 struct ReceiveResult {
-    ReceiveResult(std::string &&error) : num_samps(0), error(std::move(error)) {}
-    ReceiveResult(const size_t num_channels, const size_t num_samps) : num_samps(num_samps), bufs(std::vector<float *>(num_channels)) {
+    ReceiveResult(std::string &&error) : num_samps(0), error(true), message(std::move(error)) {}
+    ReceiveResult(const size_t num_channels, const size_t num_samps) : num_samps(num_samps), bufs(std::vector<float *>(num_channels)), error(false) {
         for (auto &ptr : bufs)
             ptr = reinterpret_cast<float *>(malloc(sizeof(float) * 2  * num_samps));
     }
     size_t num_samps;
     std::vector<float *> bufs;
-    std::string error;
+    time_spec_t start;
+    bool error;
+    std::string message;
 };
 
 class ReceiveWorker {
@@ -54,7 +56,7 @@ class ReceiveWorker {
     std::future<void> make_request(const ReceiveRequestType type, const size_t num_samps,
                                    std::vector<long unsigned int> &&channels,
                                    const double seconds_in_future, const double timeout);
-    ReceiveResult *get_result();
+    ReceiveResult *get_result(const bool fresh = false);
     size_t num_received();
 
   private:
