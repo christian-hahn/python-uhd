@@ -68,7 +68,10 @@ def main():
 
     # Start streaming & update graphic continuously
     try:
-        u.receive(args.num_samps, args.channels, streaming=True)
+        u.receive(
+            args.num_samps, args.channels,
+            streaming=True, recycle=True,
+        )
         while True:
             # Receive a block of samples
             samps = u.receive()
@@ -79,9 +82,6 @@ def main():
             print('avg-pwr = {:.3f} dBfs, peak-pwr = {:.3f} dBfs'
                   .format(avg_pwr, peak_pwr))
             spec.update(samps)
-            # Drop extra blocks of samples if we're not keeping up.
-            while u.num_received > 1:
-                samps = u.receive()
     finally:
         u.stop_receive()
 
