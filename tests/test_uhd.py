@@ -373,9 +373,11 @@ class UhdTestCase(unittest.TestCase):
             {},
             {'seconds_in_future': 1.0},
             {'streaming': False},
-            {'streaming': True},
-            {'streaming': True, 'recycle': False},
-            {'streaming': True, 'recycle': True},
+            ({'streaming': True}, {}),
+            ({'streaming': True, 'recycle': False}, {}),
+            ({'streaming': True, 'recycle': True}, {}),
+            ({'streaming': True, 'recycle': True}, {'fresh': False}),
+            ({'streaming': True, 'recycle': True}, {'fresh': True}),
         )
         for channels_type, channels_case in product(channels_types, channels_cases):
             channels = channels_type(channels_case)
@@ -384,9 +386,9 @@ class UhdTestCase(unittest.TestCase):
                     print('Testing RX (channels = {}, num_samps = {}, kwargs = {})'.format(
                           channels, num_samps, kwargs))
                     try:
-                        if kwargs.get('streaming', False):
-                            self.dut.receive(num_samps, channels, **kwargs)
-                            samps = self.dut.receive()
+                        if isinstance(kwargs, tuple):
+                            self.dut.receive(num_samps, channels, **kwargs[0])
+                            samps = self.dut.receive(**kwargs[1])
                             self.dut.stop_receive()
                         else:
                             samps = self.dut.receive(num_samps, channels, **kwargs)
