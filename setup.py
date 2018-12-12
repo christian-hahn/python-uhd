@@ -23,6 +23,7 @@ uhd = Extension(
         'uhd/uhd_object.cpp',
         'uhd/uhd_types.cpp',
         'uhd/uhd_rx.cpp',
+        'uhd/uhd_tx.cpp',
         'uhd/uhd_timespec.cpp',
     ],
 )

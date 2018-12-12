@@ -18,6 +18,7 @@
 #include "uhd_types.hpp"
 #include "uhd_expect.hpp"
 #include "uhd_rx.hpp"
+#include "uhd_tx.hpp"
 
 #include "uhd_30900.hpp"
 #include "uhd_30901.hpp"
@@ -45,6 +46,7 @@ namespace uhd {
 
 static void Uhd_dealloc(Uhd *self) {
     delete self->receiver;
+    delete self->transmitter;
     Py_TYPE(self)->tp_free(reinterpret_cast<PyObject *>(self));
 }
 
@@ -79,6 +81,9 @@ static int Uhd_init(Uhd *self, PyObject *args) {
 
     self->receiver = new ReceiveWorker(self->dev, std::ref(self->dev_lock));
     self->receiver->init();
+
+    self->transmitter = new TransmitWorker(self->dev, std::ref(self->dev_lock));
+    self->transmitter->init();
 
     return 0;
 }
@@ -279,6 +284,170 @@ static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_TRANSMIT \
+"Transmit samples.\n" \
+"\n" \
+"Args:\n" \
+"    samples (sequence): sequence of ndarrays of samples of type complex64\n" \
+"    channels (sequence): sequence of channels to receive of type int\n" \
+"    continuous (bool, optional): is continuous transmit, default is False\n" \
+"    seconds_in_future (float, optional): seconds in the future to transmit,\n" \
+"                                         default is 1.0\n" \
+"    timeout (float, optional): timeout in seconds, default is 0.5\n"
+static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
+
+    /** Required **/
+    PyObject *p_samples = nullptr;
+    PyObject *p_channels = nullptr;
+    /** Optional **/
+    PyObject *p_continuous = nullptr;
+    PyObject *p_seconds_in_future = nullptr;
+    PyObject *p_timeout = nullptr;
+    static const char *keywords[] = {"samples", "channels", "continuous",
+                                     "seconds_in_future", "timeout", nullptr};
+    if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOO", const_cast<char **>(keywords), &p_samples,
+                                    &p_channels, &p_continuous, &p_seconds_in_future, &p_timeout)) {
+        return nullptr;
+    }
+
+    /** samples **/
+    if ((p_samples = PySequence_Fast(p_samples, "(0) samples: Expected sequence.")) == nullptr)
+        return nullptr;
+    if (PySequence_Fast_GET_SIZE(p_samples) <= 0) {
+        Py_DECREF(p_samples);
+        return PyErr_Format(PyExc_TypeError, "(0) samples: Expected sequence of length > 0.");
+    }
+    std::vector<std::complex<float> *> samples(PySequence_Fast_GET_SIZE(p_samples));
+    size_t num_samps = 0;
+    for (size_t it = 0; it < samples.size(); it++) {
+        PyObject * const elem = PySequence_Fast_GET_ITEM(p_samples, it);
+        if (!PyArray_CheckExact(elem)) {
+            Py_DECREF(p_samples);
+            return PyErr_Format(PyExc_TypeError, "(0) samples[i]: Expected ndarray.");
+        }
+        PyArrayObject * const array = reinterpret_cast<PyArrayObject *>(elem);
+        const npy_intp size = PyArray_SIZE(array);
+        if (!size) {
+            Py_DECREF(p_samples);
+            return PyErr_Format(PyExc_ValueError, "(0) samples[i]: Expected ndarray of size > 0.");
+        }
+        if (it && size != static_cast<npy_intp>(num_samps)) {
+            Py_DECREF(p_samples);
+            return PyErr_Format(PyExc_ValueError, "(0) samples[i]: Expected ndarrays of equal size.");
+        }
+        num_samps = static_cast<size_t>(size);
+        if (PyArray_DESCR(array)->type_num != NPY_COMPLEX64) {
+            Py_DECREF(p_samples);
+            return PyErr_Format(PyExc_TypeError, "(0) samples[i]: Expected ndarrays of type complex64.");
+        }
+        if (!(PyArray_FLAGS(array) & NPY_ARRAY_OWNDATA)
+            || PyArray_BASE(array) != nullptr
+            || reinterpret_cast<PyArrayObject_fields *>(array)->weakreflist != nullptr
+            || PyArray_REFCOUNT(array) > 2) {
+            Py_DECREF(p_samples);
+            return PyErr_Format(PyExc_ValueError, "(0) samples[i]: Bad ndarray: must own its data and "
+                                                  "cannot be referenced-by or reference another array.");
+        }
+        samples[it] = reinterpret_cast<std::complex<float> *>(array);
+    }
+    Py_DECREF(p_samples);
+    for (size_t it = 0; it < samples.size(); it++) {
+        PyArrayObject * const array = reinterpret_cast<PyArrayObject *>(samples[it]);
+        PyArrayObject_fields * const fields = reinterpret_cast<PyArrayObject_fields *>(array);
+        samples[it] = reinterpret_cast<std::complex<float> *>(fields->data);
+        void * const new_data = PyDataMem_NEW(PyArray_DESCR(array)->elsize);
+        if (new_data == nullptr)
+            return PyErr_Format(PyExc_MemoryError, "Failed to allocate memory for array.");
+        fields->data = reinterpret_cast<char *>(new_data);
+        PyDimMem_FREE(fields->dimensions);
+        fields->nd = 0;
+        fields->dimensions = nullptr;
+        fields->strides = nullptr;
+    }
+
+    /** channels **/
+    if ((p_channels = PySequence_Fast(p_channels, "(1) channels: Expected sequence.")) == nullptr)
+        return nullptr;
+    if (PySequence_Fast_GET_SIZE(p_channels) != static_cast<Py_ssize_t>(samples.size())) {
+        Py_DECREF(p_channels);
+        return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of length %d.", samples.size());
+    }
+    std::vector<long unsigned int> channels(samples.size());
+    for (size_t it = 0; it < channels.size(); it++) {
+        PyObject *elem = PySequence_Fast_GET_ITEM(p_channels, it);
+        if (PyLong_CheckExact(elem)) {
+            channels[it] = static_cast<long unsigned int>(PyLong_AsUnsignedLongMask(elem));
+        } else {
+            Py_DECREF(p_channels);
+            return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of integers.");
+        }
+    }
+    Py_DECREF(p_channels);
+
+    /** continuous (optional) **/
+    bool continuous = false;
+    if (p_continuous) {
+        Expect<bool> _continuous;
+        if (!(_continuous = to<bool>(p_continuous)))
+            return PyErr_Format(PyExc_TypeError, "continuous: %s", _continuous.what());
+        continuous = _continuous.get();
+    }
+
+    /** seconds_in_future (optional) **/
+    double seconds_in_future = 1.0;
+    if (p_seconds_in_future) {
+        Expect<double> _seconds_in_future;
+        if (!(_seconds_in_future = to<double>(p_seconds_in_future)))
+            return PyErr_Format(PyExc_TypeError, "seconds_in_future: %s", _seconds_in_future.what());
+        seconds_in_future = _seconds_in_future.get();
+    }
+
+    /** timeout (optional) **/
+    double timeout = 0.5;
+    if (p_timeout) {
+        Expect<double> _timeout;
+        if (!(_timeout = to<double>(p_timeout)))
+            return PyErr_Format(PyExc_TypeError, "timeout: %s", _timeout.what());
+        timeout = _timeout.get();
+    }
+
+    /** Classify request type. **/
+    TransmitRequestType req_type;
+    if (continuous)
+        req_type = TransmitRequestType::Continuous;
+    else
+        req_type = TransmitRequestType::Single;
+
+    std::future<std::string> accepted = self->transmitter->make_request(
+        req_type,
+        num_samps,
+        std::move(samples),
+        std::move(channels),
+        seconds_in_future,
+        timeout
+    );
+    accepted.wait();
+
+    const std::string &error = accepted.get();
+    if (!error.empty())
+        return PyErr_Format(UhdError, "Error on transmit(): %s", error.c_str());
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_STOP_TRANSMIT \
+"Stop transmit."
+static PyObject *Uhd_stop_transmit(Uhd *self, PyObject *args) {
+    std::future<std::string> accepted = self->transmitter->make_request(TransmitRequestType::Stop);
+    accepted.wait();
+    const std::string &error = accepted.get();
+    if (!error.empty())
+        return PyErr_Format(UhdError, "Error on stop_transmit(): %s", error.c_str());
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMemberDef Uhd_members[] = {{NULL}};
 
 static std::vector<PyMethodDef> Uhd_methods;
@@ -286,6 +455,8 @@ static std::vector<PyMethodDef> Uhd_methods;
 const static std::vector<PyMethodDef> Uhd_user_methods {
     {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, DOC_RECEIVE},
     {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, DOC_STOP_RECEIVE},
+    {"transmit", (PyCFunction)Uhd_transmit, METH_VARARGS | METH_KEYWORDS, DOC_TRANSMIT},
+    {"stop_transmit", (PyCFunction)Uhd_stop_transmit, METH_NOARGS, DOC_STOP_TRANSMIT},
 };
 
 static PyGetSetDef Uhd_getset[] = {

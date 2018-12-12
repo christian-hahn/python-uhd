@@ -8,6 +8,7 @@
 #include <uhd/usrp/multi_usrp.hpp>
 
 #include "uhd_rx.hpp"
+#include "uhd_tx.hpp"
 
 namespace uhd {
 
@@ -16,6 +17,7 @@ namespace uhd {
         uhd::usrp::multi_usrp::sptr dev;
         std::mutex dev_lock;
         ReceiveWorker *receiver;
+        TransmitWorker *transmitter;
     } Uhd;
 
     int Uhd_register_type(PyObject *module);
