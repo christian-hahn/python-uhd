@@ -507,6 +507,11 @@ PyObject *from(const dict<std::string, std::string> &value) {
 }
 
 PyObject *from(const meta_range_t &value) {
+    if (value.empty()) {
+        /** meta-range is empty. **/
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
     PyObject *ret = PyDict_New();
     if (ret) {
         if (dict_insert_string_float(ret, "start", value.start())
