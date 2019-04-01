@@ -2,7 +2,6 @@ try:
     from setuptools import setup, Extension
 except ImportError:
     from distutils.core import setup, Extension
-from os.path import join
 import numpy
 
 
@@ -30,7 +29,7 @@ uhd = Extension(
 
 setup(
     name='uhd',
-    version='{}.{}'.format(MAJOR_VERSION,MINOR_VERSION),
+    version='{}.{}'.format(MAJOR_VERSION, MINOR_VERSION),
     description='A Python 3 C-extension to facilitate development with USRP '
         'hardware.',
     setup_requires=['numpy'],
