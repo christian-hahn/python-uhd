@@ -118,7 +118,7 @@ static PyObject *_get_receive(Uhd *self, const bool fresh = false) {
 "\n" \
 "Args:\n" \
 "    num_samps (int): number of samples\n" \
-"    channels (sequence): list of channels to receive\n" \
+"    channels (sequence): sequence of channels to receive\n" \
 "    streaming (bool, optional): is streaming receive, default is False\n" \
 "    recycle (bool, optional): recycled un-claimed results, default is False\n" \
 "    seconds_in_future (float, optional): seconds in the future to receive,\n" \
@@ -162,22 +162,23 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
             return PyErr_Format(PyExc_TypeError, "(0) num_samps: %s", num_samps.what());
 
         /** channels **/
-        std::vector<long unsigned int> channels;
-        if (PySequence_Check(p_channels) && (p_channels = PySequence_Fast(p_channels, "(1) channels: Expected sequence.")) != nullptr
-            && PySequence_Fast_GET_SIZE(p_channels)) {
-            channels.resize(PySequence_Fast_GET_SIZE(p_channels));
-            for (size_t it = 0; it < channels.size(); it++) {
-                PyObject *elem = PySequence_Fast_GET_ITEM(p_channels, it);
-                if (PyLong_CheckExact(elem)) {
-                    channels[it] = static_cast<long unsigned int>(PyLong_AsUnsignedLongMask(elem));
-                } else {
-                    PyErr_SetString(PyExc_TypeError, "(1) channels: Expected sequence of integers.");
-                    return nullptr;
-                }
-            }
-        } else {
-            return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of non-zero length.");
+        if ((p_channels = PySequence_Fast(p_channels, "(1) channels: Expected sequence.")) == nullptr)
+            return nullptr;
+        if (PySequence_Fast_GET_SIZE(p_channels) <= 0) {
+            Py_DECREF(p_channels);
+            return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of length > 0.");
         }
+        std::vector<long unsigned int> channels(PySequence_Fast_GET_SIZE(p_channels));
+        for (size_t it = 0; it < channels.size(); it++) {
+            PyObject *elem = PySequence_Fast_GET_ITEM(p_channels, it);
+            if (PyLong_CheckExact(elem)) {
+                channels[it] = static_cast<long unsigned int>(PyLong_AsUnsignedLongMask(elem));
+            } else {
+                Py_DECREF(p_channels);
+                return PyErr_Format(PyExc_TypeError, "(1) channels: Expected sequence of integers.");
+            }
+        }
+        Py_DECREF(p_channels);
 
         /** streaming (optional) **/
         bool streaming = false;
