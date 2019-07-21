@@ -14,6 +14,7 @@ import unittest
 from itertools import combinations, product
 import numpy as np
 from math import isclose
+from time import sleep
 
 
 def not_supported(function):
@@ -372,12 +373,15 @@ class UhdTestCase(unittest.TestCase):
         kwargs_cases = (
             {},
             {'seconds_in_future': 1.0},
+            {'timeout': 0.5},
             {'streaming': False},
             ({'streaming': True}, {}),
             ({'streaming': True, 'recycle': False}, {}),
             ({'streaming': True, 'recycle': True}, {}),
             ({'streaming': True, 'recycle': True}, {'fresh': False}),
             ({'streaming': True, 'recycle': True}, {'fresh': True}),
+            {'otw_format': 'sc16'},
+            {'otw_format': 'sc8'},
         )
         for channels_type, channels_case in product(channels_types, channels_cases):
             channels = channels_type(channels_case)
@@ -396,6 +400,39 @@ class UhdTestCase(unittest.TestCase):
                         self.assertTrue(all(len(i) == num_samps for i in samps))
                     except uhd.UhdError as e:
                         self.fail('Failed to receive (channels = {}, num_samps = {}, kwargs'
+                                  ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
+
+    def test_transmit(self):
+        """Test transmit methods."""
+        self.dut.set_master_clock_rate(16.e6)
+        self.dut.set_tx_rate(1.e6)
+        channels = list(range(self.dut.get_tx_num_channels()))
+        channels_cases = [[x for x in c if x is not None] for c in combinations(
+                          channels + [None] * (len(channels) - 1), len(channels))]
+        channels_types = (list, tuple)
+        kwargs_cases = (
+            {},
+            {'seconds_in_future': 1.0},
+            {'timeout': 0.5},
+            {'continuous': False},
+            {'continuous': True},
+            {'otw_format': 'sc16'},
+            {'otw_format': 'sc8'},
+        )
+        for channels_type, channels_case in product(channels_types, channels_cases):
+            channels = channels_type(channels_case)
+            for num_samps in (2**12, 2**16, 2**20):
+                samps = [np.zeros((num_samps,), dtype=np.complex64) for _ in channels]
+                for kwargs in kwargs_cases:
+                    print('Testing TX (channels = {}, num_samps = {}, kwargs = {})'.format(
+                          channels, num_samps, kwargs))
+                    try:
+                        self.dut.transmit(samps, channels, **kwargs)
+                        if kwargs.get('continuous', False):
+                            self.dut.stop_transmit()
+                        sleep(100e-3)
+                    except uhd.UhdError as e:
+                        self.fail('Failed to transmit (channels = {}, num_samps = {}, kwargs'
                                   ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
 
 
