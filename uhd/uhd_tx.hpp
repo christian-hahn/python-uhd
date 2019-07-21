@@ -22,14 +22,16 @@ enum class TransmitRequestType {
 struct TransmitRequest {
     TransmitRequest(const TransmitRequestType type) : type(type) {}
     TransmitRequest(const TransmitRequestType type, const size_t num_samps, std::vector<std::complex<float> *> &&samps,
-                    std::vector<long unsigned int> &&channels, const double seconds_in_future, const double timeout)
+                    std::vector<long unsigned int> &&channels, const double seconds_in_future, const double timeout,
+                    const std::string &otw_format)
         : type(type), num_samps(num_samps), samps(std::move(samps)), channels(std::move(channels)),
-          seconds_in_future(seconds_in_future), timeout(timeout) {}
+          seconds_in_future(seconds_in_future), timeout(timeout), otw_format(otw_format) {}
     TransmitRequestType type;
     size_t num_samps;
     std::vector<std::complex<float> *> samps;
     std::vector<long unsigned int> channels;
     double seconds_in_future, timeout;
+    std::string otw_format;
     std::promise<std::string> accepted;
 };
 
@@ -43,7 +45,8 @@ class TransmitWorker {
     std::future<std::string> make_request(const TransmitRequestType type, const size_t num_samps,
                                           std::vector<std::complex<float> *> &&samps,
                                           std::vector<long unsigned int> &&channels,
-                                          const double seconds_in_future, const double timeout);
+                                          const double seconds_in_future, const double timeout,
+                                          const std::string &otw_format);
 
   private:
     void _worker();

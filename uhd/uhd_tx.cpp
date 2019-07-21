@@ -36,9 +36,9 @@ std::future<std::string> TransmitWorker::make_request(const TransmitRequestType 
 
 std::future<std::string> TransmitWorker::make_request(const TransmitRequestType type, const size_t num_samps,
                                                       std::vector<std::complex<float> *> &&samps, std::vector<long unsigned int> &&channels,
-                                                      const double seconds_in_future, const double timeout) {
+                                                      const double seconds_in_future, const double timeout, const std::string &otw_format) {
     TransmitRequest *request = new TransmitRequest(type, num_samps, std::move(samps), std::move(channels),
-                                                   seconds_in_future, timeout);
+                                                   seconds_in_future, timeout, otw_format);
     std::future<std::string> accepted = request->accepted.get_future();
     /** Push into requests queue **/
     {
@@ -89,7 +89,7 @@ void TransmitWorker::_worker() {
         /** Extend the first timeout by 'seconds_in_future' **/
         double next_timeout = timeout + seconds_in_future;
         const bool streaming = req_type == TransmitRequestType::Continuous;
-        uhd::stream_args_t stream_args("fc32", "sc16");
+        uhd::stream_args_t stream_args("fc32", req->otw_format);
         stream_args.channels = std::move(req->channels);
 
         uhd::tx_streamer::sptr tx_stream;

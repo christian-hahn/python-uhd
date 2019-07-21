@@ -23,13 +23,14 @@ enum class ReceiveRequestType {
 struct ReceiveRequest {
     ReceiveRequest(const ReceiveRequestType type) : type(type) {}
     ReceiveRequest(const ReceiveRequestType type, const size_t num_samps, std::vector<long unsigned int> &&channels,
-                   const double seconds_in_future, const double timeout) : type(type), num_samps(num_samps),
-        channels(std::move(channels)), seconds_in_future(seconds_in_future), timeout(timeout) {}
-
+                   const double seconds_in_future, const double timeout, const std::string &otw_format)
+        : type(type), num_samps(num_samps), channels(std::move(channels)), seconds_in_future(seconds_in_future),
+          timeout(timeout), otw_format(otw_format) {}
     ReceiveRequestType type;
     size_t num_samps;
     std::vector<long unsigned int> channels;
     double seconds_in_future, timeout;
+    std::string otw_format;
     std::promise<void> accepted;
 };
 
@@ -55,7 +56,8 @@ class ReceiveWorker {
     std::future<void> make_request(const ReceiveRequestType type);
     std::future<void> make_request(const ReceiveRequestType type, const size_t num_samps,
                                    std::vector<long unsigned int> &&channels,
-                                   const double seconds_in_future, const double timeout);
+                                   const double seconds_in_future, const double timeout,
+                                   const std::string &otw_format);
     ReceiveResult *get_result(const bool fresh = false);
     size_t num_received();
 

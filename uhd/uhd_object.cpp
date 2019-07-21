@@ -129,6 +129,7 @@ static PyObject *_get_receive(Uhd *self, const bool fresh = false) {
 "    seconds_in_future (float, optional): seconds in the future to receive,\n" \
 "                                         default is 1.0\n" \
 "    timeout (float, optional): timeout in seconds, default is 0.5\n" \
+"    otw_format (str, optional): over-the-wire format, default is 'sc16'\n" \
 "\n" \
 "Returns:\n" \
 "    list: None if streaming else list of ndarrays\n" \
@@ -154,10 +155,11 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
         PyObject *p_recycle = nullptr;
         PyObject *p_seconds_in_future = nullptr;
         PyObject *p_timeout = nullptr;
+        PyObject *p_otw_format = nullptr;
         static const char *keywords[] = {"num_samps", "channels", "streaming", "recycle",
-                                         "seconds_in_future", "timeout", nullptr};
-        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOO", const_cast<char **>(keywords), &p_num_samps,
-                                        &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout)) {
+                                         "seconds_in_future", "timeout", "otw_format", nullptr};
+        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOOO", const_cast<char **>(keywords), &p_num_samps,
+                                        &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
             return nullptr;
         }
 
@@ -221,6 +223,15 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
             timeout = _timeout.get();
         }
 
+        /** otw_format (optional) **/
+        std::string otw_format("sc16");
+        if (p_otw_format) {
+            Expect<std::string> _otw_format;
+            if (!(_otw_format = to<std::string>(p_otw_format)))
+                return PyErr_Format(PyExc_TypeError, "otw_format: %s", _otw_format.what());
+            otw_format = _otw_format.get();
+        }
+
         /** Classify request type. **/
         ReceiveRequestType req_type;
         if (streaming && recycle)
@@ -235,7 +246,8 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
             num_samps.get(),
             std::move(channels),
             seconds_in_future,
-            timeout
+            timeout,
+            otw_format
         );
         accepted.wait();
 
@@ -293,7 +305,8 @@ static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
 "    continuous (bool, optional): is continuous transmit, default is False\n" \
 "    seconds_in_future (float, optional): seconds in the future to transmit,\n" \
 "                                         default is 1.0\n" \
-"    timeout (float, optional): timeout in seconds, default is 0.5\n"
+"    timeout (float, optional): timeout in seconds, default is 0.5\n" \
+"    otw_format (str, optional): over-the-wire format, default is 'sc16'\n"
 static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
 
     /** Required **/
@@ -303,10 +316,11 @@ static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
     PyObject *p_continuous = nullptr;
     PyObject *p_seconds_in_future = nullptr;
     PyObject *p_timeout = nullptr;
+    PyObject *p_otw_format = nullptr;
     static const char *keywords[] = {"samples", "channels", "continuous",
-                                     "seconds_in_future", "timeout", nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOO", const_cast<char **>(keywords), &p_samples,
-                                    &p_channels, &p_continuous, &p_seconds_in_future, &p_timeout)) {
+                                     "seconds_in_future", "timeout", "otw_format", nullptr};
+    if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOO", const_cast<char **>(keywords), &p_samples,
+                                    &p_channels, &p_continuous, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
         return nullptr;
     }
 
@@ -411,6 +425,15 @@ static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
         timeout = _timeout.get();
     }
 
+    /** otw_format (optional) **/
+    std::string otw_format("sc16");
+    if (p_otw_format) {
+        Expect<std::string> _otw_format;
+        if (!(_otw_format = to<std::string>(p_otw_format)))
+            return PyErr_Format(PyExc_TypeError, "otw_format: %s", _otw_format.what());
+        otw_format = _otw_format.get();
+    }
+
     /** Classify request type. **/
     TransmitRequestType req_type;
     if (continuous)
@@ -424,7 +447,8 @@ static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
         std::move(samples),
         std::move(channels),
         seconds_in_future,
-        timeout
+        timeout,
+        otw_format
     );
     accepted.wait();
 

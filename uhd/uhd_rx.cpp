@@ -48,9 +48,10 @@ std::future<void> ReceiveWorker::make_request(const ReceiveRequestType type) {
 
 std::future<void> ReceiveWorker::make_request(const ReceiveRequestType type, const size_t num_samps,
                                               std::vector<long unsigned int> &&channels,
-                                              const double seconds_in_future, const double timeout) {
+                                              const double seconds_in_future, const double timeout,
+                                              const std::string &otw_format) {
     ReceiveRequest *request = new ReceiveRequest(type, num_samps, std::move(channels),
-                                                 seconds_in_future, timeout);
+                                                 seconds_in_future, timeout, otw_format);
     std::future<void> accepted = request->accepted.get_future();
     /** Push into requests queue **/
     {
@@ -148,7 +149,7 @@ void ReceiveWorker::_worker() {
         /** Extend the first timeout by 'seconds_in_future' **/
         double next_timeout = timeout + seconds_in_future;
         bool streaming = req_type == ReceiveRequestType::Continuous || req_type == ReceiveRequestType::Recycle;
-        uhd::stream_args_t stream_args("fc32", "sc16");
+        uhd::stream_args_t stream_args("fc32", req->otw_format);
         stream_args.channels = std::move(req->channels);
         /** All done with request. **/
         delete req;
@@ -188,7 +189,7 @@ void ReceiveWorker::_worker() {
 
             try {
                 uhd::rx_metadata_t md;
-                size_t num_samps_recvd = rx_stream->recv(result->bufs, result->num_samps, md, next_timeout, false);
+                size_t num_samps_recvd = rx_stream->recv(result->bufs, num_samps, md, next_timeout, false);
                 next_timeout = timeout;
                 (void)num_samps_recvd;
                 if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE
