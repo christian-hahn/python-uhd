@@ -74,19 +74,16 @@ class UhdTestCase(unittest.TestCase):
                 self.assertEqual(ret, value)
             self.assertIsInstance(ret, type(values[0]))
 
-    def test_version(self):
-        version_abi = uhd.VERSION_ABI
-        version_long = uhd.VERSION_LONG
-        version = uhd.VERSION
-        print('Got \'version_abi\' = {}'.format(version_abi))
-        print('Got \'version_long\' = {}'.format(version_long))
-        print('Got \'version\' = {}'.format(version))
-        self.assertIsInstance(version_abi, str)
-        self.assertTrue(len(version_abi) > 0)
-        self.assertIsInstance(version_long, str)
-        self.assertTrue(len(version_long) > 0)
-        self.assertIsInstance(version, int)
-        self.assertTrue(version > 0)
+    def test_versions(self):
+        for attr in ('__version__', 'UHD_VERSION_ABI', 'UHD_VERSION_LONG'):
+            value = getattr(uhd, attr)
+            print('Got {} = \'{}\''.format(attr, value))
+            self.assertIsInstance(value, str)
+            self.assertTrue(len(value) > 0)
+        uhd_ver = uhd.UHD_VERSION
+        print('Got UHD_VERSION = {}'.format(uhd_ver))
+        self.assertIsInstance(uhd_ver, int)
+        self.assertTrue(uhd_ver > 0)
 
     def test_clock_sources(self):
         """Test set/get clock sources methods."""

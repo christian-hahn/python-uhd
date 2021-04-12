@@ -5,14 +5,12 @@ except ImportError:
 import numpy
 
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 1
+VERSION = '1.1.0'
 
 uhd = Extension(
     'uhd',
     define_macros=[
-        ('MAJOR_VERSION', str(MAJOR_VERSION)),
-        ('MINOR_VERSION', str(MINOR_VERSION)),
+        ('PYUHD_VERSION', '"{}"'.format(VERSION)),
     ],
     include_dirs=[numpy.get_include(), 'uhd/'],
     libraries=['uhd'],
@@ -29,7 +27,7 @@ uhd = Extension(
 
 setup(
     name='uhd',
-    version='{}.{}'.format(MAJOR_VERSION, MINOR_VERSION),
+    version=VERSION,
     description='A Python 3 C-extension to facilitate development with USRP '
         'hardware.',
     setup_requires=['numpy'],

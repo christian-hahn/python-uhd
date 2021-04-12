@@ -53,13 +53,17 @@ PyMODINIT_FUNC PyInit_uhd(void) {
     Py_INCREF(UhdError);
     PyModule_AddObject(module, "UhdError", UhdError);
 
-    /** Add VERSION_ABI / VERSION_LONG / VERSION **/
-    if (PyModule_AddStringConstant(module, "VERSION_ABI", get_abi_string().c_str()))
-        return PyErr_Format(PyExc_ValueError, "Failed to add string VERSION_ABI object.");
-    if (PyModule_AddStringConstant(module, "VERSION_LONG", get_version_string().c_str()))
-        return PyErr_Format(PyExc_ValueError, "Failed to add string VERSION_LONG object.");
-    if (PyModule_AddIntConstant(module, "VERSION", UHD_VERSION))
-        return PyErr_Format(PyExc_ValueError, "Failed to add int VERSION object.");
+    /** Add UHD_{VERSION, VERSION_ABI, VERSION_LONG} **/
+    if (PyModule_AddIntConstant(module, "UHD_VERSION", UHD_VERSION))
+        return PyErr_Format(PyExc_ValueError, "Failed to add int UHD_VERSION.");
+    if (PyModule_AddStringConstant(module, "UHD_VERSION_ABI", get_abi_string().c_str()))
+        return PyErr_Format(PyExc_ValueError, "Failed to add string UHD_VERSION_ABI.");
+    if (PyModule_AddStringConstant(module, "UHD_VERSION_LONG", get_version_string().c_str()))
+        return PyErr_Format(PyExc_ValueError, "Failed to add string UHD_VERSION_LONG.");
+
+    /** Add __version__ **/
+    if (PyModule_AddStringConstant(module, "__version__", PYUHD_VERSION))
+        return PyErr_Format(PyExc_ValueError, "Failed to add string __version__.");
 
     return module;
 }
