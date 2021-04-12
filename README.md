@@ -6,7 +6,15 @@ python-uhd is a Python C-extension that wraps the USRP hardware driver: facilita
 
 ## Prerequisites
 
-Install USRP Hardware Driver (UHD) software.  There are several ways to achieve this.  uhd-python has been tested and is compatible with the latest UHD releases including versions >= 3.9.0.
+Install USRP Hardware Driver (UHD) software.  There are several ways to achieve this.  python-uhd has been tested and is compatible with the following UHD releases:
+
+* v3.9.0 - v3.9.7
+* v3.10.0.0 - v3.10.3.0
+* v3.11.0.0 - v3.11.1.0
+* v3.12.0.0
+* v3.13.0.0 - v3.13.1.0
+* v3.14.0.0 - v3.14.1.1
+* v3.15.0.0
 
 In Ubuntu, using package manager:
 ``` text
@@ -23,7 +31,7 @@ sudo pip3 install numpy
 Using setup.py:
 ``` text
 git clone https://github.com/christian-hahn/python-uhd.git
-cd python-uhd
+cd python-uhd/
 sudo python3 setup.py install
 ```
 
