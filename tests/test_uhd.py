@@ -306,8 +306,13 @@ class UhdTestCase(unittest.TestCase):
         sync = self.dut.get_time_synchronized()
         self.assertTrue(isinstance(sync, bool) and sync)
         # get_filter_names
-        filters = self.dut.get_filter_names()
-        self.assertTrue(all(isinstance(n, str) and len(n) for n in filters))
+        if hasattr(self.dut, 'get_filter_names'):
+            filters = self.dut.get_filter_names()
+            self.assertTrue(all(isinstance(n, str) and len(n) for n in filters))
+        else:
+            # UHD v4.x.x does not have get_filter_names
+            self.assertTrue(int(uhd.UHD_VERSION_ABI.split('.')[0]) >= 4,
+                            'Expected UHD major version >= 4.')
 
     def test_rx_setters(self):
         """Test RX-specific setters."""
