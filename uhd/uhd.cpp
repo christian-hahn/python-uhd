@@ -8,7 +8,7 @@
 #include <uhd/version.hpp>
 
 #include "uhd.hpp"
-#include "uhd_object.hpp"
+#include "uhd_usrp.hpp"
 #include "uhd_timespec.hpp"
 
 namespace uhd {

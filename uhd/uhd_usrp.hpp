@@ -1,5 +1,5 @@
-#ifndef __UHD_OBJECT_HPP__
-#define __UHD_OBJECT_HPP__
+#ifndef __UHD_USRP_HPP__
+#define __UHD_USRP_HPP__
 
 #include <mutex>
 
@@ -24,4 +24,4 @@ namespace uhd {
 
 }
 
-#endif  /** __UHD_OBJECT_HPP__ **/
+#endif  /** __UHD_USRP_HPP__ **/
