@@ -9,7 +9,7 @@
     sudo pip3 install pyalsaaudio
 '''
 
-from pyuhd import Uhd
+from pyuhd import Usrp
 import numpy as np
 from scipy.signal import lfilter, cheby1
 import alsaaudio
@@ -33,8 +33,8 @@ def main():
     audio_bw = 15.e3  # Audio bandwidth
     audio_samp_rate = 48e3  # Output audio sample-rate of 48 kSps
 
-    # Create UHD object
-    u = Uhd()
+    # Create USRP object
+    u = Usrp()
 
     # Select optimal LO frequency: signal_freq - bandwidth rounded
     # to nearest 1.25 MHz

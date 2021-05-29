@@ -18,9 +18,9 @@ namespace uhd {
         std::mutex dev_lock;
         ReceiveWorker *receiver;
         TransmitWorker *transmitter;
-    } Uhd;
+    } Usrp;
 
-    int Uhd_register_type(PyObject *module);
+    int Usrp_register_type(PyObject *module);
 
 }
 

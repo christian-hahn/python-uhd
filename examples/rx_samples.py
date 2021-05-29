@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from pyuhd import Uhd
+from pyuhd import Usrp
 
-u = Uhd()
+# Create USRP object
+u = Usrp()
 
 # Parameters
 center_freq = 140.625e6

@@ -48,18 +48,18 @@
 
 namespace uhd {
 
-static void Uhd_dealloc(Uhd *self) {
+static void Usrp_dealloc(Usrp *self) {
     delete self->receiver;
     delete self->transmitter;
     Py_TYPE(self)->tp_free(reinterpret_cast<PyObject *>(self));
 }
 
-static PyObject *Uhd_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    Uhd *self = reinterpret_cast<Uhd *>(type->tp_alloc(type, 0));
+static PyObject *Usrp_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+    Usrp *self = reinterpret_cast<Usrp *>(type->tp_alloc(type, 0));
     return reinterpret_cast<PyObject *>(self);
 }
 
-static int Uhd_init(Uhd *self, PyObject *args) {
+static int Usrp_init(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
 
@@ -92,7 +92,7 @@ static int Uhd_init(Uhd *self, PyObject *args) {
     return 0;
 }
 
-static PyObject *_get_receive(Uhd *self, const bool fresh = false) {
+static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 
     ReceiveResult *result = self->receiver->get_result(fresh);
     if (result->error) {
@@ -147,7 +147,7 @@ static PyObject *_get_receive(Uhd *self, const bool fresh = false) {
 "\n" \
 "Returns:\n" \
 "    list: list of ndarrays\n"
-static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
+static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
 
     if (PyTuple_Size(args)) {
 
@@ -287,13 +287,13 @@ static PyObject *Uhd_receive(Uhd *self, PyObject *args, PyObject *kwargs) {
 "\n" \
 "Returns:\n" \
 "    int: number of sample-blocks\n"
-static PyObject *Uhd_num_received(Uhd *self, void *closure) {
+static PyObject *Usrp_num_received(Usrp *self, void *closure) {
     return from(self->receiver->num_received());
 }
 
 #define DOC_STOP_RECEIVE \
 "Stop receiving."
-static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
+static PyObject *Usrp_stop_receive(Usrp *self, PyObject *args) {
     std::future<void> accepted = self->receiver->make_request(ReceiveRequestType::Stop);
     accepted.wait();
     Py_INCREF(Py_None);
@@ -311,7 +311,7 @@ static PyObject *Uhd_stop_receive(Uhd *self, PyObject *args) {
 "                                         default is 1.0\n" \
 "    timeout (float, optional): timeout in seconds, default is 0.5\n" \
 "    otw_format (str, optional): over-the-wire format, default is 'sc16'\n"
-static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
+static PyObject *Usrp_transmit(Usrp *self, PyObject *args, PyObject *kwargs) {
 
     /** Required **/
     PyObject *p_samples = nullptr;
@@ -466,7 +466,7 @@ static PyObject *Uhd_transmit(Uhd *self, PyObject *args, PyObject *kwargs) {
 
 #define DOC_STOP_TRANSMIT \
 "Stop transmit."
-static PyObject *Uhd_stop_transmit(Uhd *self, PyObject *args) {
+static PyObject *Usrp_stop_transmit(Usrp *self, PyObject *args) {
     std::future<std::string> accepted = self->transmitter->make_request(TransmitRequestType::Stop);
     accepted.wait();
     const std::string &error = accepted.get();
@@ -476,28 +476,28 @@ static PyObject *Uhd_stop_transmit(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyMemberDef Uhd_members[] = {{NULL}};
+static PyMemberDef Usrp_members[] = {{NULL}};
 
-static std::vector<PyMethodDef> Uhd_methods;
+static std::vector<PyMethodDef> Usrp_methods;
 
-const static std::vector<PyMethodDef> Uhd_user_methods {
-    {"receive", (PyCFunction)Uhd_receive, METH_VARARGS | METH_KEYWORDS, DOC_RECEIVE},
-    {"stop_receive", (PyCFunction)Uhd_stop_receive, METH_NOARGS, DOC_STOP_RECEIVE},
-    {"transmit", (PyCFunction)Uhd_transmit, METH_VARARGS | METH_KEYWORDS, DOC_TRANSMIT},
-    {"stop_transmit", (PyCFunction)Uhd_stop_transmit, METH_NOARGS, DOC_STOP_TRANSMIT},
+const static std::vector<PyMethodDef> Usrp_user_methods {
+    {"receive", (PyCFunction)Usrp_receive, METH_VARARGS | METH_KEYWORDS, DOC_RECEIVE},
+    {"stop_receive", (PyCFunction)Usrp_stop_receive, METH_NOARGS, DOC_STOP_RECEIVE},
+    {"transmit", (PyCFunction)Usrp_transmit, METH_VARARGS | METH_KEYWORDS, DOC_TRANSMIT},
+    {"stop_transmit", (PyCFunction)Usrp_stop_transmit, METH_NOARGS, DOC_STOP_TRANSMIT},
 };
 
-static PyGetSetDef Uhd_getset[] = {
-    {(char *)"num_received", (getter)Uhd_num_received, NULL, (char *)DOC_NUM_RECEIVED, NULL},
+static PyGetSetDef Usrp_getset[] = {
+    {(char *)"num_received", (getter)Usrp_num_received, NULL, (char *)DOC_NUM_RECEIVED, NULL},
     {NULL},
 };
 
-static PyTypeObject UhdType = {
+static PyTypeObject UsrpType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "uhd.Uhd",                                 /* tp_name */
-    sizeof(Uhd),                               /* tp_basicsize */
+    "pyuhd.Usrp",                              /* tp_name */
+    sizeof(Usrp),                              /* tp_basicsize */
     0,                                         /* tp_itemsize */
-    (destructor)Uhd_dealloc,                   /* tp_dealloc */
+    (destructor)Usrp_dealloc,                  /* tp_dealloc */
     0,                                         /* tp_print */
     0,                                         /* tp_getattr */
     0,                                         /* tp_setattr */
@@ -513,7 +513,7 @@ static PyTypeObject UhdType = {
     0,                                         /* tp_setattro */
     0,                                         /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /* tp_flags */
-    "Uhd object",                              /* tp_doc */
+    "Usrp object",                             /* tp_doc */
     0,                                         /* tp_traverse */
     0,                                         /* tp_clear */
     0,                                         /* tp_richcompare */
@@ -521,31 +521,31 @@ static PyTypeObject UhdType = {
     0,                                         /* tp_iter */
     0,                                         /* tp_iternext */
     0,                                         /* tp_methods (DEFERRED) */
-    Uhd_members,                               /* tp_members */
-    Uhd_getset,                                /* tp_getset */
+    Usrp_members,                              /* tp_members */
+    Usrp_getset,                               /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */
     0,                                         /* tp_descr_set */
     0,                                         /* tp_dictoffset */
-    (initproc)Uhd_init,                        /* tp_init */
+    (initproc)Usrp_init,                       /* tp_init */
     0,                                         /* tp_alloc */
-    Uhd_new,                                   /* tp_new */
+    Usrp_new,                                  /* tp_new */
 };
 
-int Uhd_register_type(PyObject *module) {
+int Usrp_register_type(PyObject *module) {
     /* Append generated & user methods */
-    Uhd_methods.clear();
-    for (const auto &method: Uhd_gen_methods)
-        Uhd_methods.push_back(method);
-    for (const auto &method: Uhd_user_methods)
-        Uhd_methods.push_back(method);
-    Uhd_methods.push_back({NULL});
-    UhdType.tp_methods = Uhd_methods.data();
-    if (PyType_Ready(&UhdType) < 0)
+    Usrp_methods.clear();
+    for (const auto &method: Usrp_gen_methods)
+        Usrp_methods.push_back(method);
+    for (const auto &method: Usrp_user_methods)
+        Usrp_methods.push_back(method);
+    Usrp_methods.push_back({NULL});
+    UsrpType.tp_methods = Usrp_methods.data();
+    if (PyType_Ready(&UsrpType) < 0)
         return -1;
-    Py_INCREF(&UhdType);
-    PyModule_AddObject(module, "Uhd", reinterpret_cast<PyObject *>(&UhdType));
+    Py_INCREF(&UsrpType);
+    PyModule_AddObject(module, "Usrp", reinterpret_cast<PyObject *>(&UsrpType));
     return 0;
 }
 

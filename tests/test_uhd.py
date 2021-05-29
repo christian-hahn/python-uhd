@@ -1,6 +1,6 @@
-"""Tests for UHD object.
+"""Tests for UHD module.
 
-This module contains unit-tests for the UHD object and its methods.
+This module contains unit-tests for the UHD module, USRP object and its methods.
 
 TODO:
   * write_register
@@ -10,7 +10,7 @@ TODO:
 """
 
 import pyuhd
-from pyuhd import Uhd, UhdError
+from pyuhd import Usrp, UhdError
 import unittest
 from itertools import combinations, product
 import numpy as np
@@ -39,8 +39,8 @@ def is_range(obj):
 class UhdTestCase(unittest.TestCase):
 
     def setUp(self):
-        """Create UHD object. Do some global setup."""
-        self.dut = Uhd()
+        """Create USRP object. Do some global setup."""
+        self.dut = Usrp()
         # Setup TX/RX frequencies: some functions need this setup to pass
         for chan in range(self.dut.get_rx_num_channels()):
             self.dut.set_rx_freq(self.dut.get_rx_freq_range(chan)['start'],
@@ -50,7 +50,7 @@ class UhdTestCase(unittest.TestCase):
                                  chan)
 
     def tearDown(self):
-        """Delete UHD object."""
+        """Delete USRP object."""
         del self.dut
 
     def helper_range(self, f_set, f_get, f_range, steps=None):

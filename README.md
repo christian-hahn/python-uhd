@@ -40,10 +40,10 @@ sudo python3 setup.py install
 
 ### Receive samples
 ```python
-from pyuhd import Uhd
+from pyuhd import Usrp
 
-# Create Uhd object
-u = Uhd()
+# Create USRP object
+u = Usrp()
 
 # Parameters
 center_freq = 140.625e6

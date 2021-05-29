@@ -23,7 +23,7 @@ namespace uhd {
 "\n" \
 "Args:\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Uhd_clear_command_time(Uhd *self, PyObject *args) {
+PyObject *Usrp_clear_command_time(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -55,7 +55,7 @@ PyObject *Uhd_clear_command_time(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of register paths\n"
-PyObject *Uhd_enumerate_registers(Uhd *self, PyObject *args) {
+PyObject *Usrp_enumerate_registers(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -87,7 +87,7 @@ PyObject *Uhd_enumerate_registers(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the string representing the clock source\n"
-PyObject *Uhd_get_clock_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_clock_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -116,7 +116,7 @@ PyObject *Uhd_get_clock_source(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of strings for possible settings\n"
-PyObject *Uhd_get_clock_sources(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_clock_sources(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -145,7 +145,7 @@ PyObject *Uhd_get_clock_sources(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_fe_rx_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_fe_rx_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -177,7 +177,7 @@ PyObject *Uhd_get_fe_rx_freq_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_fe_tx_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -213,7 +213,7 @@ PyObject *Uhd_get_fe_tx_freq_range(Uhd *self, PyObject *args) {
 "Returns:\n" \
 "    list: a vector of strings representing the\n" \
 "          selected filter names.\n"
-PyObject *Uhd_get_filter_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_filter_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -256,7 +256,7 @@ PyObject *Uhd_get_filter_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    int: the value set for this attribute\n"
-PyObject *Uhd_get_gpio_attr(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_gpio_attr(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -295,7 +295,7 @@ PyObject *Uhd_get_gpio_attr(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a list of string for each bank name\n"
-PyObject *Uhd_get_gpio_banks(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -352,7 +352,7 @@ PyObject *Uhd_get_gpio_banks(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: the value set for this attribute in vector of strings\n"
-PyObject *Uhd_get_gpio_string_attr(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_gpio_string_attr(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -391,7 +391,7 @@ PyObject *Uhd_get_gpio_string_attr(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the master clock rate in Hz.\n"
-PyObject *Uhd_get_master_clock_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_master_clock_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -437,7 +437,7 @@ PyObject *Uhd_get_master_clock_rate(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: value\n"
-PyObject *Uhd_get_master_clock_rate_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_master_clock_rate_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -469,7 +469,7 @@ PyObject *Uhd_get_master_clock_rate_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: a string representing the name\n"
-PyObject *Uhd_get_mboard_name(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_mboard_name(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -501,7 +501,7 @@ PyObject *Uhd_get_mboard_name(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of sensor names\n"
-PyObject *Uhd_get_mboard_sensor_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_mboard_sensor_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -535,7 +535,7 @@ PyObject *Uhd_get_mboard_sensor_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: s The normalized gain (in [0, 1])\n"
-PyObject *Uhd_get_normalized_rx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_normalized_rx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -569,7 +569,7 @@ PyObject *Uhd_get_normalized_rx_gain(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: s The normalized gain (in [0, 1])\n"
-PyObject *Uhd_get_normalized_tx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_normalized_tx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -598,7 +598,7 @@ PyObject *Uhd_get_normalized_tx_gain(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    int: value\n"
-PyObject *Uhd_get_num_mboards(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_num_mboards(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -620,7 +620,7 @@ PyObject *Uhd_get_num_mboards(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: a printable string\n"
-PyObject *Uhd_get_pp_string(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_pp_string(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -645,7 +645,7 @@ PyObject *Uhd_get_pp_string(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the antenna name\n"
-PyObject *Uhd_get_rx_antenna(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_antenna(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -677,7 +677,7 @@ PyObject *Uhd_get_rx_antenna(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of antenna names\n"
-PyObject *Uhd_get_rx_antennas(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_antennas(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -709,7 +709,7 @@ PyObject *Uhd_get_rx_antennas(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the bandwidth in Hz\n"
-PyObject *Uhd_get_rx_bandwidth(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_bandwidth(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -741,7 +741,7 @@ PyObject *Uhd_get_rx_bandwidth(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a range of bandwidths in Hz\n"
-PyObject *Uhd_get_rx_bandwidth_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -773,7 +773,7 @@ PyObject *Uhd_get_rx_bandwidth_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: value\n"
-PyObject *Uhd_get_rx_dc_offset_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -805,7 +805,7 @@ PyObject *Uhd_get_rx_dc_offset_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the frequency in Hz\n"
-PyObject *Uhd_get_rx_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -841,7 +841,7 @@ PyObject *Uhd_get_rx_freq(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_rx_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -883,7 +883,7 @@ PyObject *Uhd_get_rx_freq_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: value\n"
-static PyObject *Uhd_get_rx_gain_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_rx_gain_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -911,7 +911,7 @@ static PyObject *Uhd_get_rx_gain_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *Uhd_get_rx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_rx_gain_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -935,18 +935,18 @@ static PyObject *Uhd_get_rx_gain_1(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-PyObject *Uhd_get_rx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_get_rx_gain_0(self, args);
+        return Usrp_get_rx_gain_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return Uhd_get_rx_gain_1(self, args);
+        return Usrp_get_rx_gain_1(self, args);
     }
-    return Uhd_get_rx_gain_0(self, args);
+    return Usrp_get_rx_gain_0(self, args);
 }
 
 #define DOC_GET_RX_GAIN_NAMES \
@@ -958,7 +958,7 @@ PyObject *Uhd_get_rx_gain(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of gain element names\n"
-PyObject *Uhd_get_rx_gain_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_gain_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -990,7 +990,7 @@ PyObject *Uhd_get_rx_gain_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: a string of current RX gain profile of corresponding channel.\n"
-PyObject *Uhd_get_rx_gain_profile(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_gain_profile(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1028,7 +1028,7 @@ PyObject *Uhd_get_rx_gain_profile(Uhd *self, PyObject *args) {
 "Returns:\n" \
 "    list: a vector of strings for possible gain profile options, or an empty list of\n" \
 "          this doesn't apply.\n"
-PyObject *Uhd_get_rx_gain_profile_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_gain_profile_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1070,7 +1070,7 @@ PyObject *Uhd_get_rx_gain_profile_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: value\n"
-static PyObject *Uhd_get_rx_gain_range_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_rx_gain_range_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -1098,7 +1098,7 @@ static PyObject *Uhd_get_rx_gain_range_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *Uhd_get_rx_gain_range_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_rx_gain_range_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1122,18 +1122,18 @@ static PyObject *Uhd_get_rx_gain_range_1(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-PyObject *Uhd_get_rx_gain_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_gain_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_get_rx_gain_range_0(self, args);
+        return Usrp_get_rx_gain_range_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return Uhd_get_rx_gain_range_1(self, args);
+        return Usrp_get_rx_gain_range_1(self, args);
     }
-    return Uhd_get_rx_gain_range_0(self, args);
+    return Usrp_get_rx_gain_range_0(self, args);
 }
 
 #define DOC_GET_RX_LO_EXPORT_ENABLED \
@@ -1145,7 +1145,7 @@ PyObject *Uhd_get_rx_gain_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    bool: value\n"
-PyObject *Uhd_get_rx_lo_export_enabled(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -1187,7 +1187,7 @@ PyObject *Uhd_get_rx_lo_export_enabled(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the configured LO frequency\n"
-PyObject *Uhd_get_rx_lo_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -1226,7 +1226,7 @@ PyObject *Uhd_get_rx_lo_freq(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_rx_lo_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -1269,7 +1269,7 @@ PyObject *Uhd_get_rx_lo_freq_range(Uhd *self, PyObject *args) {
 "Returns:\n" \
 "    list: a vector of strings for possible LO names, or an empty list of\n" \
 "          this doesn't apply (i.e. there are no controllable LO stages)\n"
-PyObject *Uhd_get_rx_lo_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1303,7 +1303,7 @@ PyObject *Uhd_get_rx_lo_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the configured LO source\n"
-PyObject *Uhd_get_rx_lo_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -1346,7 +1346,7 @@ PyObject *Uhd_get_rx_lo_source(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of strings for possible settings\n"
-PyObject *Uhd_get_rx_lo_sources(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_lo_sources(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -1383,7 +1383,7 @@ PyObject *Uhd_get_rx_lo_sources(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    int: value\n"
-PyObject *Uhd_get_rx_num_channels(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_num_channels(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -1408,7 +1408,7 @@ PyObject *Uhd_get_rx_num_channels(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the rate in Sps\n"
-PyObject *Uhd_get_rx_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1440,7 +1440,7 @@ PyObject *Uhd_get_rx_rate(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: the meta range of rates\n"
-PyObject *Uhd_get_rx_rates(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_rates(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1472,7 +1472,7 @@ PyObject *Uhd_get_rx_rates(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of sensor names\n"
-PyObject *Uhd_get_rx_sensor_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_sensor_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1504,7 +1504,7 @@ PyObject *Uhd_get_rx_sensor_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the frontend name\n"
-PyObject *Uhd_get_rx_subdev_name(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_subdev_name(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1536,7 +1536,7 @@ PyObject *Uhd_get_rx_subdev_name(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the frontend specification in use\n"
-PyObject *Uhd_get_rx_subdev_spec(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_rx_subdev_spec(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1568,7 +1568,7 @@ PyObject *Uhd_get_rx_subdev_spec(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    TimeSpec: a timespec representing the last pps\n"
-PyObject *Uhd_get_time_last_pps(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_time_last_pps(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1600,7 +1600,7 @@ PyObject *Uhd_get_time_last_pps(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    TimeSpec: a timespec representing current usrp time\n"
-PyObject *Uhd_get_time_now(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_time_now(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1632,7 +1632,7 @@ PyObject *Uhd_get_time_now(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the string representing the time source\n"
-PyObject *Uhd_get_time_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_time_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -1661,7 +1661,7 @@ PyObject *Uhd_get_time_source(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of strings for possible settings\n"
-PyObject *Uhd_get_time_sources(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_time_sources(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -1689,7 +1689,7 @@ PyObject *Uhd_get_time_sources(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    bool: true when all motherboards time registers are in sync\n"
-PyObject *Uhd_get_time_synchronized(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_time_synchronized(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -1714,7 +1714,7 @@ PyObject *Uhd_get_time_synchronized(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the antenna name\n"
-PyObject *Uhd_get_tx_antenna(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_antenna(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1746,7 +1746,7 @@ PyObject *Uhd_get_tx_antenna(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of antenna names\n"
-PyObject *Uhd_get_tx_antennas(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_antennas(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1778,7 +1778,7 @@ PyObject *Uhd_get_tx_antennas(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the bandwidth in Hz\n"
-PyObject *Uhd_get_tx_bandwidth(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_bandwidth(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1810,7 +1810,7 @@ PyObject *Uhd_get_tx_bandwidth(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a range of bandwidths in Hz\n"
-PyObject *Uhd_get_tx_bandwidth_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1842,7 +1842,7 @@ PyObject *Uhd_get_tx_bandwidth_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: value\n"
-PyObject *Uhd_get_tx_dc_offset_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1874,7 +1874,7 @@ PyObject *Uhd_get_tx_dc_offset_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the frequency in Hz\n"
-PyObject *Uhd_get_tx_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1910,7 +1910,7 @@ PyObject *Uhd_get_tx_freq(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_tx_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -1952,7 +1952,7 @@ PyObject *Uhd_get_tx_freq_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: value\n"
-static PyObject *Uhd_get_tx_gain_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_tx_gain_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -1980,7 +1980,7 @@ static PyObject *Uhd_get_tx_gain_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *Uhd_get_tx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_tx_gain_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2004,18 +2004,18 @@ static PyObject *Uhd_get_tx_gain_1(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-PyObject *Uhd_get_tx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_get_tx_gain_0(self, args);
+        return Usrp_get_tx_gain_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return Uhd_get_tx_gain_1(self, args);
+        return Usrp_get_tx_gain_1(self, args);
     }
-    return Uhd_get_tx_gain_0(self, args);
+    return Usrp_get_tx_gain_0(self, args);
 }
 
 #define DOC_GET_TX_GAIN_NAMES \
@@ -2027,7 +2027,7 @@ PyObject *Uhd_get_tx_gain(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of gain element names\n"
-PyObject *Uhd_get_tx_gain_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_gain_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2059,7 +2059,7 @@ PyObject *Uhd_get_tx_gain_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: a string of current TX gain profile of corresponding channel.\n"
-PyObject *Uhd_get_tx_gain_profile(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_gain_profile(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2097,7 +2097,7 @@ PyObject *Uhd_get_tx_gain_profile(Uhd *self, PyObject *args) {
 "Returns:\n" \
 "    list: a vector of strings for possible gain profile options, or an empty list of\n" \
 "          this doesn't apply.\n"
-PyObject *Uhd_get_tx_gain_profile_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_gain_profile_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2139,7 +2139,7 @@ PyObject *Uhd_get_tx_gain_profile_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: value\n"
-static PyObject *Uhd_get_tx_gain_range_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_tx_gain_range_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2167,7 +2167,7 @@ static PyObject *Uhd_get_tx_gain_range_0(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-static PyObject *Uhd_get_tx_gain_range_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_get_tx_gain_range_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2191,18 +2191,18 @@ static PyObject *Uhd_get_tx_gain_range_1(Uhd *self, PyObject *args) {
     return from(ret);
 }
 
-PyObject *Uhd_get_tx_gain_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_gain_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 1 && nargs <= 2
         && is<std::string>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_get_tx_gain_range_0(self, args);
+        return Usrp_get_tx_gain_range_0(self, args);
     } else if (nargs >= 0 && nargs <= 1
         && (nargs <= 0 || is<size_t>(PyTuple_GetItem(args, 0)))) {
-        return Uhd_get_tx_gain_range_1(self, args);
+        return Usrp_get_tx_gain_range_1(self, args);
     }
-    return Uhd_get_tx_gain_range_0(self, args);
+    return Usrp_get_tx_gain_range_0(self, args);
 }
 
 #define DOC_GET_TX_LO_EXPORT_ENABLED \
@@ -2214,7 +2214,7 @@ PyObject *Uhd_get_tx_gain_range(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    bool: value\n"
-PyObject *Uhd_get_tx_lo_export_enabled(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -2256,7 +2256,7 @@ PyObject *Uhd_get_tx_lo_export_enabled(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the configured LO frequency\n"
-PyObject *Uhd_get_tx_lo_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2295,7 +2295,7 @@ PyObject *Uhd_get_tx_lo_freq(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a frequency range object\n"
-PyObject *Uhd_get_tx_lo_freq_range(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_freq_range(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2336,7 +2336,7 @@ PyObject *Uhd_get_tx_lo_freq_range(Uhd *self, PyObject *args) {
 "Returns:\n" \
 "    list: a vector of strings for possible LO names, or an empty list of\n" \
 "          this doesn't apply (i.e. there are no controllable LO stages)\n"
-PyObject *Uhd_get_tx_lo_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2370,7 +2370,7 @@ PyObject *Uhd_get_tx_lo_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the configured LO source\n"
-PyObject *Uhd_get_tx_lo_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -2412,7 +2412,7 @@ PyObject *Uhd_get_tx_lo_source(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of strings for possible settings\n"
-PyObject *Uhd_get_tx_lo_sources(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_lo_sources(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 2)
@@ -2449,7 +2449,7 @@ PyObject *Uhd_get_tx_lo_sources(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    int: value\n"
-PyObject *Uhd_get_tx_num_channels(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_num_channels(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -2474,7 +2474,7 @@ PyObject *Uhd_get_tx_num_channels(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: the rate in Sps\n"
-PyObject *Uhd_get_tx_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2506,7 +2506,7 @@ PyObject *Uhd_get_tx_rate(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: the meta range of rates\n"
-PyObject *Uhd_get_tx_rates(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_rates(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2538,7 +2538,7 @@ PyObject *Uhd_get_tx_rates(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: a vector of sensor names\n"
-PyObject *Uhd_get_tx_sensor_names(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_sensor_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2570,7 +2570,7 @@ PyObject *Uhd_get_tx_sensor_names(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the frontend name\n"
-PyObject *Uhd_get_tx_subdev_name(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_subdev_name(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2602,7 +2602,7 @@ PyObject *Uhd_get_tx_subdev_name(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    str: the frontend specification in use\n"
-PyObject *Uhd_get_tx_subdev_spec(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_tx_subdev_spec(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2636,7 +2636,7 @@ PyObject *Uhd_get_tx_subdev_spec(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: RX info\n"
-PyObject *Uhd_get_usrp_rx_info(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_usrp_rx_info(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2670,7 +2670,7 @@ PyObject *Uhd_get_usrp_rx_info(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    list: TX info\n"
-PyObject *Uhd_get_usrp_tx_info(Uhd *self, PyObject *args) {
+PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 1)
@@ -2699,7 +2699,7 @@ PyObject *Uhd_get_usrp_tx_info(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    bool: value\n"
-PyObject *Uhd_is_device3(Uhd *self, PyObject *args) {
+PyObject *Usrp_is_device3(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 0 || nargs > 0)
@@ -2726,7 +2726,7 @@ PyObject *Uhd_is_device3(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    int: the value of the register field\n"
-PyObject *Uhd_read_register(Uhd *self, PyObject *args) {
+PyObject *Usrp_read_register(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -2793,7 +2793,7 @@ PyObject *Uhd_read_register(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    source (str): a string representing the time source\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Uhd_set_clock_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2830,7 +2830,7 @@ PyObject *Uhd_set_clock_source(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    enb (bool): true to output the clock source.\n" \
 "    mboard (int, optional): which motherboard to set\n"
-PyObject *Uhd_set_clock_source_out(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_clock_source_out(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2867,7 +2867,7 @@ PyObject *Uhd_set_clock_source_out(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time at which the next command will activate\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Uhd_set_command_time(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -2948,7 +2948,7 @@ PyObject *Uhd_set_command_time(Uhd *self, PyObject *args) {
 "    mask (int, optional): the bit mask to\n" \
 "                          effect which pins are changed\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-static PyObject *Uhd_set_gpio_attr_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_gpio_attr_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 5)
@@ -2988,7 +2988,7 @@ static PyObject *Uhd_set_gpio_attr_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *Uhd_set_gpio_attr_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_gpio_attr_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 5)
@@ -3028,7 +3028,7 @@ static PyObject *Uhd_set_gpio_attr_1(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-PyObject *Uhd_set_gpio_attr(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_gpio_attr(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 3 && nargs <= 5
@@ -3037,16 +3037,16 @@ PyObject *Uhd_set_gpio_attr(Uhd *self, PyObject *args) {
         && is<uint32_t>(PyTuple_GetItem(args, 2))
         && (nargs <= 3 || is<uint32_t>(PyTuple_GetItem(args, 3)))
         && (nargs <= 4 || is<size_t>(PyTuple_GetItem(args, 4)))) {
-        return Uhd_set_gpio_attr_0(self, args);
+        return Usrp_set_gpio_attr_0(self, args);
     } else if (nargs >= 3 && nargs <= 5
         && is<std::string>(PyTuple_GetItem(args, 0))
         && is<std::string>(PyTuple_GetItem(args, 1))
         && is<std::string>(PyTuple_GetItem(args, 2))
         && (nargs <= 3 || is<uint32_t>(PyTuple_GetItem(args, 3)))
         && (nargs <= 4 || is<size_t>(PyTuple_GetItem(args, 4)))) {
-        return Uhd_set_gpio_attr_1(self, args);
+        return Usrp_set_gpio_attr_1(self, args);
     }
-    return Uhd_set_gpio_attr_0(self, args);
+    return Usrp_set_gpio_attr_0(self, args);
 }
 
 #define DOC_SET_MASTER_CLOCK_RATE \
@@ -3067,7 +3067,7 @@ PyObject *Uhd_set_gpio_attr(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    rate (float): the new master clock rate in Hz\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Uhd_set_master_clock_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_master_clock_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3107,7 +3107,7 @@ PyObject *Uhd_set_master_clock_rate(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    gain (float): the normalized gain value\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_normalized_rx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_normalized_rx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3143,7 +3143,7 @@ PyObject *Uhd_set_normalized_rx_gain(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    gain (float): the normalized gain value\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_normalized_tx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3180,7 +3180,7 @@ PyObject *Uhd_set_normalized_tx_gain(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    enable (bool): Enable or Disable the AGC\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_agc(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_agc(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3214,7 +3214,7 @@ PyObject *Uhd_set_rx_agc(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    ant (str): the antenna name\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_antenna(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_antenna(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3248,7 +3248,7 @@ PyObject *Uhd_set_rx_antenna(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    bandwidth (float): the bandwidth in Hz\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_bandwidth(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_bandwidth(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3295,7 +3295,7 @@ PyObject *Uhd_set_rx_bandwidth(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    offset (complex): the dc offset (1.0 is full-scale)\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-static PyObject *Uhd_set_rx_dc_offset_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_dc_offset_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3323,7 +3323,7 @@ static PyObject *Uhd_set_rx_dc_offset_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *Uhd_set_rx_dc_offset_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_dc_offset_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3351,19 +3351,19 @@ static PyObject *Uhd_set_rx_dc_offset_1(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-PyObject *Uhd_set_rx_dc_offset(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_dc_offset(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 1 && nargs <= 2
         && is<bool>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_set_rx_dc_offset_0(self, args);
+        return Usrp_set_rx_dc_offset_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<std::complex<double>>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_set_rx_dc_offset_1(self, args);
+        return Usrp_set_rx_dc_offset_1(self, args);
     }
-    return Uhd_set_rx_dc_offset_0(self, args);
+    return Usrp_set_rx_dc_offset_0(self, args);
 }
 
 #define DOC_SET_RX_FREQ \
@@ -3375,7 +3375,7 @@ PyObject *Uhd_set_rx_dc_offset(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a tune result object\n"
-PyObject *Uhd_set_rx_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3417,7 +3417,7 @@ PyObject *Uhd_set_rx_freq(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    gain (float): gain\n" \
 "    chan (int, optional): chan\n"
-static PyObject *Uhd_set_rx_gain_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_gain_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -3448,7 +3448,7 @@ static PyObject *Uhd_set_rx_gain_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *Uhd_set_rx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_gain_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3476,20 +3476,20 @@ static PyObject *Uhd_set_rx_gain_1(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-PyObject *Uhd_set_rx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 2 && nargs <= 3
         && is<double>(PyTuple_GetItem(args, 0))
         && is<std::string>(PyTuple_GetItem(args, 1))
         && (nargs <= 2 || is<size_t>(PyTuple_GetItem(args, 2)))) {
-        return Uhd_set_rx_gain_0(self, args);
+        return Usrp_set_rx_gain_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<double>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_set_rx_gain_1(self, args);
+        return Usrp_set_rx_gain_1(self, args);
     }
-    return Uhd_set_rx_gain_0(self, args);
+    return Usrp_set_rx_gain_0(self, args);
 }
 
 #define DOC_SET_RX_GAIN_PROFILE \
@@ -3498,7 +3498,7 @@ PyObject *Uhd_set_rx_gain(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    profile (str): the profile string option\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_gain_profile(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_gain_profile(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3539,7 +3539,7 @@ PyObject *Uhd_set_rx_gain_profile(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    correction (complex): the complex correction (1.0 is full-scale)\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-static PyObject *Uhd_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_iq_balance_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 2)
@@ -3563,7 +3563,7 @@ static PyObject *Uhd_set_rx_iq_balance_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *Uhd_set_rx_iq_balance_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_rx_iq_balance_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3591,19 +3591,19 @@ static PyObject *Uhd_set_rx_iq_balance_1(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-PyObject *Uhd_set_rx_iq_balance(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_iq_balance(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 2 && nargs <= 2
         && is<bool>(PyTuple_GetItem(args, 0))
         && is<size_t>(PyTuple_GetItem(args, 1))) {
-        return Uhd_set_rx_iq_balance_0(self, args);
+        return Usrp_set_rx_iq_balance_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<std::complex<double>>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_set_rx_iq_balance_1(self, args);
+        return Usrp_set_rx_iq_balance_1(self, args);
     }
-    return Uhd_set_rx_iq_balance_0(self, args);
+    return Usrp_set_rx_iq_balance_0(self, args);
 }
 
 #define DOC_SET_RX_LO_EXPORT_ENABLED \
@@ -3615,7 +3615,7 @@ PyObject *Uhd_set_rx_iq_balance(Uhd *self, PyObject *args) {
 "    enabled (bool): if true then export the LO\n" \
 "    name (str, optional): the name of the LO stage to update\n" \
 "    chan (int, optional): the channel index 0 to N-1 for the source channel\n"
-PyObject *Uhd_set_rx_lo_export_enabled(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 3)
@@ -3674,7 +3674,7 @@ PyObject *Uhd_set_rx_lo_export_enabled(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: a coerced LO frequency\n"
-PyObject *Uhd_set_rx_lo_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_lo_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -3716,7 +3716,7 @@ PyObject *Uhd_set_rx_lo_freq(Uhd *self, PyObject *args) {
 "                          ALL_LOS is used, the setting will be applied to all LOs on\n" \
 "                          this channel.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_lo_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 3)
@@ -3756,7 +3756,7 @@ PyObject *Uhd_set_rx_lo_source(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    rate (float): the rate in Sps\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_rx_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3793,7 +3793,7 @@ PyObject *Uhd_set_rx_rate(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    spec (str): the new frontend specification\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_rx_subdev_spec(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3830,7 +3830,7 @@ PyObject *Uhd_set_rx_subdev_spec(Uhd *self, PyObject *args) {
 "    clock_source (str): A string representing the clock source\n" \
 "    time_source (str): A string representing the time source\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Uhd_set_sync_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_sync_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -3872,7 +3872,7 @@ PyObject *Uhd_set_sync_source(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Uhd_set_time_next_pps(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_time_next_pps(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3910,7 +3910,7 @@ PyObject *Uhd_set_time_next_pps(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Uhd_set_time_now(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_time_now(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -3974,7 +3974,7 @@ PyObject *Uhd_set_time_now(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    source (str): a string representing the time source\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Uhd_set_time_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_time_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4011,7 +4011,7 @@ PyObject *Uhd_set_time_source(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    enb (bool): true to output the time source.\n" \
 "    mboard (int, optional): which motherboard to set\n"
-PyObject *Uhd_set_time_source_out(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_time_source_out(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4051,7 +4051,7 @@ PyObject *Uhd_set_time_source_out(Uhd *self, PyObject *args) {
 "\n" \
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time to latch at the next pps after catching the edge\n"
-PyObject *Uhd_set_time_unknown_pps(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_time_unknown_pps(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 1)
@@ -4078,7 +4078,7 @@ PyObject *Uhd_set_time_unknown_pps(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    ant (str): the antenna name\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_antenna(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_antenna(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4112,7 +4112,7 @@ PyObject *Uhd_set_tx_antenna(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    bandwidth (float): the bandwidth in Hz\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_bandwidth(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_bandwidth(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4147,7 +4147,7 @@ PyObject *Uhd_set_tx_bandwidth(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    offset (complex): the dc offset (1.0 is full-scale)\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_dc_offset(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_dc_offset(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4184,7 +4184,7 @@ PyObject *Uhd_set_tx_dc_offset(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    dict: a tune result object\n"
-PyObject *Uhd_set_tx_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4226,7 +4226,7 @@ PyObject *Uhd_set_tx_freq(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    gain (float): gain\n" \
 "    chan (int, optional): chan\n"
-static PyObject *Uhd_set_tx_gain_0(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_tx_gain_0(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -4257,7 +4257,7 @@ static PyObject *Uhd_set_tx_gain_0(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *Uhd_set_tx_gain_1(Uhd *self, PyObject *args) {
+static PyObject *Usrp_set_tx_gain_1(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4285,20 +4285,20 @@ static PyObject *Uhd_set_tx_gain_1(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-PyObject *Uhd_set_tx_gain(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_gain(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs >= 2 && nargs <= 3
         && is<double>(PyTuple_GetItem(args, 0))
         && is<std::string>(PyTuple_GetItem(args, 1))
         && (nargs <= 2 || is<size_t>(PyTuple_GetItem(args, 2)))) {
-        return Uhd_set_tx_gain_0(self, args);
+        return Usrp_set_tx_gain_0(self, args);
     } else if (nargs >= 1 && nargs <= 2
         && is<double>(PyTuple_GetItem(args, 0))
         && (nargs <= 1 || is<size_t>(PyTuple_GetItem(args, 1)))) {
-        return Uhd_set_tx_gain_1(self, args);
+        return Usrp_set_tx_gain_1(self, args);
     }
-    return Uhd_set_tx_gain_0(self, args);
+    return Usrp_set_tx_gain_0(self, args);
 }
 
 #define DOC_SET_TX_GAIN_PROFILE \
@@ -4307,7 +4307,7 @@ PyObject *Uhd_set_tx_gain(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    profile (str): the profile string option\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_gain_profile(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_gain_profile(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4342,7 +4342,7 @@ PyObject *Uhd_set_tx_gain_profile(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    correction (complex): the complex correction (1.0 is full-scale)\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_iq_balance(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_iq_balance(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4379,7 +4379,7 @@ PyObject *Uhd_set_tx_iq_balance(Uhd *self, PyObject *args) {
 "    enabled (bool): if true then export the LO\n" \
 "    name (str, optional): the name of the LO stage to update\n" \
 "    chan (int, optional): the channel index 0 to N-1 for the source channel\n"
-PyObject *Uhd_set_tx_lo_export_enabled(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 3)
@@ -4438,7 +4438,7 @@ PyObject *Uhd_set_tx_lo_export_enabled(Uhd *self, PyObject *args) {
 "\n" \
 "Returns:\n" \
 "    float: a coerced LO frequency\n"
-PyObject *Uhd_set_tx_lo_freq(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_lo_freq(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -4480,7 +4480,7 @@ PyObject *Uhd_set_tx_lo_freq(Uhd *self, PyObject *args) {
 "                          ALL_LOS is used, the setting will be applied to all LOs on\n" \
 "                          this channel.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_lo_source(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_lo_source(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 3)
@@ -4520,7 +4520,7 @@ PyObject *Uhd_set_tx_lo_source(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    rate (float): the rate in Sps\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
-PyObject *Uhd_set_tx_rate(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_rate(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4557,7 +4557,7 @@ PyObject *Uhd_set_tx_rate(Uhd *self, PyObject *args) {
 "Args:\n" \
 "    spec (str): the new frontend specification\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Uhd_set_tx_subdev_spec(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_tx_subdev_spec(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 1 || nargs > 2)
@@ -4593,7 +4593,7 @@ PyObject *Uhd_set_tx_subdev_spec(Uhd *self, PyObject *args) {
 "    addr (int): 8-bit register address\n" \
 "    data (int): 32-bit register value\n" \
 "    mboard (int, optional): which motherboard to set the user register\n"
-PyObject *Uhd_set_user_register(Uhd *self, PyObject *args) {
+PyObject *Usrp_set_user_register(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 2 || nargs > 3)
@@ -4634,7 +4634,7 @@ PyObject *Uhd_set_user_register(Uhd *self, PyObject *args) {
 "    value (int): the value to write to the register field\n" \
 "    mboard (int, optional): the\n" \
 "                            motherboard index 0 to M-1\n"
-PyObject *Uhd_write_register(Uhd *self, PyObject *args) {
+PyObject *Usrp_write_register(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 4)
@@ -4668,122 +4668,122 @@ PyObject *Uhd_write_register(Uhd *self, PyObject *args) {
     return Py_None;
 }
 
-const std::vector<PyMethodDef> Uhd_gen_methods {
-    {"clear_command_time", (PyCFunction)Uhd_clear_command_time, METH_VARARGS, DOC_CLEAR_COMMAND_TIME},
-    {"enumerate_registers", (PyCFunction)Uhd_enumerate_registers, METH_VARARGS, DOC_ENUMERATE_REGISTERS},
-    {"get_clock_source", (PyCFunction)Uhd_get_clock_source, METH_VARARGS, DOC_GET_CLOCK_SOURCE},
-    {"get_clock_sources", (PyCFunction)Uhd_get_clock_sources, METH_VARARGS, DOC_GET_CLOCK_SOURCES},
-    {"get_fe_rx_freq_range", (PyCFunction)Uhd_get_fe_rx_freq_range, METH_VARARGS, DOC_GET_FE_RX_FREQ_RANGE},
-    {"get_fe_tx_freq_range", (PyCFunction)Uhd_get_fe_tx_freq_range, METH_VARARGS, DOC_GET_FE_TX_FREQ_RANGE},
-    {"get_filter_names", (PyCFunction)Uhd_get_filter_names, METH_VARARGS, DOC_GET_FILTER_NAMES},
-    {"get_gpio_attr", (PyCFunction)Uhd_get_gpio_attr, METH_VARARGS, DOC_GET_GPIO_ATTR},
-    {"get_gpio_banks", (PyCFunction)Uhd_get_gpio_banks, METH_VARARGS, DOC_GET_GPIO_BANKS},
-    {"get_gpio_string_attr", (PyCFunction)Uhd_get_gpio_string_attr, METH_VARARGS, DOC_GET_GPIO_STRING_ATTR},
-    {"get_master_clock_rate", (PyCFunction)Uhd_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
-    {"get_master_clock_rate_range", (PyCFunction)Uhd_get_master_clock_rate_range, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE_RANGE},
-    {"get_mboard_name", (PyCFunction)Uhd_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
-    {"get_mboard_sensor_names", (PyCFunction)Uhd_get_mboard_sensor_names, METH_VARARGS, DOC_GET_MBOARD_SENSOR_NAMES},
-    {"get_normalized_rx_gain", (PyCFunction)Uhd_get_normalized_rx_gain, METH_VARARGS, DOC_GET_NORMALIZED_RX_GAIN},
-    {"get_normalized_tx_gain", (PyCFunction)Uhd_get_normalized_tx_gain, METH_VARARGS, DOC_GET_NORMALIZED_TX_GAIN},
-    {"get_num_mboards", (PyCFunction)Uhd_get_num_mboards, METH_VARARGS, DOC_GET_NUM_MBOARDS},
-    {"get_pp_string", (PyCFunction)Uhd_get_pp_string, METH_VARARGS, DOC_GET_PP_STRING},
-    {"get_rx_antenna", (PyCFunction)Uhd_get_rx_antenna, METH_VARARGS, DOC_GET_RX_ANTENNA},
-    {"get_rx_antennas", (PyCFunction)Uhd_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
-    {"get_rx_bandwidth", (PyCFunction)Uhd_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
-    {"get_rx_bandwidth_range", (PyCFunction)Uhd_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
-    {"get_rx_dc_offset_range", (PyCFunction)Uhd_get_rx_dc_offset_range, METH_VARARGS, DOC_GET_RX_DC_OFFSET_RANGE},
-    {"get_rx_freq", (PyCFunction)Uhd_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
-    {"get_rx_freq_range", (PyCFunction)Uhd_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
-    {"get_rx_gain", (PyCFunction)Uhd_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
-    {"get_rx_gain_names", (PyCFunction)Uhd_get_rx_gain_names, METH_VARARGS, DOC_GET_RX_GAIN_NAMES},
-    {"get_rx_gain_profile", (PyCFunction)Uhd_get_rx_gain_profile, METH_VARARGS, DOC_GET_RX_GAIN_PROFILE},
-    {"get_rx_gain_profile_names", (PyCFunction)Uhd_get_rx_gain_profile_names, METH_VARARGS, DOC_GET_RX_GAIN_PROFILE_NAMES},
-    {"get_rx_gain_range", (PyCFunction)Uhd_get_rx_gain_range, METH_VARARGS, DOC_GET_RX_GAIN_RANGE},
-    {"get_rx_lo_export_enabled", (PyCFunction)Uhd_get_rx_lo_export_enabled, METH_VARARGS, DOC_GET_RX_LO_EXPORT_ENABLED},
-    {"get_rx_lo_freq", (PyCFunction)Uhd_get_rx_lo_freq, METH_VARARGS, DOC_GET_RX_LO_FREQ},
-    {"get_rx_lo_freq_range", (PyCFunction)Uhd_get_rx_lo_freq_range, METH_VARARGS, DOC_GET_RX_LO_FREQ_RANGE},
-    {"get_rx_lo_names", (PyCFunction)Uhd_get_rx_lo_names, METH_VARARGS, DOC_GET_RX_LO_NAMES},
-    {"get_rx_lo_source", (PyCFunction)Uhd_get_rx_lo_source, METH_VARARGS, DOC_GET_RX_LO_SOURCE},
-    {"get_rx_lo_sources", (PyCFunction)Uhd_get_rx_lo_sources, METH_VARARGS, DOC_GET_RX_LO_SOURCES},
-    {"get_rx_num_channels", (PyCFunction)Uhd_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
-    {"get_rx_rate", (PyCFunction)Uhd_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
-    {"get_rx_rates", (PyCFunction)Uhd_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
-    {"get_rx_sensor_names", (PyCFunction)Uhd_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
-    {"get_rx_subdev_name", (PyCFunction)Uhd_get_rx_subdev_name, METH_VARARGS, DOC_GET_RX_SUBDEV_NAME},
-    {"get_rx_subdev_spec", (PyCFunction)Uhd_get_rx_subdev_spec, METH_VARARGS, DOC_GET_RX_SUBDEV_SPEC},
-    {"get_time_last_pps", (PyCFunction)Uhd_get_time_last_pps, METH_VARARGS, DOC_GET_TIME_LAST_PPS},
-    {"get_time_now", (PyCFunction)Uhd_get_time_now, METH_VARARGS, DOC_GET_TIME_NOW},
-    {"get_time_source", (PyCFunction)Uhd_get_time_source, METH_VARARGS, DOC_GET_TIME_SOURCE},
-    {"get_time_sources", (PyCFunction)Uhd_get_time_sources, METH_VARARGS, DOC_GET_TIME_SOURCES},
-    {"get_time_synchronized", (PyCFunction)Uhd_get_time_synchronized, METH_VARARGS, DOC_GET_TIME_SYNCHRONIZED},
-    {"get_tx_antenna", (PyCFunction)Uhd_get_tx_antenna, METH_VARARGS, DOC_GET_TX_ANTENNA},
-    {"get_tx_antennas", (PyCFunction)Uhd_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
-    {"get_tx_bandwidth", (PyCFunction)Uhd_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
-    {"get_tx_bandwidth_range", (PyCFunction)Uhd_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
-    {"get_tx_dc_offset_range", (PyCFunction)Uhd_get_tx_dc_offset_range, METH_VARARGS, DOC_GET_TX_DC_OFFSET_RANGE},
-    {"get_tx_freq", (PyCFunction)Uhd_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
-    {"get_tx_freq_range", (PyCFunction)Uhd_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
-    {"get_tx_gain", (PyCFunction)Uhd_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
-    {"get_tx_gain_names", (PyCFunction)Uhd_get_tx_gain_names, METH_VARARGS, DOC_GET_TX_GAIN_NAMES},
-    {"get_tx_gain_profile", (PyCFunction)Uhd_get_tx_gain_profile, METH_VARARGS, DOC_GET_TX_GAIN_PROFILE},
-    {"get_tx_gain_profile_names", (PyCFunction)Uhd_get_tx_gain_profile_names, METH_VARARGS, DOC_GET_TX_GAIN_PROFILE_NAMES},
-    {"get_tx_gain_range", (PyCFunction)Uhd_get_tx_gain_range, METH_VARARGS, DOC_GET_TX_GAIN_RANGE},
-    {"get_tx_lo_export_enabled", (PyCFunction)Uhd_get_tx_lo_export_enabled, METH_VARARGS, DOC_GET_TX_LO_EXPORT_ENABLED},
-    {"get_tx_lo_freq", (PyCFunction)Uhd_get_tx_lo_freq, METH_VARARGS, DOC_GET_TX_LO_FREQ},
-    {"get_tx_lo_freq_range", (PyCFunction)Uhd_get_tx_lo_freq_range, METH_VARARGS, DOC_GET_TX_LO_FREQ_RANGE},
-    {"get_tx_lo_names", (PyCFunction)Uhd_get_tx_lo_names, METH_VARARGS, DOC_GET_TX_LO_NAMES},
-    {"get_tx_lo_source", (PyCFunction)Uhd_get_tx_lo_source, METH_VARARGS, DOC_GET_TX_LO_SOURCE},
-    {"get_tx_lo_sources", (PyCFunction)Uhd_get_tx_lo_sources, METH_VARARGS, DOC_GET_TX_LO_SOURCES},
-    {"get_tx_num_channels", (PyCFunction)Uhd_get_tx_num_channels, METH_VARARGS, DOC_GET_TX_NUM_CHANNELS},
-    {"get_tx_rate", (PyCFunction)Uhd_get_tx_rate, METH_VARARGS, DOC_GET_TX_RATE},
-    {"get_tx_rates", (PyCFunction)Uhd_get_tx_rates, METH_VARARGS, DOC_GET_TX_RATES},
-    {"get_tx_sensor_names", (PyCFunction)Uhd_get_tx_sensor_names, METH_VARARGS, DOC_GET_TX_SENSOR_NAMES},
-    {"get_tx_subdev_name", (PyCFunction)Uhd_get_tx_subdev_name, METH_VARARGS, DOC_GET_TX_SUBDEV_NAME},
-    {"get_tx_subdev_spec", (PyCFunction)Uhd_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
-    {"get_usrp_rx_info", (PyCFunction)Uhd_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
-    {"get_usrp_tx_info", (PyCFunction)Uhd_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
-    {"is_device3", (PyCFunction)Uhd_is_device3, METH_VARARGS, DOC_IS_DEVICE3},
-    {"read_register", (PyCFunction)Uhd_read_register, METH_VARARGS, DOC_READ_REGISTER},
-    {"set_clock_source", (PyCFunction)Uhd_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
-    {"set_clock_source_out", (PyCFunction)Uhd_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
-    {"set_command_time", (PyCFunction)Uhd_set_command_time, METH_VARARGS, DOC_SET_COMMAND_TIME},
-    {"set_gpio_attr", (PyCFunction)Uhd_set_gpio_attr, METH_VARARGS, DOC_SET_GPIO_ATTR},
-    {"set_master_clock_rate", (PyCFunction)Uhd_set_master_clock_rate, METH_VARARGS, DOC_SET_MASTER_CLOCK_RATE},
-    {"set_normalized_rx_gain", (PyCFunction)Uhd_set_normalized_rx_gain, METH_VARARGS, DOC_SET_NORMALIZED_RX_GAIN},
-    {"set_normalized_tx_gain", (PyCFunction)Uhd_set_normalized_tx_gain, METH_VARARGS, DOC_SET_NORMALIZED_TX_GAIN},
-    {"set_rx_agc", (PyCFunction)Uhd_set_rx_agc, METH_VARARGS, DOC_SET_RX_AGC},
-    {"set_rx_antenna", (PyCFunction)Uhd_set_rx_antenna, METH_VARARGS, DOC_SET_RX_ANTENNA},
-    {"set_rx_bandwidth", (PyCFunction)Uhd_set_rx_bandwidth, METH_VARARGS, DOC_SET_RX_BANDWIDTH},
-    {"set_rx_dc_offset", (PyCFunction)Uhd_set_rx_dc_offset, METH_VARARGS, DOC_SET_RX_DC_OFFSET},
-    {"set_rx_freq", (PyCFunction)Uhd_set_rx_freq, METH_VARARGS, DOC_SET_RX_FREQ},
-    {"set_rx_gain", (PyCFunction)Uhd_set_rx_gain, METH_VARARGS, DOC_SET_RX_GAIN},
-    {"set_rx_gain_profile", (PyCFunction)Uhd_set_rx_gain_profile, METH_VARARGS, DOC_SET_RX_GAIN_PROFILE},
-    {"set_rx_iq_balance", (PyCFunction)Uhd_set_rx_iq_balance, METH_VARARGS, DOC_SET_RX_IQ_BALANCE},
-    {"set_rx_lo_export_enabled", (PyCFunction)Uhd_set_rx_lo_export_enabled, METH_VARARGS, DOC_SET_RX_LO_EXPORT_ENABLED},
-    {"set_rx_lo_freq", (PyCFunction)Uhd_set_rx_lo_freq, METH_VARARGS, DOC_SET_RX_LO_FREQ},
-    {"set_rx_lo_source", (PyCFunction)Uhd_set_rx_lo_source, METH_VARARGS, DOC_SET_RX_LO_SOURCE},
-    {"set_rx_rate", (PyCFunction)Uhd_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
-    {"set_rx_subdev_spec", (PyCFunction)Uhd_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
-    {"set_sync_source", (PyCFunction)Uhd_set_sync_source, METH_VARARGS, DOC_SET_SYNC_SOURCE},
-    {"set_time_next_pps", (PyCFunction)Uhd_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},
-    {"set_time_now", (PyCFunction)Uhd_set_time_now, METH_VARARGS, DOC_SET_TIME_NOW},
-    {"set_time_source", (PyCFunction)Uhd_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},
-    {"set_time_source_out", (PyCFunction)Uhd_set_time_source_out, METH_VARARGS, DOC_SET_TIME_SOURCE_OUT},
-    {"set_time_unknown_pps", (PyCFunction)Uhd_set_time_unknown_pps, METH_VARARGS, DOC_SET_TIME_UNKNOWN_PPS},
-    {"set_tx_antenna", (PyCFunction)Uhd_set_tx_antenna, METH_VARARGS, DOC_SET_TX_ANTENNA},
-    {"set_tx_bandwidth", (PyCFunction)Uhd_set_tx_bandwidth, METH_VARARGS, DOC_SET_TX_BANDWIDTH},
-    {"set_tx_dc_offset", (PyCFunction)Uhd_set_tx_dc_offset, METH_VARARGS, DOC_SET_TX_DC_OFFSET},
-    {"set_tx_freq", (PyCFunction)Uhd_set_tx_freq, METH_VARARGS, DOC_SET_TX_FREQ},
-    {"set_tx_gain", (PyCFunction)Uhd_set_tx_gain, METH_VARARGS, DOC_SET_TX_GAIN},
-    {"set_tx_gain_profile", (PyCFunction)Uhd_set_tx_gain_profile, METH_VARARGS, DOC_SET_TX_GAIN_PROFILE},
-    {"set_tx_iq_balance", (PyCFunction)Uhd_set_tx_iq_balance, METH_VARARGS, DOC_SET_TX_IQ_BALANCE},
-    {"set_tx_lo_export_enabled", (PyCFunction)Uhd_set_tx_lo_export_enabled, METH_VARARGS, DOC_SET_TX_LO_EXPORT_ENABLED},
-    {"set_tx_lo_freq", (PyCFunction)Uhd_set_tx_lo_freq, METH_VARARGS, DOC_SET_TX_LO_FREQ},
-    {"set_tx_lo_source", (PyCFunction)Uhd_set_tx_lo_source, METH_VARARGS, DOC_SET_TX_LO_SOURCE},
-    {"set_tx_rate", (PyCFunction)Uhd_set_tx_rate, METH_VARARGS, DOC_SET_TX_RATE},
-    {"set_tx_subdev_spec", (PyCFunction)Uhd_set_tx_subdev_spec, METH_VARARGS, DOC_SET_TX_SUBDEV_SPEC},
-    {"set_user_register", (PyCFunction)Uhd_set_user_register, METH_VARARGS, DOC_SET_USER_REGISTER},
-    {"write_register", (PyCFunction)Uhd_write_register, METH_VARARGS, DOC_WRITE_REGISTER},
+const std::vector<PyMethodDef> Usrp_gen_methods {
+    {"clear_command_time", (PyCFunction)Usrp_clear_command_time, METH_VARARGS, DOC_CLEAR_COMMAND_TIME},
+    {"enumerate_registers", (PyCFunction)Usrp_enumerate_registers, METH_VARARGS, DOC_ENUMERATE_REGISTERS},
+    {"get_clock_source", (PyCFunction)Usrp_get_clock_source, METH_VARARGS, DOC_GET_CLOCK_SOURCE},
+    {"get_clock_sources", (PyCFunction)Usrp_get_clock_sources, METH_VARARGS, DOC_GET_CLOCK_SOURCES},
+    {"get_fe_rx_freq_range", (PyCFunction)Usrp_get_fe_rx_freq_range, METH_VARARGS, DOC_GET_FE_RX_FREQ_RANGE},
+    {"get_fe_tx_freq_range", (PyCFunction)Usrp_get_fe_tx_freq_range, METH_VARARGS, DOC_GET_FE_TX_FREQ_RANGE},
+    {"get_filter_names", (PyCFunction)Usrp_get_filter_names, METH_VARARGS, DOC_GET_FILTER_NAMES},
+    {"get_gpio_attr", (PyCFunction)Usrp_get_gpio_attr, METH_VARARGS, DOC_GET_GPIO_ATTR},
+    {"get_gpio_banks", (PyCFunction)Usrp_get_gpio_banks, METH_VARARGS, DOC_GET_GPIO_BANKS},
+    {"get_gpio_string_attr", (PyCFunction)Usrp_get_gpio_string_attr, METH_VARARGS, DOC_GET_GPIO_STRING_ATTR},
+    {"get_master_clock_rate", (PyCFunction)Usrp_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
+    {"get_master_clock_rate_range", (PyCFunction)Usrp_get_master_clock_rate_range, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE_RANGE},
+    {"get_mboard_name", (PyCFunction)Usrp_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
+    {"get_mboard_sensor_names", (PyCFunction)Usrp_get_mboard_sensor_names, METH_VARARGS, DOC_GET_MBOARD_SENSOR_NAMES},
+    {"get_normalized_rx_gain", (PyCFunction)Usrp_get_normalized_rx_gain, METH_VARARGS, DOC_GET_NORMALIZED_RX_GAIN},
+    {"get_normalized_tx_gain", (PyCFunction)Usrp_get_normalized_tx_gain, METH_VARARGS, DOC_GET_NORMALIZED_TX_GAIN},
+    {"get_num_mboards", (PyCFunction)Usrp_get_num_mboards, METH_VARARGS, DOC_GET_NUM_MBOARDS},
+    {"get_pp_string", (PyCFunction)Usrp_get_pp_string, METH_VARARGS, DOC_GET_PP_STRING},
+    {"get_rx_antenna", (PyCFunction)Usrp_get_rx_antenna, METH_VARARGS, DOC_GET_RX_ANTENNA},
+    {"get_rx_antennas", (PyCFunction)Usrp_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
+    {"get_rx_bandwidth", (PyCFunction)Usrp_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
+    {"get_rx_bandwidth_range", (PyCFunction)Usrp_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
+    {"get_rx_dc_offset_range", (PyCFunction)Usrp_get_rx_dc_offset_range, METH_VARARGS, DOC_GET_RX_DC_OFFSET_RANGE},
+    {"get_rx_freq", (PyCFunction)Usrp_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
+    {"get_rx_freq_range", (PyCFunction)Usrp_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
+    {"get_rx_gain", (PyCFunction)Usrp_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
+    {"get_rx_gain_names", (PyCFunction)Usrp_get_rx_gain_names, METH_VARARGS, DOC_GET_RX_GAIN_NAMES},
+    {"get_rx_gain_profile", (PyCFunction)Usrp_get_rx_gain_profile, METH_VARARGS, DOC_GET_RX_GAIN_PROFILE},
+    {"get_rx_gain_profile_names", (PyCFunction)Usrp_get_rx_gain_profile_names, METH_VARARGS, DOC_GET_RX_GAIN_PROFILE_NAMES},
+    {"get_rx_gain_range", (PyCFunction)Usrp_get_rx_gain_range, METH_VARARGS, DOC_GET_RX_GAIN_RANGE},
+    {"get_rx_lo_export_enabled", (PyCFunction)Usrp_get_rx_lo_export_enabled, METH_VARARGS, DOC_GET_RX_LO_EXPORT_ENABLED},
+    {"get_rx_lo_freq", (PyCFunction)Usrp_get_rx_lo_freq, METH_VARARGS, DOC_GET_RX_LO_FREQ},
+    {"get_rx_lo_freq_range", (PyCFunction)Usrp_get_rx_lo_freq_range, METH_VARARGS, DOC_GET_RX_LO_FREQ_RANGE},
+    {"get_rx_lo_names", (PyCFunction)Usrp_get_rx_lo_names, METH_VARARGS, DOC_GET_RX_LO_NAMES},
+    {"get_rx_lo_source", (PyCFunction)Usrp_get_rx_lo_source, METH_VARARGS, DOC_GET_RX_LO_SOURCE},
+    {"get_rx_lo_sources", (PyCFunction)Usrp_get_rx_lo_sources, METH_VARARGS, DOC_GET_RX_LO_SOURCES},
+    {"get_rx_num_channels", (PyCFunction)Usrp_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
+    {"get_rx_rate", (PyCFunction)Usrp_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
+    {"get_rx_rates", (PyCFunction)Usrp_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
+    {"get_rx_sensor_names", (PyCFunction)Usrp_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
+    {"get_rx_subdev_name", (PyCFunction)Usrp_get_rx_subdev_name, METH_VARARGS, DOC_GET_RX_SUBDEV_NAME},
+    {"get_rx_subdev_spec", (PyCFunction)Usrp_get_rx_subdev_spec, METH_VARARGS, DOC_GET_RX_SUBDEV_SPEC},
+    {"get_time_last_pps", (PyCFunction)Usrp_get_time_last_pps, METH_VARARGS, DOC_GET_TIME_LAST_PPS},
+    {"get_time_now", (PyCFunction)Usrp_get_time_now, METH_VARARGS, DOC_GET_TIME_NOW},
+    {"get_time_source", (PyCFunction)Usrp_get_time_source, METH_VARARGS, DOC_GET_TIME_SOURCE},
+    {"get_time_sources", (PyCFunction)Usrp_get_time_sources, METH_VARARGS, DOC_GET_TIME_SOURCES},
+    {"get_time_synchronized", (PyCFunction)Usrp_get_time_synchronized, METH_VARARGS, DOC_GET_TIME_SYNCHRONIZED},
+    {"get_tx_antenna", (PyCFunction)Usrp_get_tx_antenna, METH_VARARGS, DOC_GET_TX_ANTENNA},
+    {"get_tx_antennas", (PyCFunction)Usrp_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
+    {"get_tx_bandwidth", (PyCFunction)Usrp_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
+    {"get_tx_bandwidth_range", (PyCFunction)Usrp_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
+    {"get_tx_dc_offset_range", (PyCFunction)Usrp_get_tx_dc_offset_range, METH_VARARGS, DOC_GET_TX_DC_OFFSET_RANGE},
+    {"get_tx_freq", (PyCFunction)Usrp_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
+    {"get_tx_freq_range", (PyCFunction)Usrp_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
+    {"get_tx_gain", (PyCFunction)Usrp_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
+    {"get_tx_gain_names", (PyCFunction)Usrp_get_tx_gain_names, METH_VARARGS, DOC_GET_TX_GAIN_NAMES},
+    {"get_tx_gain_profile", (PyCFunction)Usrp_get_tx_gain_profile, METH_VARARGS, DOC_GET_TX_GAIN_PROFILE},
+    {"get_tx_gain_profile_names", (PyCFunction)Usrp_get_tx_gain_profile_names, METH_VARARGS, DOC_GET_TX_GAIN_PROFILE_NAMES},
+    {"get_tx_gain_range", (PyCFunction)Usrp_get_tx_gain_range, METH_VARARGS, DOC_GET_TX_GAIN_RANGE},
+    {"get_tx_lo_export_enabled", (PyCFunction)Usrp_get_tx_lo_export_enabled, METH_VARARGS, DOC_GET_TX_LO_EXPORT_ENABLED},
+    {"get_tx_lo_freq", (PyCFunction)Usrp_get_tx_lo_freq, METH_VARARGS, DOC_GET_TX_LO_FREQ},
+    {"get_tx_lo_freq_range", (PyCFunction)Usrp_get_tx_lo_freq_range, METH_VARARGS, DOC_GET_TX_LO_FREQ_RANGE},
+    {"get_tx_lo_names", (PyCFunction)Usrp_get_tx_lo_names, METH_VARARGS, DOC_GET_TX_LO_NAMES},
+    {"get_tx_lo_source", (PyCFunction)Usrp_get_tx_lo_source, METH_VARARGS, DOC_GET_TX_LO_SOURCE},
+    {"get_tx_lo_sources", (PyCFunction)Usrp_get_tx_lo_sources, METH_VARARGS, DOC_GET_TX_LO_SOURCES},
+    {"get_tx_num_channels", (PyCFunction)Usrp_get_tx_num_channels, METH_VARARGS, DOC_GET_TX_NUM_CHANNELS},
+    {"get_tx_rate", (PyCFunction)Usrp_get_tx_rate, METH_VARARGS, DOC_GET_TX_RATE},
+    {"get_tx_rates", (PyCFunction)Usrp_get_tx_rates, METH_VARARGS, DOC_GET_TX_RATES},
+    {"get_tx_sensor_names", (PyCFunction)Usrp_get_tx_sensor_names, METH_VARARGS, DOC_GET_TX_SENSOR_NAMES},
+    {"get_tx_subdev_name", (PyCFunction)Usrp_get_tx_subdev_name, METH_VARARGS, DOC_GET_TX_SUBDEV_NAME},
+    {"get_tx_subdev_spec", (PyCFunction)Usrp_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
+    {"get_usrp_rx_info", (PyCFunction)Usrp_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
+    {"get_usrp_tx_info", (PyCFunction)Usrp_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
+    {"is_device3", (PyCFunction)Usrp_is_device3, METH_VARARGS, DOC_IS_DEVICE3},
+    {"read_register", (PyCFunction)Usrp_read_register, METH_VARARGS, DOC_READ_REGISTER},
+    {"set_clock_source", (PyCFunction)Usrp_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
+    {"set_clock_source_out", (PyCFunction)Usrp_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
+    {"set_command_time", (PyCFunction)Usrp_set_command_time, METH_VARARGS, DOC_SET_COMMAND_TIME},
+    {"set_gpio_attr", (PyCFunction)Usrp_set_gpio_attr, METH_VARARGS, DOC_SET_GPIO_ATTR},
+    {"set_master_clock_rate", (PyCFunction)Usrp_set_master_clock_rate, METH_VARARGS, DOC_SET_MASTER_CLOCK_RATE},
+    {"set_normalized_rx_gain", (PyCFunction)Usrp_set_normalized_rx_gain, METH_VARARGS, DOC_SET_NORMALIZED_RX_GAIN},
+    {"set_normalized_tx_gain", (PyCFunction)Usrp_set_normalized_tx_gain, METH_VARARGS, DOC_SET_NORMALIZED_TX_GAIN},
+    {"set_rx_agc", (PyCFunction)Usrp_set_rx_agc, METH_VARARGS, DOC_SET_RX_AGC},
+    {"set_rx_antenna", (PyCFunction)Usrp_set_rx_antenna, METH_VARARGS, DOC_SET_RX_ANTENNA},
+    {"set_rx_bandwidth", (PyCFunction)Usrp_set_rx_bandwidth, METH_VARARGS, DOC_SET_RX_BANDWIDTH},
+    {"set_rx_dc_offset", (PyCFunction)Usrp_set_rx_dc_offset, METH_VARARGS, DOC_SET_RX_DC_OFFSET},
+    {"set_rx_freq", (PyCFunction)Usrp_set_rx_freq, METH_VARARGS, DOC_SET_RX_FREQ},
+    {"set_rx_gain", (PyCFunction)Usrp_set_rx_gain, METH_VARARGS, DOC_SET_RX_GAIN},
+    {"set_rx_gain_profile", (PyCFunction)Usrp_set_rx_gain_profile, METH_VARARGS, DOC_SET_RX_GAIN_PROFILE},
+    {"set_rx_iq_balance", (PyCFunction)Usrp_set_rx_iq_balance, METH_VARARGS, DOC_SET_RX_IQ_BALANCE},
+    {"set_rx_lo_export_enabled", (PyCFunction)Usrp_set_rx_lo_export_enabled, METH_VARARGS, DOC_SET_RX_LO_EXPORT_ENABLED},
+    {"set_rx_lo_freq", (PyCFunction)Usrp_set_rx_lo_freq, METH_VARARGS, DOC_SET_RX_LO_FREQ},
+    {"set_rx_lo_source", (PyCFunction)Usrp_set_rx_lo_source, METH_VARARGS, DOC_SET_RX_LO_SOURCE},
+    {"set_rx_rate", (PyCFunction)Usrp_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
+    {"set_rx_subdev_spec", (PyCFunction)Usrp_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
+    {"set_sync_source", (PyCFunction)Usrp_set_sync_source, METH_VARARGS, DOC_SET_SYNC_SOURCE},
+    {"set_time_next_pps", (PyCFunction)Usrp_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},
+    {"set_time_now", (PyCFunction)Usrp_set_time_now, METH_VARARGS, DOC_SET_TIME_NOW},
+    {"set_time_source", (PyCFunction)Usrp_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},
+    {"set_time_source_out", (PyCFunction)Usrp_set_time_source_out, METH_VARARGS, DOC_SET_TIME_SOURCE_OUT},
+    {"set_time_unknown_pps", (PyCFunction)Usrp_set_time_unknown_pps, METH_VARARGS, DOC_SET_TIME_UNKNOWN_PPS},
+    {"set_tx_antenna", (PyCFunction)Usrp_set_tx_antenna, METH_VARARGS, DOC_SET_TX_ANTENNA},
+    {"set_tx_bandwidth", (PyCFunction)Usrp_set_tx_bandwidth, METH_VARARGS, DOC_SET_TX_BANDWIDTH},
+    {"set_tx_dc_offset", (PyCFunction)Usrp_set_tx_dc_offset, METH_VARARGS, DOC_SET_TX_DC_OFFSET},
+    {"set_tx_freq", (PyCFunction)Usrp_set_tx_freq, METH_VARARGS, DOC_SET_TX_FREQ},
+    {"set_tx_gain", (PyCFunction)Usrp_set_tx_gain, METH_VARARGS, DOC_SET_TX_GAIN},
+    {"set_tx_gain_profile", (PyCFunction)Usrp_set_tx_gain_profile, METH_VARARGS, DOC_SET_TX_GAIN_PROFILE},
+    {"set_tx_iq_balance", (PyCFunction)Usrp_set_tx_iq_balance, METH_VARARGS, DOC_SET_TX_IQ_BALANCE},
+    {"set_tx_lo_export_enabled", (PyCFunction)Usrp_set_tx_lo_export_enabled, METH_VARARGS, DOC_SET_TX_LO_EXPORT_ENABLED},
+    {"set_tx_lo_freq", (PyCFunction)Usrp_set_tx_lo_freq, METH_VARARGS, DOC_SET_TX_LO_FREQ},
+    {"set_tx_lo_source", (PyCFunction)Usrp_set_tx_lo_source, METH_VARARGS, DOC_SET_TX_LO_SOURCE},
+    {"set_tx_rate", (PyCFunction)Usrp_set_tx_rate, METH_VARARGS, DOC_SET_TX_RATE},
+    {"set_tx_subdev_spec", (PyCFunction)Usrp_set_tx_subdev_spec, METH_VARARGS, DOC_SET_TX_SUBDEV_SPEC},
+    {"set_user_register", (PyCFunction)Usrp_set_user_register, METH_VARARGS, DOC_SET_USER_REGISTER},
+    {"write_register", (PyCFunction)Usrp_write_register, METH_VARARGS, DOC_WRITE_REGISTER},
 };
 
 }

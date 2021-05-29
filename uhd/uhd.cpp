@@ -40,8 +40,8 @@ PyMODINIT_FUNC PyInit_pyuhd(void) {
     if ((module = PyModule_Create(&moduledef)) == nullptr)
         return nullptr;
 
-    /** Add Uhd object **/
-    if (Uhd_register_type(module) < 0)
+    /** Add Usrp object **/
+    if (Usrp_register_type(module) < 0)
         return nullptr;
 
     /** Add TimeSpec object **/
