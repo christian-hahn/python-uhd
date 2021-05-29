@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import uhd
+from pyuhd import Uhd
 
-u = uhd.Uhd()
+u = Uhd()
 
 # Parameters
 center_freq = 140.625e6

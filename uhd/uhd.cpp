@@ -19,7 +19,7 @@ static PyMethodDef module_methods[] = {{NULL}};
 
 static PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
-    "uhd",                                  /* m_name */
+    "pyuhd",                                /* m_name */
     "USRP hardware driver Python module.",  /* m_doc */
     -1,                                     /* m_size */
     module_methods,                         /* m_methods */
@@ -32,7 +32,7 @@ static PyModuleDef moduledef = {
 #ifdef __cplusplus
 extern "C"
 #endif
-PyMODINIT_FUNC PyInit_uhd(void) {
+PyMODINIT_FUNC PyInit_pyuhd(void) {
 
     import_array();
 
@@ -49,7 +49,7 @@ PyMODINIT_FUNC PyInit_uhd(void) {
         return nullptr;
 
     /** Add UhdError exception **/
-    UhdError = PyErr_NewExceptionWithDoc((char *)"uhd.UhdError", (char *)"UHD exception.", NULL, NULL);
+    UhdError = PyErr_NewExceptionWithDoc((char *)"pyuhd.UhdError", (char *)"UHD exception.", NULL, NULL);
     Py_INCREF(UhdError);
     PyModule_AddObject(module, "UhdError", UhdError);
 

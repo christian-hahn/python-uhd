@@ -9,7 +9,7 @@
     sudo pip3 install pyalsaaudio
 '''
 
-import uhd
+from pyuhd import Uhd
 import numpy as np
 from scipy.signal import lfilter, cheby1
 import alsaaudio
@@ -34,7 +34,7 @@ def main():
     audio_samp_rate = 48e3  # Output audio sample-rate of 48 kSps
 
     # Create UHD object
-    u = uhd.Uhd()
+    u = Uhd()
 
     # Select optimal LO frequency: signal_freq - bandwidth rounded
     # to nearest 1.25 MHz

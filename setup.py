@@ -7,8 +7,8 @@ import numpy
 
 VERSION = '1.1.0'
 
-uhd = Extension(
-    'uhd',
+pyuhd = Extension(
+    'pyuhd',
     define_macros=[
         ('PYUHD_VERSION', '"{}"'.format(VERSION)),
     ],
@@ -26,16 +26,15 @@ uhd = Extension(
 )
 
 setup(
-    name='uhd',
+    name='pyuhd',
     version=VERSION,
     description='A Python 3 C-extension to facilitate development with USRP '
         'hardware.',
     setup_requires=['numpy'],
     install_requires=['numpy'],
-    ext_modules=[uhd],
+    ext_modules=[pyuhd],
     author='Christian Hahn',
     author_email='christianhahn09@gmail.com',
-    packages=['uhd'],
     long_description='python-uhd is a Python 3 C-extension to facilitate '
         'development with USRP hardware from Python.',
     license='MIT',

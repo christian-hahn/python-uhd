@@ -9,7 +9,8 @@ TODO:
   * set_user_register
 """
 
-import uhd
+import pyuhd
+from pyuhd import Uhd, UhdError
 import unittest
 from itertools import combinations, product
 import numpy as np
@@ -22,7 +23,7 @@ def not_supported(function):
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except uhd.UhdError as e:
+        except UhdError as e:
             if 'not supported on this device' not in str(e):
                 raise
     return wrapper
@@ -39,7 +40,7 @@ class UhdTestCase(unittest.TestCase):
 
     def setUp(self):
         """Create UHD object. Do some global setup."""
-        self.dut = uhd.Uhd()
+        self.dut = Uhd()
         # Setup TX/RX frequencies: some functions need this setup to pass
         for chan in range(self.dut.get_rx_num_channels()):
             self.dut.set_rx_freq(self.dut.get_rx_freq_range(chan)['start'],
@@ -76,11 +77,11 @@ class UhdTestCase(unittest.TestCase):
 
     def test_versions(self):
         for attr in ('__version__', 'UHD_VERSION_ABI', 'UHD_VERSION_LONG'):
-            value = getattr(uhd, attr)
+            value = getattr(pyuhd, attr)
             print('Got {} = \'{}\''.format(attr, value))
             self.assertIsInstance(value, str)
             self.assertTrue(len(value) > 0)
-        uhd_ver = uhd.UHD_VERSION
+        uhd_ver = pyuhd.UHD_VERSION
         print('Got UHD_VERSION = {}'.format(uhd_ver))
         self.assertIsInstance(uhd_ver, int)
         self.assertTrue(uhd_ver > 0)
@@ -311,7 +312,7 @@ class UhdTestCase(unittest.TestCase):
             self.assertTrue(all(isinstance(n, str) and len(n) for n in filters))
         else:
             # UHD v4.x.x does not have get_filter_names
-            self.assertTrue(int(uhd.UHD_VERSION_ABI.split('.')[0]) >= 4,
+            self.assertTrue(int(pyuhd.UHD_VERSION_ABI.split('.')[0]) >= 4,
                             'Expected UHD major version >= 4.')
 
     def test_rx_setters(self):
@@ -400,7 +401,7 @@ class UhdTestCase(unittest.TestCase):
                             samps = self.dut.receive(num_samps, channels, **kwargs)
                         self.assertEqual(len(samps), len(channels))
                         self.assertTrue(all(len(i) == num_samps for i in samps))
-                    except uhd.UhdError as e:
+                    except UhdError as e:
                         self.fail('Failed to receive (channels = {}, num_samps = {}, kwargs'
                                   ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
 
@@ -433,7 +434,7 @@ class UhdTestCase(unittest.TestCase):
                         if kwargs.get('continuous', False):
                             self.dut.stop_transmit()
                         sleep(100e-3)
-                    except uhd.UhdError as e:
+                    except UhdError as e:
                         self.fail('Failed to transmit (channels = {}, num_samps = {}, kwargs'
                                   ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
 

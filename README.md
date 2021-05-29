@@ -40,7 +40,7 @@ sudo python3 setup.py install
 
 ### Receive samples
 ```python
-from uhd import Uhd
+from pyuhd import Uhd
 
 # Create Uhd object
 u = Uhd()

@@ -3,7 +3,7 @@
 ''' Implements a spectrum analyzer.
     Tested with USRP B210 & B200mini. '''
 
-import uhd
+from pyuhd import Uhd
 import signal
 import sys
 import numpy as np
@@ -28,7 +28,7 @@ def main():
     args = parser.parse_args()
 
     # Create UHD object
-    u = uhd.Uhd()
+    u = Uhd()
 
     # Register an interrupt handler to catch Ctrl+C
     signal.signal(signal.SIGINT, signal_handler)
