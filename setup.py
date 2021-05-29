@@ -37,5 +37,6 @@ setup(
     author_email='christianhahn09@gmail.com',
     long_description='python-uhd is a Python 3 C-extension to facilitate '
         'development with USRP hardware from Python.',
+    url='https://github.com/christian-hahn/python-uhd',
     license='MIT',
 )
