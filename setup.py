@@ -5,7 +5,7 @@ except ImportError:
 import numpy
 
 
-VERSION = '1.1.0'
+VERSION = '2.0.0'
 
 pyuhd = Extension(
     'pyuhd',
