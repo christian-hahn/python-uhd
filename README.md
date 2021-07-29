@@ -16,6 +16,7 @@ Install USRP Hardware Driver (UHD) software.  There are several ways to achieve 
 * v3.14.0.0 - v3.14.1.1
 * v3.15.0.0
 * v4.0.0.0
+* v4.1.0.0 - v4.1.0.1
 
 In Ubuntu, using package manager:
 ``` text
