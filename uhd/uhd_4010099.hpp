@@ -172,18 +172,19 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
 #define DOC_GET_GPIO_ATTR \
 "Get a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
-" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
-" - DDR - 1 for output 0 for input\n" \
+" - CTRL - 1 for ATR mode, 0 for GPIO mode\n" \
+" - DDR - 1 for output, 0 for input\n" \
 " - OUT - GPIO output level (not ATR mode)\n" \
 " - ATR_0X - ATR idle state\n" \
 " - ATR_RX - ATR receive only state\n" \
 " - ATR_TX - ATR transmit only state\n" \
 " - ATR_XX - ATR full duplex state\n" \
 " - READBACK - readback input GPIOs\n" \
+"For bank names, refer to set_gpio_attr().\n" \
 "\n" \
 "Args:\n" \
 "    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
+"    attr (str): the name of a GPIO attribute (see list above)\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n" \
 "\n" \
 "Returns:\n" \
@@ -220,7 +221,7 @@ PyObject *Usrp_get_gpio_attr(Usrp *self, PyObject *args) {
 }
 
 #define DOC_GET_GPIO_BANKS \
-"Enumerate gpio banks on the specified device.\n" \
+"Enumerate GPIO banks on the specified device.\n" \
 "\n" \
 "Args:\n" \
 "    mboard (int): the motherboard index 0 to M-1\n" \
@@ -3101,17 +3102,47 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 #define DOC_SET_GPIO_ATTR \
 "Set a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
-" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
-" - DDR - 1 for output 0 for input\n" \
+" - CTRL - 1 for ATR mode, 0 for GPIO mode\n" \
+" - DDR - 1 for output, 0 for input\n" \
 " - OUT - GPIO output level (not ATR mode)\n" \
 " - ATR_0X - ATR idle state\n" \
 " - ATR_RX - ATR receive only state\n" \
 " - ATR_TX - ATR transmit only state\n" \
 " - ATR_XX - ATR full duplex state\n" \
+"A note on bank names: Query get_gpio_banks() for a valid list of arguments\n" \
+"for bank names. Note that RFNoC devices (E3xx, N3xx, X3x0, X410) behave\n" \
+"slightly differently when using this API vs. using the\n" \
+"radio_control::set_gpio_attr() API. For backward-compatibility reasons,\n" \
+"this API does not have a dedicated argument to address a specific radio,\n" \
+"although the aforementioned devices have separate GPIO banks for each\n" \
+"radio. This API thus allows appending the slot name (typically \"A\" or \"B\")\n" \
+"to the GPIO bank to differentiate between radios. The following example\n" \
+"shows the difference between the RFNoC and multi_usrp APIs on a USRP N310:\n" \
+"~~~{.py}\n" \
+"my_usrp = uhd.usrp.MultiUSRP(\"type=n3xx\")\n" \
+"print(my_usrp.get_gpio_banks()) # Will print: FP0A, FP0B\n" \
+"# Now set all pins to GPIO for Radio 1 (note the 'B' in 'FP0B'):\n" \
+"my_usrp.set_gpio_attr(\"FP0B\", \"CTRL\", 0x000)\n" \
+"# For backwards compatibility, you can omit the 'A', but that will default\n" \
+"# to radio 0. The following lines thus do the same:\n" \
+"my_usrp.set_gpio_attr(\"FP0\", \"CTRL\", 0x000)\n" \
+"my_usrp.set_gpio_attr(\"FP0A\", \"CTRL\", 0x000)\n" \
+"### This is how you do the same thing with RFNoC API:\n" \
+"print(my_usrp.get_radio_control(0).get_gpio_banks()) # Will print: FP0\n" \
+"print(my_usrp.get_radio_control(1).get_gpio_banks()) # Will print: FP0\n" \
+"# Note how the radio controller only has a single bank!\n" \
+"# When accessing the radio directly, we thus can't specify any other bank\n" \
+"# than FP0:\n" \
+"my_usrp.get_radio_control(1).set_gpio_attr(\"FP0\", \"CTRL\", 0x000)\n" \
+"The mask argument can be used to apply value only to select pins,\n" \
+"and retain the existing value on the rest. Because of this feature, this\n" \
+"API call will incur two register transactions (one read, one write).\n" \
+"Note that this API call alone may not be sufficient to configure the\n" \
+"physical GPIO pins. See set_gpio_src() for more details.\n" \
 "\n" \
 "Args:\n" \
 "    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
+"    attr (str): the name of a GPIO attribute (see list above)\n" \
 "    value (int): the new value for this GPIO bank\n" \
 "    mask (int, optional): the bit mask to effect which pins are changed\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
