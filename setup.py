@@ -28,14 +28,14 @@ pyuhd = Extension(
 setup(
     name='pyuhd',
     version=VERSION,
-    description='A Python 3 C-extension to facilitate development with USRP '
+    description='A Python 3 C++ extension to facilitate development with USRP '
         'hardware.',
     setup_requires=['numpy'],
     install_requires=['numpy'],
     ext_modules=[pyuhd],
     author='Christian Hahn',
     author_email='christianhahn09@gmail.com',
-    long_description='python-uhd is a Python 3 C-extension to facilitate '
+    long_description='python-uhd is a Python 3 C++ extension to facilitate '
         'development with USRP hardware from Python.',
     url='https://github.com/christian-hahn/python-uhd',
     license='MIT',
