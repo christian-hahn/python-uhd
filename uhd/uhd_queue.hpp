@@ -11,8 +11,8 @@ template <typename T>
 class Queue {
   public:
     Queue() {}
-    void push(T &&value);
     void push(const T &value);
+    void push(T &&value);
     T pop();
     void clear();
     bool empty();
@@ -23,6 +23,13 @@ class Queue {
     std::condition_variable _notify;
     std::queue<T> _queue;
 };
+
+template <typename T>
+void Queue<T>::push(const T &value) {
+    std::lock_guard<std::mutex> lg(_lock);
+    _queue.push(value);
+    _notify.notify_one();
+}
 
 template <typename T>
 void Queue<T>::push(T &&value) {
