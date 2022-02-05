@@ -104,8 +104,8 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 
     const size_t num_channels = result->bufs.size();
 
-    PyObject *ret, *ele;
-    if (!(ret = PyList_New(num_channels))) {
+    PyObject *list, *ele;
+    if (!(list = PyList_New(num_channels))) {
         for (auto &ptr : result->bufs)
             free(ptr);
         delete result;
@@ -115,12 +115,28 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
     for (size_t it = 0; it < num_channels; it++) {
         ele = PyArray_SimpleNewFromData(1, &dims, NPY_COMPLEX64, result->bufs[it]);
         PyArray_ENABLEFLAGS(reinterpret_cast<PyArrayObject *>(ele), NPY_ARRAY_OWNDATA);
-        PyList_SET_ITEM(ret, it, ele);
+        PyList_SET_ITEM(list, it, ele);
+    }
+
+    PyObject *timespec = from(result->start);
+    if (!timespec) {
+        delete result;
+        Py_DECREF(list);
+        return nullptr;
     }
 
     delete result;
 
+    PyObject *ret = PyTuple_New(2);
+    if (!ret) {
+        Py_DECREF(list);
+        Py_DECREF(timespec);
+        return PyErr_Format(PyExc_ValueError, "Failed to create tuple.");
+    }
+    PyTuple_SET_ITEM(ret, 0, list);
+    PyTuple_SET_ITEM(ret, 1, timespec);
     return ret;
+
 }
 
 #define DOC_RECEIVE \
@@ -137,7 +153,7 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 "    otw_format (str, optional): over-the-wire format, default is 'sc16'\n" \
 "\n" \
 "Returns:\n" \
-"    list: None if streaming else list of ndarrays\n" \
+"    tuple: None if streaming else same return as (2) below.\n" \
 "\n" \
 "(2) Receive streaming samples. Must follow a previous call to (1) receive() for\n" \
 "    which streaming was True.\n" \
@@ -147,7 +163,8 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 "                            if streaming and recycle are True. Default is False.\n" \
 "\n" \
 "Returns:\n" \
-"    list: list of ndarrays\n"
+"    tuple: (samps, time_spec) where 'samps' is list of ndarrays and 'time_spec'\n" \
+"                              is TimeSpec object representing time of first sample."
 static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
 
     if (PyTuple_Size(args)) {
