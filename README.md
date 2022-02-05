@@ -79,7 +79,7 @@ for chan in channels:
 #### Method A
 Not streaming, one-shot and done.
 ```python
-samples = u.receive(
+samples, _ = u.receive(
     num_samples,
     channels,
 )
@@ -92,7 +92,7 @@ u.receive(
     channels,
     streaming=True,
 )
-samples = u.receive()
+samples, _ = u.receive()
 u.stop_receive()
 ```
 #### Method C
@@ -106,7 +106,7 @@ u.receive(
     streaming=True,
     recycle=True,
 )
-samples = u.receive(fresh=True)
+samples, _ = u.receive(fresh=True)
 u.stop_receive()
 ```
 `fresh=True` guarantees that the time of the first sample returned is after the call to

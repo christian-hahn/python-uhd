@@ -3,7 +3,7 @@
 from pyuhd import Usrp
 
 # Create USRP object
-u = Usrp()
+u = Usrp('type=b200')
 
 # Parameters
 center_freq = 140.625e6
@@ -22,7 +22,7 @@ for chan in channels:
     u.set_rx_gain(40., chan)
 
 """(1) Capture samples: not streaming"""
-samps = u.receive(
+samps, start = u.receive(
     num_samps,
     channels,
     streaming=False,
@@ -39,7 +39,7 @@ u.receive(
     seconds_in_future=1.0,
     timeout=0.5,
 )
-samps = u.receive()
+samps, start = u.receive()
 u.stop_receive()
 
 """(3) Capture samples: streaming with recycle
@@ -56,5 +56,5 @@ u.receive(
 )
 """Fresh = True guarantees that the time of the first sample is after the call
    to receive().  That the samples are indeed fresh, not stale. """
-samps = u.receive(fresh=True)
+samps, start = u.receive(fresh=True)
 u.stop_receive()

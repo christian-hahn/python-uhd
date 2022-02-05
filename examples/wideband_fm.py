@@ -112,7 +112,7 @@ def main():
         while True:
 
             # Get received samples
-            samps = u.receive()[0]
+            samps, _ = u.receive()[0]
 
             # Compute average power: this is for display purposes only
             samps_sqrd = np.real(np.conj(samps) * samps)

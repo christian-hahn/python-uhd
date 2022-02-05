@@ -74,7 +74,7 @@ def main():
         )
         while True:
             # Receive a block of samples
-            samps = u.receive()
+            samps, _ = u.receive()
             # Compute average and peak power
             samps_sqrd = np.real(samps[0] * np.conj(samps[0]))
             avg_pwr = 10. * np.log10(np.mean(samps_sqrd))
