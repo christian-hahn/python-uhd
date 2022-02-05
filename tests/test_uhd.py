@@ -10,7 +10,7 @@ TODO:
 """
 
 import pyuhd
-from pyuhd import Usrp, UhdError
+from pyuhd import Usrp, UhdError, TimeSpec
 import unittest
 from itertools import combinations, product
 import numpy as np
@@ -395,12 +395,13 @@ class UhdTestCase(unittest.TestCase):
                     try:
                         if isinstance(kwargs, tuple):
                             self.dut.receive(num_samps, channels, **kwargs[0])
-                            samps = self.dut.receive(**kwargs[1])
+                            samps, start = self.dut.receive(**kwargs[1])
                             self.dut.stop_receive()
                         else:
-                            samps = self.dut.receive(num_samps, channels, **kwargs)
+                            samps, start = self.dut.receive(num_samps, channels, **kwargs)
                         self.assertEqual(len(samps), len(channels))
                         self.assertTrue(all(len(i) == num_samps for i in samps))
+                        self.assertIsInstance(start, TimeSpec)
                     except UhdError as e:
                         self.fail('Failed to receive (channels = {}, num_samps = {}, kwargs'
                                   ' = {}): {}'.format(channels, num_samps, kwargs, str(e)))
