@@ -3,7 +3,7 @@
 from pyuhd import Usrp
 
 # Create USRP object
-u = Usrp('type=b200')
+u = Usrp()
 
 # Parameters
 center_freq = 140.625e6
