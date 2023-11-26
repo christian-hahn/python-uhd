@@ -22,7 +22,12 @@ Install USRP Hardware Driver (UHD) software.  There are several ways to achieve 
 * v3.14.0.0 - v3.14.1.1
 * v3.15.0.0
 * v4.0.0.0
-* v4.1.0.0 - v4.1.0.5
+* v4.1.0.0 - v4.1.0.7
+* v4.2.0.0 - v4.2.0.1
+* v4.3.0.0
+* v4.4.0.0
+* v4.5.0.0
+* v4.6.0.0
 
 **python-uhd** has been tested with the following hardware:
 
@@ -32,9 +37,7 @@ Install USRP Hardware Driver (UHD) software.  There are several ways to achieve 
 
 Install UHD.  For example, in Ubuntu using package manager:
 ``` text
-sudo add-apt-repository ppa:ettusresearch/uhd
-sudo apt-get update
-sudo apt-get install libuhd-dev libuhd4.1.0 uhd-host
+sudo apt-get install libuhd-dev uhd-host
 ```
 
 Install numpy.  For example, in Ubuntu using package manager:

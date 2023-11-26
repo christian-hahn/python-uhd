@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 3130199
+#if (UHD_VERSION / 100) == 31200
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__
@@ -748,38 +748,6 @@ PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_bandwidth_range(chan.get());
         else
             ret = self->dev->get_rx_bandwidth_range();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
-#define DOC_GET_RX_DC_OFFSET_RANGE \
-"Get the valid range for RX DC offset values.\n" \
-"\n" \
-"Args:\n" \
-"    chan (int, optional): the channel index 0 to N-1\n" \
-"\n" \
-"Returns:\n" \
-"    dict: value\n"
-PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> chan;
-    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
-
-    meta_range_t ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_rx_dc_offset_range();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -1824,38 +1792,6 @@ PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_GET_TX_DC_OFFSET_RANGE \
-"Get the valid range for TX DC offset values.\n" \
-"\n" \
-"Args:\n" \
-"    chan (int, optional): the channel index 0 to N-1\n" \
-"\n" \
-"Returns:\n" \
-"    dict: value\n"
-PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> chan;
-    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
-
-    meta_range_t ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_tx_dc_offset_range();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
 #define DOC_GET_TX_FREQ \
 "Get the TX center frequency.\n" \
 "\n" \
@@ -2677,28 +2613,6 @@ PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
             ret = self->dev->get_usrp_tx_info(chan.get());
         else
             ret = self->dev->get_usrp_tx_info();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
-#define DOC_IS_DEVICE3 \
-"Returns true if this is a generation-3 device.\n" \
-"\n" \
-"Returns:\n" \
-"    bool: value\n"
-PyObject *Usrp_is_device3(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 0)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
-
-    bool ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->is_device3();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4574,7 +4488,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_antennas", (PyCFunction)Usrp_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
     {"get_rx_bandwidth", (PyCFunction)Usrp_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
     {"get_rx_bandwidth_range", (PyCFunction)Usrp_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
-    {"get_rx_dc_offset_range", (PyCFunction)Usrp_get_rx_dc_offset_range, METH_VARARGS, DOC_GET_RX_DC_OFFSET_RANGE},
     {"get_rx_freq", (PyCFunction)Usrp_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
     {"get_rx_freq_range", (PyCFunction)Usrp_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
     {"get_rx_gain", (PyCFunction)Usrp_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
@@ -4603,7 +4516,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_antennas", (PyCFunction)Usrp_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
     {"get_tx_bandwidth", (PyCFunction)Usrp_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
     {"get_tx_bandwidth_range", (PyCFunction)Usrp_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
-    {"get_tx_dc_offset_range", (PyCFunction)Usrp_get_tx_dc_offset_range, METH_VARARGS, DOC_GET_TX_DC_OFFSET_RANGE},
     {"get_tx_freq", (PyCFunction)Usrp_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
     {"get_tx_freq_range", (PyCFunction)Usrp_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
     {"get_tx_gain", (PyCFunction)Usrp_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
@@ -4625,7 +4537,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_subdev_spec", (PyCFunction)Usrp_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
     {"get_usrp_rx_info", (PyCFunction)Usrp_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
     {"get_usrp_tx_info", (PyCFunction)Usrp_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
-    {"is_device3", (PyCFunction)Usrp_is_device3, METH_VARARGS, DOC_IS_DEVICE3},
     {"read_register", (PyCFunction)Usrp_read_register, METH_VARARGS, DOC_READ_REGISTER},
     {"set_clock_source", (PyCFunction)Usrp_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
     {"set_clock_source_out", (PyCFunction)Usrp_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},

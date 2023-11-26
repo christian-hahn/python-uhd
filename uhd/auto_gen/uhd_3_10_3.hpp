@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 30903
+#if (UHD_VERSION / 100) == 31003
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__
@@ -919,6 +919,237 @@ PyObject *Usrp_get_rx_gain_range(Usrp *self, PyObject *args) {
     return Usrp_get_rx_gain_range_0(self, args);
 }
 
+#define DOC_GET_RX_LO_EXPORT_ENABLED \
+"Returns true if the currently selected LO is being exported.\n" \
+"\n" \
+"Args:\n" \
+"    name (str, optional): the name of the LO stage to query\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    bool: value\n"
+PyObject *Usrp_get_rx_lo_export_enabled(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 2.", nargs);
+
+    Expect<std::string> name;
+    Expect<size_t> chan;
+
+    if (nargs > 0 && !(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    bool ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_rx_lo_export_enabled(name.get(), chan.get());
+        else if (nargs == 1)
+            ret = self->dev->get_rx_lo_export_enabled(name.get());
+        else
+            ret = self->dev->get_rx_lo_export_enabled();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_LO_FREQ \
+"Get the current RX LO frequency (Advanced).\n" \
+"If the channel does not have independently configurable LOs\n" \
+"the current rf frequency will be returned.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the LO stage to query\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: the configured LO frequency\n"
+PyObject *Usrp_get_rx_lo_freq(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    double ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_rx_lo_freq(name.get(), chan.get());
+        else
+            ret = self->dev->get_rx_lo_freq(name.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_LO_FREQ_RANGE \
+"Get the LO frequency range of the RX LO.\n" \
+"If the channel does not have independently configurable LOs\n" \
+"the rf frequency range will be returned.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the LO stage to query\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a frequency range object\n"
+PyObject *Usrp_get_rx_lo_freq_range(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    freq_range_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_rx_lo_freq_range(name.get(), chan.get());
+        else
+            ret = self->dev->get_rx_lo_freq_range(name.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_LO_NAMES \
+"Get a list of possible LO stage names\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings for possible LO names\n"
+PyObject *Usrp_get_rx_lo_names(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_rx_lo_names(chan.get());
+        else
+            ret = self->dev->get_rx_lo_names();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_LO_SOURCE \
+"Get the currently set LO source.\n" \
+"Channels without controllable LO sources will return\n" \
+"\"internal\"\n" \
+"\n" \
+"Args:\n" \
+"    name (str, optional): the name of the LO stage to query\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    str: the configured LO source\n"
+PyObject *Usrp_get_rx_lo_source(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 2.", nargs);
+
+    Expect<std::string> name;
+    Expect<size_t> chan;
+
+    if (nargs > 0 && !(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    std::string ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_rx_lo_source(name.get(), chan.get());
+        else if (nargs == 1)
+            ret = self->dev->get_rx_lo_source(name.get());
+        else
+            ret = self->dev->get_rx_lo_source();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_LO_SOURCES \
+"Get a list of possible LO sources.\n" \
+"Channels which do not have controllable LO sources\n" \
+"will return \"internal\".\n" \
+"\n" \
+"Args:\n" \
+"    name (str, optional): the name of the LO stage to query\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings for possible settings\n"
+PyObject *Usrp_get_rx_lo_sources(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 2.", nargs);
+
+    Expect<std::string> name;
+    Expect<size_t> chan;
+
+    if (nargs > 0 && !(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_rx_lo_sources(name.get(), chan.get());
+        else if (nargs == 1)
+            ret = self->dev->get_rx_lo_sources(name.get());
+        else
+            ret = self->dev->get_rx_lo_sources();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
 #define DOC_GET_RX_NUM_CHANNELS \
 "Get the number of RX channels in this configuration.\n" \
 "This is the number of USRPs times the number of RX channels per board,\n" \
@@ -1104,7 +1335,7 @@ PyObject *Usrp_get_rx_subdev_spec(Usrp *self, PyObject *args) {
 }
 
 #define DOC_GET_TIME_LAST_PPS \
-"Get the time when the last pps pulse occured.\n" \
+"Get the time when the last pps pulse occurred.\n" \
 "\n" \
 "Args:\n" \
 "    mboard (int, optional): which motherboard to query\n" \
@@ -2108,14 +2339,18 @@ PyObject *Usrp_set_gpio_attr(Usrp *self, PyObject *args) {
 
 #define DOC_SET_MASTER_CLOCK_RATE \
 "Set the master clock rate.\n" \
-"This controls the rate of the clock that feeds the FPGA DSP.\n" \
-"On some devices, this re-tunes the clock to the specified rate.\n" \
-"If the specified rate is not available, this method will throw.\n" \
-"On other devices, this method notifies the software of the rate,\n" \
-"but requires the the user has made the necessary hardware change.\n" \
+"What exactly this changes is device-dependent, but it will always\n" \
+"affect the rate at which the ADC/DAC is running.\n" \
+"Like tuning receive or transmit frequencies, this call will do a best\n" \
+"effort to change the master clock rate. The device will coerce to the\n" \
+"closest clock rate available, and on many devices won't actually change\n" \
+"anything at all. Call get_master_clock_rate() to see which rate was\n" \
+"actually applied.\n" \
+"Note that changing this value during streaming is not recommended and\n" \
+"can have random side effects.\n" \
 "If the device has an 'auto clock rate' setting (e.g. B200, see also\n" \
-"b200_auto_mcr), this will get disabled and the clock rate will be\n" \
-"fixed to rate.\n" \
+"b200_auto_mcr), calling this function will disable the automatic\n" \
+"clock rate selection, and the clock rate will be fixed to rate.\n" \
 "\n" \
 "Args:\n" \
 "    rate (float): the new master clock rate in Hz\n" \
@@ -2623,6 +2858,134 @@ PyObject *Usrp_set_rx_iq_balance(Usrp *self, PyObject *args) {
         return Usrp_set_rx_iq_balance_1(self, args);
     }
     return Usrp_set_rx_iq_balance_0(self, args);
+}
+
+#define DOC_SET_RX_LO_EXPORT_ENABLED \
+"Set whether the LO used by the usrp device is exported\n" \
+"For usrps that support exportable LOs, this function\n" \
+"configures if the LO used by chan is exported or not.\n" \
+"\n" \
+"Args:\n" \
+"    enabled (bool): if true then export the LO\n" \
+"    name (str, optional): the name of the LO stage to update\n" \
+"    chan (int, optional): the channel index 0 to N-1 for the source channel\n"
+PyObject *Usrp_set_rx_lo_export_enabled(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 3)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 3.", nargs);
+
+    Expect<bool> enabled;
+    if (!(enabled = to<bool>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "enabled: %s", enabled.what());
+
+    Expect<std::string> name;
+    Expect<size_t> chan;
+
+    if (nargs > 1 && !(name = to<std::string>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+    if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 3)
+            self->dev->set_rx_lo_export_enabled(enabled.get(), name.get(), chan.get());
+        else if (nargs == 2)
+            self->dev->set_rx_lo_export_enabled(enabled.get(), name.get());
+        else
+            self->dev->set_rx_lo_export_enabled(enabled.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_RX_LO_FREQ \
+"Set the RX LO frequency (Advanced).\n" \
+"\n" \
+"Args:\n" \
+"    freq (float): the frequency to set the LO to\n" \
+"    name (str): the name of the LO stage to update\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    float: a coerced LO frequency\n"
+PyObject *Usrp_set_rx_lo_freq(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 2 || nargs > 3)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
+
+    Expect<double> freq;
+    if (!(freq = to<double>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "freq: %s", freq.what());
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> chan;
+    if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    double ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 3)
+            ret = self->dev->set_rx_lo_freq(freq.get(), name.get(), chan.get());
+        else
+            ret = self->dev->set_rx_lo_freq(freq.get(), name.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_SET_RX_LO_SOURCE \
+"Set the LO source for the usrp device.\n" \
+"For usrps that support selectable LOs, this function\n" \
+"allows switching between them.\n" \
+"Typical options for source: internal, external.\n" \
+"\n" \
+"Args:\n" \
+"    src (str): a string representing the LO source\n" \
+"    name (str, optional): the name of the LO stage to update\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
+PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 3)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 3.", nargs);
+
+    Expect<std::string> src;
+    if (!(src = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "src: %s", src.what());
+
+    Expect<std::string> name;
+    Expect<size_t> chan;
+
+    if (nargs > 1 && !(name = to<std::string>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+    if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 3)
+            self->dev->set_rx_lo_source(src.get(), name.get(), chan.get());
+        else if (nargs == 2)
+            self->dev->set_rx_lo_source(src.get(), name.get());
+        else
+            self->dev->set_rx_lo_source(src.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 #define DOC_SET_RX_RATE \
@@ -3322,6 +3685,12 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_gain", (PyCFunction)Usrp_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
     {"get_rx_gain_names", (PyCFunction)Usrp_get_rx_gain_names, METH_VARARGS, DOC_GET_RX_GAIN_NAMES},
     {"get_rx_gain_range", (PyCFunction)Usrp_get_rx_gain_range, METH_VARARGS, DOC_GET_RX_GAIN_RANGE},
+    {"get_rx_lo_export_enabled", (PyCFunction)Usrp_get_rx_lo_export_enabled, METH_VARARGS, DOC_GET_RX_LO_EXPORT_ENABLED},
+    {"get_rx_lo_freq", (PyCFunction)Usrp_get_rx_lo_freq, METH_VARARGS, DOC_GET_RX_LO_FREQ},
+    {"get_rx_lo_freq_range", (PyCFunction)Usrp_get_rx_lo_freq_range, METH_VARARGS, DOC_GET_RX_LO_FREQ_RANGE},
+    {"get_rx_lo_names", (PyCFunction)Usrp_get_rx_lo_names, METH_VARARGS, DOC_GET_RX_LO_NAMES},
+    {"get_rx_lo_source", (PyCFunction)Usrp_get_rx_lo_source, METH_VARARGS, DOC_GET_RX_LO_SOURCE},
+    {"get_rx_lo_sources", (PyCFunction)Usrp_get_rx_lo_sources, METH_VARARGS, DOC_GET_RX_LO_SOURCES},
     {"get_rx_num_channels", (PyCFunction)Usrp_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
     {"get_rx_rate", (PyCFunction)Usrp_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
     {"get_rx_rates", (PyCFunction)Usrp_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
@@ -3365,6 +3734,9 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"set_rx_freq", (PyCFunction)Usrp_set_rx_freq, METH_VARARGS, DOC_SET_RX_FREQ},
     {"set_rx_gain", (PyCFunction)Usrp_set_rx_gain, METH_VARARGS, DOC_SET_RX_GAIN},
     {"set_rx_iq_balance", (PyCFunction)Usrp_set_rx_iq_balance, METH_VARARGS, DOC_SET_RX_IQ_BALANCE},
+    {"set_rx_lo_export_enabled", (PyCFunction)Usrp_set_rx_lo_export_enabled, METH_VARARGS, DOC_SET_RX_LO_EXPORT_ENABLED},
+    {"set_rx_lo_freq", (PyCFunction)Usrp_set_rx_lo_freq, METH_VARARGS, DOC_SET_RX_LO_FREQ},
+    {"set_rx_lo_source", (PyCFunction)Usrp_set_rx_lo_source, METH_VARARGS, DOC_SET_RX_LO_SOURCE},
     {"set_rx_rate", (PyCFunction)Usrp_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
     {"set_rx_subdev_spec", (PyCFunction)Usrp_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
     {"set_time_next_pps", (PyCFunction)Usrp_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},

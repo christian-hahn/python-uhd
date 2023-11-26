@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 3130099
+#if (UHD_VERSION / 100) == 31300
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__

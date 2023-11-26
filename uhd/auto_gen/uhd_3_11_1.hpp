@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 3150099
+#if (UHD_VERSION / 100) == 31101
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__
@@ -207,12 +207,10 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
 "Args:\n" \
 "    search_mask (str, optional):\n" \
 "        Select only certain filter names by specifying this search mask.\n" \
-"        E.g. if search mask is set to \"rx_frontends/A\" only filter names including that\n" \
-"        string will be returned.\n" \
+"        E.g. if search mask is set to \"rx_frontends/A\" only filter names including that string will be returned.\n" \
 "\n" \
 "Returns:\n" \
-"    list: a vector of strings representing the\n" \
-"          selected filter names.\n"
+"    list: a vector of strings representing the selected filter names.\n"
 PyObject *Usrp_get_filter_names(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -320,8 +318,7 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
 "Get a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
 " - SRC  - \"PS\" for handling by processing system\n" \
-"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of\n" \
-"Radio]; M is in [0..Number of port per Radio]\n" \
+"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of Radio]; M is in [0..Number of port per Radio]\n" \
 " - CTRL - \"ATR\"  for ATR mode\n" \
 "        - \"GPIO\" for GPIO mode\n" \
 " - DDR  - \"OUT\" for output\n" \
@@ -329,20 +326,13 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
 " - OUT -  a string of numbers representing GPIO output level (not ATR mode)\n" \
 "       - \"HIGH\"or \"LOW\" as GPIO output level that apply for each bit mask that is 1\n" \
 " - ATR_0X - a string of numbers representing a value of the ATR idle state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state\n" \
-"register\n" \
-" - ATR_RX - a string of numbers representing a value of a ATR receive only state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only\n" \
-"state register\n" \
-" - ATR_TX - a string of numbers representing a value of the ATR transmit only state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only\n" \
-"state register\n" \
-" - ATR_XX - a string of numbers representing a value of the ATR full duplex state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex\n" \
-"state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state register\n" \
+" - ATR_RX - a string of numbers representing a value of a ATR receive only state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only state register\n" \
+" - ATR_TX - a string of numbers representing a value of the ATR transmit only state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only state register\n" \
+" - ATR_XX - a string of numbers representing a value of the ATR full duplex state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex state register\n" \
 " - READBACK - readback input GPIOs\n" \
 "\n" \
 "Args:\n" \
@@ -408,52 +398,6 @@ PyObject *Usrp_get_master_clock_rate(Usrp *self, PyObject *args) {
             ret = self->dev->get_master_clock_rate(mboard.get());
         else
             ret = self->dev->get_master_clock_rate();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
-#define DOC_GET_MASTER_CLOCK_RATE_RANGE \
-"Return the range within which the master clock rate can be set for this\n" \
-" session\n" \
-"Note that many USRPs do not actually support setting the master clock\n" \
-"rate during a running session. In this case, the range will consist of\n" \
-"a single value, which is the current master clock rate.\n" \
-"Values from this range are valid/sensible inputs to\n" \
-"set_master_clock_rate(), although keep in mind that the latter coerces.\n" \
-"Examples:\n" \
-"- The B200 series' master clock rate can be changed at runtime and\n" \
-"  will report the true range of supported values\n" \
-"- The X300 series has _two_ discrete options for the clock rate, but will\n" \
-"  always return the clock rate which the USRP was initialized to because\n" \
-"  it cannot be changed at runtime\n" \
-"- The N200 series does not have a configurable clock rate, and will\n" \
-"  always return the same single value as a range\n" \
-"\n" \
-"Args:\n" \
-"    mboard (int, optional): mboard\n" \
-"\n" \
-"Returns:\n" \
-"    dict: value\n"
-PyObject *Usrp_get_master_clock_rate_range(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> mboard;
-    if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    meta_range_t ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_master_clock_rate_range(mboard.get());
-        else
-            ret = self->dev->get_master_clock_rate_range();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -765,38 +709,6 @@ PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_GET_RX_DC_OFFSET_RANGE \
-"Get the valid range for RX DC offset values.\n" \
-"\n" \
-"Args:\n" \
-"    chan (int, optional): the channel index 0 to N-1\n" \
-"\n" \
-"Returns:\n" \
-"    dict: value\n"
-PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> chan;
-    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
-
-    meta_range_t ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_rx_dc_offset_range();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
 #define DOC_GET_RX_FREQ \
 "Get the RX center frequency.\n" \
 "\n" \
@@ -1016,11 +928,11 @@ PyObject *Usrp_get_rx_gain_profile(Usrp *self, PyObject *args) {
 
 #define DOC_GET_RX_GAIN_PROFILE_NAMES \
 "Get a list of possible RX gain profile options\n" \
-"Example: On the TwinRX, this will return \"low-noise\", \"low-distortion\" or\n" \
-"\"default\". These names can be used in gain-profile related API called. An empty\n" \
-"return value doesn't mean there are no profile options, it means that this radio\n" \
-"does not have any gain profiles implemented, and typically means there is only one\n" \
-"default profile of set gain\n" \
+"Example: On the TwinRX, this will return \"low-noise\", \"low-distortion\" or \"default\".\n" \
+"These names can be used in gain-profile related API called.\n" \
+"An empty return value doesn't mean there are no profile options, it means that\n" \
+"this radio does not have any gain profiles implemented, and typically means\n" \
+"there is only one default profile of set gain\n" \
 "\n" \
 "Args:\n" \
 "    chan (int, optional): the channel index 0 to N-1\n" \
@@ -1827,38 +1739,6 @@ PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_bandwidth_range(chan.get());
         else
             ret = self->dev->get_tx_bandwidth_range();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
-#define DOC_GET_TX_DC_OFFSET_RANGE \
-"Get the valid range for TX DC offset values.\n" \
-"\n" \
-"Args:\n" \
-"    chan (int, optional): the channel index 0 to N-1\n" \
-"\n" \
-"Returns:\n" \
-"    dict: value\n"
-PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> chan;
-    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
-
-    meta_range_t ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_tx_dc_offset_range();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2694,28 +2574,6 @@ PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_IS_DEVICE3 \
-"Returns true if this is a generation-3 device.\n" \
-"\n" \
-"Returns:\n" \
-"    bool: value\n"
-PyObject *Usrp_is_device3(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 0)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
-
-    bool ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->is_device3();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
 #define DOC_READ_REGISTER \
 "Read a low-level register field from a register in the USRP hardware\n" \
 "\n" \
@@ -2758,40 +2616,12 @@ PyObject *Usrp_read_register(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_CLOCK_SOURCE \
-"Set the clock source for the USRP device\n" \
-"This sets the source of the frequency reference, typically a 10 MHz\n" \
-"signal. In order to frequency-align multiple USRPs, it is necessary to\n" \
-"connect all of them to a common reference and provide them with the same\n" \
-"clock source.\n" \
-"Typical values for source are 'internal', 'external'. Refer to the\n" \
-"specific device manual for a full list of options.\n" \
-"If the value for for source is not available for this device, it will\n" \
-"throw an exception. Calling get_clock_sources() will return a valid list\n" \
-"of options for this method.\n" \
-"Side effects: Some devices only support certain combinations of time and\n" \
-"clock source. It is possible that the underlying device implementation\n" \
-"will change the time source when the clock source changes and vice versa.\n" \
-"Reading back the current values of clock and time source using\n" \
-"get_clock_source() and get_time_source() is the only certain way of\n" \
-"knowing which clock and time source are currently selected.\n" \
-"This function does not force a re-initialization of the underlying\n" \
-"hardware when the value does not change. Consider the following snippet:\n" \
-"~~~{.cpp}\n" \
-"auto usrp = uhd::usrp::multi_usrp::make(device_args);\n" \
-"// This may or may not cause the hardware to reconfigure, depending on\n" \
-"// the default state of the device\n" \
-"usrp->set_clock_source(\"internal\");\n" \
-"// Now, the clock source is definitely set to \"internal\"!\n" \
-"// The next call probably won't do anything but will return immediately,\n" \
-"// because the clock source was already set to \"internal\"\n" \
-"usrp->set_clock_source(\"internal\");\n" \
-"// The clock source is still guaranteed to be \"internal\" at this point\n" \
-"See also:\n" \
-"- set_time_source()\n" \
-"- set_sync_source()\n" \
+"Set the clock source for the usrp device.\n" \
+"This sets the source for a 10 MHz reference clock.\n" \
+"Typical options for source: internal, external, MIMO.\n" \
 "\n" \
 "Args:\n" \
-"    source (str): a string representing the time source\n" \
+"    source (str): a string representing the clock source\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
 PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
 
@@ -2916,8 +2746,7 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 "(2) ""Set a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
 " - SRC  - \"PS\" for handling by processing system\n" \
-"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of\n" \
-"Radio]; M is in [0..Number of port per Radio]\n" \
+"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of Radio]; M is in [0..Number of port per Radio]\n" \
 " - CTRL - \"ATR\"  for ATR mode\n" \
 "        - \"GPIO\" for GPIO mode\n" \
 " - DDR  - \"OUT\" for output\n" \
@@ -2925,28 +2754,19 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 " - OUT -  a string of numbers representing GPIO output level (not ATR mode)\n" \
 "       - \"HIGH\"or \"LOW\" as GPIO output level that apply for each bit mask that is 1\n" \
 " - ATR_0X - a string of numbers representing a value of the ATR idle state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state\n" \
-"register\n" \
-" - ATR_RX - a string of numbers representing a value of a ATR receive only state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only\n" \
-"state register\n" \
-" - ATR_TX - a string of numbers representing a value of the ATR transmit only state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only\n" \
-"state register\n" \
-" - ATR_XX - a string of numbers representing a value of the ATR full duplex state\n" \
-"register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex\n" \
-"state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state register\n" \
+" - ATR_RX - a string of numbers representing a value of a ATR receive only state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only state register\n" \
+" - ATR_TX - a string of numbers representing a value of the ATR transmit only state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only state register\n" \
+" - ATR_XX - a string of numbers representing a value of the ATR full duplex state register\n" \
+"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex state register\n" \
 "\n" \
 "Args:\n" \
 "    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO\n" \
-"                attribute\n" \
+"    attr (str): the name of a GPIO attribute\n" \
 "    value (str): the new value for this GPIO bank\n" \
-"    mask (int, optional): the bit mask to\n" \
-"                          effect which pins are changed\n" \
+"    mask (int, optional): the bit mask to effect which pins are changed\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
 static PyObject *Usrp_set_gpio_attr_0(Usrp *self, PyObject *args) {
 
@@ -3174,8 +2994,8 @@ PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
 #define DOC_SET_RX_AGC \
 "Enable or disable the RX AGC module.\n" \
 "Once this module is enabled manual gain settings will be ignored.\n" \
-"The AGC will start in a default configuration which should be good for most use\n" \
-"cases. Device specific configuration parameters can be found in the property tree.\n" \
+"The AGC will start in a default configuration which should be good for most use cases.\n" \
+"Device specific configuration parameters can be found in the property tree.\n" \
 "\n" \
 "Args:\n" \
 "    enable (bool): Enable or Disable the AGC\n" \
@@ -3821,46 +3641,6 @@ PyObject *Usrp_set_rx_subdev_spec(Usrp *self, PyObject *args) {
     return Py_None;
 }
 
-#define DOC_SET_SYNC_SOURCE \
-"Set the reference/synchronization sources for the USRP device\n" \
-"This is a shorthand for calling\n" \
-"`set_sync_source(device_addr_t(\"clock_source=$CLOCK_SOURCE,time_source=$TIME_SOURCE\"))`\n" \
-"\n" \
-"Args:\n" \
-"    clock_source (str): A string representing the clock source\n" \
-"    time_source (str): A string representing the time source\n" \
-"    mboard (int, optional): which motherboard to set the config\n"
-PyObject *Usrp_set_sync_source(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
-
-    Expect<std::string> clock_source;
-    if (!(clock_source = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "clock_source: %s", clock_source.what());
-    Expect<std::string> time_source;
-    if (!(time_source = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "time_source: %s", time_source.what());
-
-    Expect<size_t> mboard;
-    if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            self->dev->set_sync_source(clock_source.get(), time_source.get(), mboard.get());
-        else
-            self->dev->set_sync_source(clock_source.get(), time_source.get());
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
 #define DOC_SET_TIME_NEXT_PPS \
 "Set the time registers on the usrp at the next pps tick.\n" \
 "The values will not be latched in until the pulse occurs.\n" \
@@ -3939,37 +3719,10 @@ PyObject *Usrp_set_time_now(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_TIME_SOURCE \
-"Set the time source for the USRP device\n" \
-"This sets the method of time synchronization, typically a pulse per\n" \
-"second signal. In order to time-align multiple USRPs, it is necessary to\n" \
-"connect all of them to a common reference and provide them with the same\n" \
-"time source.\n" \
-"Typical values for source are 'internal', 'external'. Refer to the\n" \
-"specific device manual for a full list of options.\n" \
-"If the value for for source is not available for this device, it will\n" \
-"throw an exception. Calling get_time_sources() will return a valid list\n" \
-"of options for this method.\n" \
-"Side effects: Some devices only support certain combinations of time and\n" \
-"clock source. It is possible that the underlying device implementation\n" \
-"will change the clock source when the time source changes and vice versa.\n" \
-"Reading back the current values of clock and time source using\n" \
-"get_clock_source() and get_time_source() is the only certain way of\n" \
-"knowing which clock and time source are currently selected.\n" \
-"This function does not force a re-initialization of the underlying\n" \
-"hardware when the value does not change. Consider the following snippet:\n" \
-"~~~{.cpp}\n" \
-"auto usrp = uhd::usrp::multi_usrp::make(device_args);\n" \
-"// This may or may not cause the hardware to reconfigure, depending on\n" \
-"// the default state of the device\n" \
-"usrp->set_time_source(\"internal\");\n" \
-"// Now, the time source is definitely set to \"internal\"!\n" \
-"// The next call probably won't do anything but will return immediately,\n" \
-"// because the time source was already set to \"internal\"\n" \
-"usrp->set_time_source(\"internal\");\n" \
-"// The time source is still guaranteed to be \"internal\" at this point\n" \
-"See also:\n" \
-"- set_clock_source()\n" \
-"- set_sync_source()\n" \
+"Set the time source for the usrp device.\n" \
+"This sets the method of time synchronization,\n" \
+"typically a pulse per second or an encoded time.\n" \
+"Typical options for source: external, MIMO.\n" \
 "\n" \
 "Args:\n" \
 "    source (str): a string representing the time source\n" \
@@ -4629,11 +4382,9 @@ PyObject *Usrp_set_user_register(Usrp *self, PyObject *args) {
 "\n" \
 "Args:\n" \
 "    path (str): the full path to the register\n" \
-"    field (int): the identifier of bitfield to be written (all other bits remain\n" \
-"                 unchanged)\n" \
+"    field (int): the identifier of bitfield to be written (all other bits remain unchanged)\n" \
 "    value (int): the value to write to the register field\n" \
-"    mboard (int, optional): the\n" \
-"                            motherboard index 0 to M-1\n"
+"    mboard (int, optional): the motherboard index 0 to M-1\n"
 PyObject *Usrp_write_register(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -4680,7 +4431,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_gpio_banks", (PyCFunction)Usrp_get_gpio_banks, METH_VARARGS, DOC_GET_GPIO_BANKS},
     {"get_gpio_string_attr", (PyCFunction)Usrp_get_gpio_string_attr, METH_VARARGS, DOC_GET_GPIO_STRING_ATTR},
     {"get_master_clock_rate", (PyCFunction)Usrp_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
-    {"get_master_clock_rate_range", (PyCFunction)Usrp_get_master_clock_rate_range, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE_RANGE},
     {"get_mboard_name", (PyCFunction)Usrp_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
     {"get_mboard_sensor_names", (PyCFunction)Usrp_get_mboard_sensor_names, METH_VARARGS, DOC_GET_MBOARD_SENSOR_NAMES},
     {"get_normalized_rx_gain", (PyCFunction)Usrp_get_normalized_rx_gain, METH_VARARGS, DOC_GET_NORMALIZED_RX_GAIN},
@@ -4691,7 +4441,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_antennas", (PyCFunction)Usrp_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
     {"get_rx_bandwidth", (PyCFunction)Usrp_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
     {"get_rx_bandwidth_range", (PyCFunction)Usrp_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
-    {"get_rx_dc_offset_range", (PyCFunction)Usrp_get_rx_dc_offset_range, METH_VARARGS, DOC_GET_RX_DC_OFFSET_RANGE},
     {"get_rx_freq", (PyCFunction)Usrp_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
     {"get_rx_freq_range", (PyCFunction)Usrp_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
     {"get_rx_gain", (PyCFunction)Usrp_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
@@ -4720,7 +4469,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_antennas", (PyCFunction)Usrp_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
     {"get_tx_bandwidth", (PyCFunction)Usrp_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
     {"get_tx_bandwidth_range", (PyCFunction)Usrp_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
-    {"get_tx_dc_offset_range", (PyCFunction)Usrp_get_tx_dc_offset_range, METH_VARARGS, DOC_GET_TX_DC_OFFSET_RANGE},
     {"get_tx_freq", (PyCFunction)Usrp_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
     {"get_tx_freq_range", (PyCFunction)Usrp_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
     {"get_tx_gain", (PyCFunction)Usrp_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
@@ -4742,7 +4490,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_subdev_spec", (PyCFunction)Usrp_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
     {"get_usrp_rx_info", (PyCFunction)Usrp_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
     {"get_usrp_tx_info", (PyCFunction)Usrp_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
-    {"is_device3", (PyCFunction)Usrp_is_device3, METH_VARARGS, DOC_IS_DEVICE3},
     {"read_register", (PyCFunction)Usrp_read_register, METH_VARARGS, DOC_READ_REGISTER},
     {"set_clock_source", (PyCFunction)Usrp_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
     {"set_clock_source_out", (PyCFunction)Usrp_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
@@ -4764,7 +4511,6 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"set_rx_lo_source", (PyCFunction)Usrp_set_rx_lo_source, METH_VARARGS, DOC_SET_RX_LO_SOURCE},
     {"set_rx_rate", (PyCFunction)Usrp_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
     {"set_rx_subdev_spec", (PyCFunction)Usrp_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
-    {"set_sync_source", (PyCFunction)Usrp_set_sync_source, METH_VARARGS, DOC_SET_SYNC_SOURCE},
     {"set_time_next_pps", (PyCFunction)Usrp_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},
     {"set_time_now", (PyCFunction)Usrp_set_time_now, METH_VARARGS, DOC_SET_TIME_NOW},
     {"set_time_source", (PyCFunction)Usrp_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},

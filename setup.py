@@ -12,7 +12,11 @@ pyuhd = Extension(
     define_macros=[
         ('PYUHD_VERSION', '"{}"'.format(VERSION)),
     ],
-    include_dirs=[numpy.get_include(), 'uhd/'],
+    include_dirs=[
+        'uhd/',
+        'uhd/auto_gen/',
+        numpy.get_include(),
+    ],
     libraries=['uhd'],
     extra_compile_args=['-std=c++11'],
     sources=[

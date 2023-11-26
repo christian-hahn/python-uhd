@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 3120099
+#if (UHD_VERSION / 100) == 40000
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__
@@ -45,38 +45,6 @@ PyObject *Usrp_clear_command_time(Usrp *self, PyObject *args) {
 
     Py_INCREF(Py_None);
     return Py_None;
-}
-
-#define DOC_ENUMERATE_REGISTERS \
-"Enumerate the full paths of all low-level USRP registers accessible to read/write\n" \
-"\n" \
-"Args:\n" \
-"    mboard (int, optional): the motherboard index 0 to M-1\n" \
-"\n" \
-"Returns:\n" \
-"    list: a vector of register paths\n"
-PyObject *Usrp_enumerate_registers(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<size_t> mboard;
-    if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    std::vector<std::string> ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->enumerate_registers(mboard.get());
-        else
-            ret = self->dev->enumerate_registers();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
 }
 
 #define DOC_GET_CLOCK_SOURCE \
@@ -201,40 +169,6 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_GET_FILTER_NAMES \
-"Enumerate the available filters in the signal path.\n" \
-"\n" \
-"Args:\n" \
-"    search_mask (str, optional):\n" \
-"        Select only certain filter names by specifying this search mask.\n" \
-"        E.g. if search mask is set to \"rx_frontends/A\" only filter names including that string will be returned.\n" \
-"\n" \
-"Returns:\n" \
-"    list: a vector of strings representing the selected filter names.\n"
-PyObject *Usrp_get_filter_names(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 0 || nargs > 1)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
-
-    Expect<std::string> search_mask;
-    if (nargs > 0 && !(search_mask = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "search_mask: %s", search_mask.what());
-
-    std::vector<std::string> ret;
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_filter_names(search_mask.get());
-        else
-            ret = self->dev->get_filter_names();
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    return from(ret);
-}
-
 #define DOC_GET_GPIO_ATTR \
 "Get a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
@@ -314,58 +248,117 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_GET_GPIO_STRING_ATTR \
-"Get a GPIO attribute on a particular GPIO bank.\n" \
-"Possible attribute names:\n" \
-" - SRC  - \"PS\" for handling by processing system\n" \
-"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of Radio]; M is in [0..Number of port per Radio]\n" \
-" - CTRL - \"ATR\"  for ATR mode\n" \
-"        - \"GPIO\" for GPIO mode\n" \
-" - DDR  - \"OUT\" for output\n" \
-"        - \"IN\"  for input\n" \
-" - OUT -  a string of numbers representing GPIO output level (not ATR mode)\n" \
-"       - \"HIGH\"or \"LOW\" as GPIO output level that apply for each bit mask that is 1\n" \
-" - ATR_0X - a string of numbers representing a value of the ATR idle state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state register\n" \
-" - ATR_RX - a string of numbers representing a value of a ATR receive only state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only state register\n" \
-" - ATR_TX - a string of numbers representing a value of the ATR transmit only state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only state register\n" \
-" - ATR_XX - a string of numbers representing a value of the ATR full duplex state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex state register\n" \
-" - READBACK - readback input GPIOs\n" \
+#define DOC_GET_GPIO_SRC \
+"Get the current source for each pin in a GPIO bank.\n" \
 "\n" \
 "Args:\n" \
-"    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
+"    bank (str): the name of a GPIO bank. Valid values can be obtained by\n" \
+"                calling get_gpio_src_banks().\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n" \
 "\n" \
 "Returns:\n" \
-"    list: the value set for this attribute in vector of strings\n"
-PyObject *Usrp_get_gpio_string_attr(Usrp *self, PyObject *args) {
+"    list: a list of strings for current source of each GPIO pin in the\n" \
+"          chosen bank. The length of the return value matches the number of\n" \
+"          programmable GPIO pins.\n"
+PyObject *Usrp_get_gpio_src(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
 
     Expect<std::string> bank;
     if (!(bank = to<std::string>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "bank: %s", bank.what());
-    Expect<std::string> attr;
-    if (!(attr = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "attr: %s", attr.what());
 
     Expect<size_t> mboard;
-    if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
     std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->get_gpio_string_attr(bank.get(), attr.get(), mboard.get());
+        if (nargs == 2)
+            ret = self->dev->get_gpio_src(bank.get(), mboard.get());
         else
-            ret = self->dev->get_gpio_string_attr(bank.get(), attr.get());
+            ret = self->dev->get_gpio_src(bank.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_GPIO_SRC_BANKS \
+"Return a list of GPIO banks that can be source-controlled on this motherboard\n" \
+"This is a different set of banks than those returned from get_gpio_banks().\n" \
+"Here, we return a list of banks that can be used as arguments for\n" \
+"get_gpio_src(), get_gpio_srcs(), and set_gpio_src().\n" \
+"Some motherboards have GPIO banks that can be driven from different\n" \
+"sources, e.g., the N310 can have any radio channel drive the FP-GPIOs,\n" \
+"or the PS.\n" \
+"\n" \
+"Args:\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a list of valid bank names\n"
+PyObject *Usrp_get_gpio_src_banks(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> mboard;
+    if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_gpio_src_banks(mboard.get());
+        else
+            ret = self->dev->get_gpio_src_banks();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_GPIO_SRCS \
+"Enumerate sources for a gpio bank on the specified device.\n" \
+"Each of the pins in the chosen bank can be driven from one of the\n" \
+"returned sources.\n" \
+"\n" \
+"Args:\n" \
+"    bank (str): the name of a GPIO bank. Valid values can be obtained by\n" \
+"                calling get_gpio_src_banks().\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a list of strings with each valid source for the chosen bank\n"
+PyObject *Usrp_get_gpio_srcs(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> bank;
+    if (!(bank = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "bank: %s", bank.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            ret = self->dev->get_gpio_srcs(bank.get(), mboard.get());
+        else
+            ret = self->dev->get_gpio_srcs(bank.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -416,7 +409,7 @@ PyObject *Usrp_get_master_clock_rate(Usrp *self, PyObject *args) {
 "Examples:\n" \
 "- The B200 series' master clock rate can be changed at runtime and\n" \
 "  will report the true range of supported values\n" \
-"- The X300 series has _two_ discrete options for the clock rate, but will\n" \
+"- The X300 series has a valid range for the clock rate, but will\n" \
 "  always return the clock rate which the USRP was initialized to because\n" \
 "  it cannot be changed at runtime\n" \
 "- The N200 series does not have a configurable clock rate, and will\n" \
@@ -755,6 +748,69 @@ PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_RX_DC_OFFSET_RANGE \
+"Get the valid range for RX DC offset values.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    meta_range_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_rx_dc_offset_range(chan.get());
+        else
+            ret = self->dev->get_rx_dc_offset_range();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_FILTER_NAMES \
+"Enumerate the available filters in the RX signal path.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int): RX channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings representing the selected filter names.\n" \
+"    list: Filter names will follow the pattern BLOCK_ID:FILTER_NAME. For example,\n" \
+"          \"0/Radio#0:HB_0\"\n"
+PyObject *Usrp_get_rx_filter_names(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
+
+    Expect<size_t> chan;
+    if (!(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        ret = self->dev->get_rx_filter_names(chan.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
 #define DOC_GET_RX_FREQ \
 "Get the RX center frequency.\n" \
 "\n" \
@@ -974,11 +1030,11 @@ PyObject *Usrp_get_rx_gain_profile(Usrp *self, PyObject *args) {
 
 #define DOC_GET_RX_GAIN_PROFILE_NAMES \
 "Get a list of possible RX gain profile options\n" \
-"Example: On the TwinRX, this will return \"low-noise\", \"low-distortion\" or \"default\".\n" \
-"These names can be used in gain-profile related API called.\n" \
-"An empty return value doesn't mean there are no profile options, it means that\n" \
-"this radio does not have any gain profiles implemented, and typically means\n" \
-"there is only one default profile of set gain\n" \
+"Example: On the TwinRX, this will return \"low-noise\", \"low-distortion\" or\n" \
+"\"default\". These names can be used in gain-profile related API called. An empty\n" \
+"return value doesn't mean there are no profile options, it means that this radio\n" \
+"does not have any gain profiles implemented, and typically means there is only one\n" \
+"default profile of set gain\n" \
 "\n" \
 "Args:\n" \
 "    chan (int, optional): the channel index 0 to N-1\n" \
@@ -1351,6 +1407,75 @@ PyObject *Usrp_get_rx_num_channels(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_rx_num_channels();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_POWER_RANGE \
+"Return the available RX power range given the current configuration\n" \
+"This will return the range of available power levels given the current\n" \
+"frequency, gain profile, antenna, and whatever other settings may affect\n" \
+"the available power ranges. Note that the available power range may\n" \
+"change frequently, so don't assume an immutable range.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int): The channel index\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+PyObject *Usrp_get_rx_power_range(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
+
+    Expect<size_t> chan;
+    if (!(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    meta_range_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        ret = self->dev->get_rx_power_range(chan.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_RX_POWER_REFERENCE \
+"Return the actual reference RX power level.\n" \
+"Note: This functionality is not supported for most devices, and will\n" \
+"cause a uhd::not_implemented_error exception to be thrown on devices that\n" \
+"do not have this functionality.\n" \
+"For more information on how to use this API, see page_power.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): The channel for which this setting is queried\n" \
+"\n" \
+"Returns:\n" \
+"    float: value\n"
+PyObject *Usrp_get_rx_power_reference(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    double ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_rx_power_reference(chan.get());
+        else
+            ret = self->dev->get_rx_power_reference();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -1785,6 +1910,69 @@ PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_bandwidth_range(chan.get());
         else
             ret = self->dev->get_tx_bandwidth_range();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_TX_DC_OFFSET_RANGE \
+"Get the valid range for TX DC offset values.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    meta_range_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_tx_dc_offset_range(chan.get());
+        else
+            ret = self->dev->get_tx_dc_offset_range();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_TX_FILTER_NAMES \
+"Enumerate the available filters in the TX signal path.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int): TX channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    list: a vector of strings representing the selected filter names.\n" \
+"    list: Filter names will follow the pattern BLOCK_ID:FILTER_NAME. For example,\n" \
+"          \"0/Radio#0:HB_0\"\n"
+PyObject *Usrp_get_tx_filter_names(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
+
+    Expect<size_t> chan;
+    if (!(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    std::vector<std::string> ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        ret = self->dev->get_tx_filter_names(chan.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2392,6 +2580,75 @@ PyObject *Usrp_get_tx_num_channels(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
+#define DOC_GET_TX_POWER_RANGE \
+"Return the available TX power range given the current configuration\n" \
+"This will return the range of available power levels given the current\n" \
+"frequency, gain profile, antenna, and whatever other settings may affect\n" \
+"the available power ranges. Note that the available power range may\n" \
+"change frequently, so don't assume an immutable range.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int): The channel index\n" \
+"\n" \
+"Returns:\n" \
+"    dict: value\n"
+PyObject *Usrp_get_tx_power_range(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1.", nargs);
+
+    Expect<size_t> chan;
+    if (!(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    meta_range_t ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        ret = self->dev->get_tx_power_range(chan.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_GET_TX_POWER_REFERENCE \
+"Return the actual reference TX power level.\n" \
+"Note: This functionality is not supported for most devices, and will\n" \
+"cause a uhd::not_implemented_error exception to be thrown on devices that\n" \
+"do not have this functionality.\n" \
+"For more information on how to use this API, see page_power.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): The channel for which this setting is queried\n" \
+"\n" \
+"Returns:\n" \
+"    float: value\n"
+PyObject *Usrp_get_tx_power_reference(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    double ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->get_tx_power_reference(chan.get());
+        else
+            ret = self->dev->get_tx_power_reference();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
 #define DOC_GET_TX_RATE \
 "Gets the TX sample rate.\n" \
 "\n" \
@@ -2620,40 +2877,79 @@ PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
     return from(ret);
 }
 
-#define DOC_READ_REGISTER \
-"Read a low-level register field from a register in the USRP hardware\n" \
+#define DOC_HAS_RX_POWER_REFERENCE \
+"Return true if this channel has a reference power API enabled\n" \
+"Many devices either don't have a built-in reference power API, or they\n" \
+"require calibration data for it to work. This means that it is not clear,\n" \
+"even when the device type is known, if a device supports setting a power\n" \
+"reference level. Use this method to query the availability of\n" \
+"set_rx_power_reference() and get_rx_power_reference(), which will throw\n" \
+"a uhd::not_implemented_error or uhd::runtime_error if they cannot be used.\n" \
+"See page_power for more information, or query the specific device's\n" \
+"manual page to see if a power API is available, and how to enable it.\n" \
 "\n" \
 "Args:\n" \
-"    path (str): the full path to the register\n" \
-"    field (int): the identifier of bitfield to be read\n" \
-"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"    chan (int, optional): The channel for which this feature is queried\n" \
 "\n" \
 "Returns:\n" \
-"    int: the value of the register field\n"
-PyObject *Usrp_read_register(Usrp *self, PyObject *args) {
+"    bool: s true if this channel has an RX power API available\n"
+PyObject *Usrp_has_rx_power_reference(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 2 || nargs > 3)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
 
-    Expect<std::string> path;
-    if (!(path = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "path: %s", path.what());
-    Expect<uint32_t> field;
-    if (!(field = to<uint32_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "field: %s", field.what());
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    Expect<size_t> mboard;
-    if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    uint64_t ret;
+    bool ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->read_register(path.get(), field.get(), mboard.get());
+        if (nargs == 1)
+            ret = self->dev->has_rx_power_reference(chan.get());
         else
-            ret = self->dev->read_register(path.get(), field.get());
+            ret = self->dev->has_rx_power_reference();
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    return from(ret);
+}
+
+#define DOC_HAS_TX_POWER_REFERENCE \
+"Return true if this channel has a reference power API enabled\n" \
+"Many devices either don't have a built-in reference power API, or they\n" \
+"require calibration data for it to work. This means that it is not clear,\n" \
+"even when the device type is known, if a device supports setting a power\n" \
+"reference level. Use this method to query the availability of\n" \
+"set_tx_power_reference() and get_tx_power_reference(), which will throw\n" \
+"a uhd::not_implemented_error or uhd::runtime_error if they cannot be used.\n" \
+"See page_power for more information, or query the specific device's\n" \
+"manual page to see if a power API is available, and how to enable it.\n" \
+"\n" \
+"Args:\n" \
+"    chan (int, optional): The channel for which this feature is queried\n" \
+"\n" \
+"Returns:\n" \
+"    bool: s true if this channel has a TX power API available\n"
+PyObject *Usrp_has_tx_power_reference(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 0 || nargs > 1)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 0 to 1.", nargs);
+
+    Expect<size_t> chan;
+    if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    bool ret;
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 1)
+            ret = self->dev->has_tx_power_reference(chan.get());
+        else
+            ret = self->dev->has_tx_power_reference();
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2662,12 +2958,40 @@ PyObject *Usrp_read_register(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_CLOCK_SOURCE \
-"Set the clock source for the usrp device.\n" \
-"This sets the source for a 10 MHz reference clock.\n" \
-"Typical options for source: internal, external, MIMO.\n" \
+"Set the clock source for the USRP device\n" \
+"This sets the source of the frequency reference, typically a 10 MHz\n" \
+"signal. In order to frequency-align multiple USRPs, it is necessary to\n" \
+"connect all of them to a common reference and provide them with the same\n" \
+"clock source.\n" \
+"Typical values for source are 'internal', 'external'. Refer to the\n" \
+"specific device manual for a full list of options.\n" \
+"If the value for for source is not available for this device, it will\n" \
+"throw an exception. Calling get_clock_sources() will return a valid list\n" \
+"of options for this method.\n" \
+"Side effects: Some devices only support certain combinations of time and\n" \
+"clock source. It is possible that the underlying device implementation\n" \
+"will change the time source when the clock source changes and vice versa.\n" \
+"Reading back the current values of clock and time source using\n" \
+"get_clock_source() and get_time_source() is the only certain way of\n" \
+"knowing which clock and time source are currently selected.\n" \
+"This function does not force a re-initialization of the underlying\n" \
+"hardware when the value does not change. Consider the following snippet:\n" \
+"~~~{.cpp}\n" \
+"auto usrp = uhd::usrp::multi_usrp::make(device_args);\n" \
+"// This may or may not cause the hardware to reconfigure, depending on\n" \
+"// the default state of the device\n" \
+"usrp->set_clock_source(\"internal\");\n" \
+"// Now, the clock source is definitely set to \"internal\"!\n" \
+"// The next call probably won't do anything but will return immediately,\n" \
+"// because the clock source was already set to \"internal\"\n" \
+"usrp->set_clock_source(\"internal\");\n" \
+"// The clock source is still guaranteed to be \"internal\" at this point\n" \
+"See also:\n" \
+"- set_time_source()\n" \
+"- set_sync_source()\n" \
 "\n" \
 "Args:\n" \
-"    source (str): a string representing the clock source\n" \
+"    source (str): a string representing the time source\n" \
 "    mboard (int, optional): which motherboard to set the config\n"
 PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
 
@@ -2772,7 +3096,7 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_GPIO_ATTR \
-"(1) ""Set a GPIO attribute on a particular GPIO bank.\n" \
+"Set a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
 " - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
 " - DDR - 1 for output 0 for input\n" \
@@ -2787,34 +3111,8 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 "    attr (str): the name of a GPIO attribute\n" \
 "    value (int): the new value for this GPIO bank\n" \
 "    mask (int, optional): the bit mask to effect which pins are changed\n" \
-"    mboard (int, optional): the motherboard index 0 to M-1\n" \
-"\n" \
-"(2) ""Set a GPIO attribute on a particular GPIO bank.\n" \
-"Possible attribute names:\n" \
-" - SRC  - \"PS\" for handling by processing system\n" \
-"        - \"RADIO_N/M\" for handling by radio block with N is in [0..Number of Radio]; M is in [0..Number of port per Radio]\n" \
-" - CTRL - \"ATR\"  for ATR mode\n" \
-"        - \"GPIO\" for GPIO mode\n" \
-" - DDR  - \"OUT\" for output\n" \
-"        - \"IN\"  for input\n" \
-" - OUT -  a string of numbers representing GPIO output level (not ATR mode)\n" \
-"       - \"HIGH\"or \"LOW\" as GPIO output level that apply for each bit mask that is 1\n" \
-" - ATR_0X - a string of numbers representing a value of the ATR idle state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR idle state register\n" \
-" - ATR_RX - a string of numbers representing a value of a ATR receive only state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR receive only state register\n" \
-" - ATR_TX - a string of numbers representing a value of the ATR transmit only state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR transmit only state register\n" \
-" - ATR_XX - a string of numbers representing a value of the ATR full duplex state register\n" \
-"          - \"HIGH\" or \"LOW\" as a value set on each bit on of the ATR full duplex state register\n" \
-"\n" \
-"Args:\n" \
-"    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
-"    value (str): the new value for this GPIO bank\n" \
-"    mask (int, optional): the bit mask to effect which pins are changed\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
-static PyObject *Usrp_set_gpio_attr_0(Usrp *self, PyObject *args) {
+PyObject *Usrp_set_gpio_attr(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
     if (nargs < 3 || nargs > 5)
@@ -2852,67 +3150,6 @@ static PyObject *Usrp_set_gpio_attr_0(Usrp *self, PyObject *args) {
 
     Py_INCREF(Py_None);
     return Py_None;
-}
-
-static PyObject *Usrp_set_gpio_attr_1(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 3 || nargs > 5)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 3 to 5.", nargs);
-
-    Expect<std::string> bank;
-    if (!(bank = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "bank: %s", bank.what());
-    Expect<std::string> attr;
-    if (!(attr = to<std::string>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "attr: %s", attr.what());
-    Expect<std::string> value;
-    if (!(value = to<std::string>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "value: %s", value.what());
-
-    Expect<uint32_t> mask;
-    Expect<size_t> mboard;
-
-    if (nargs > 3 && !(mask = to<uint32_t>(PyTuple_GetItem(args, 3))))
-        return PyErr_Format(PyExc_TypeError, "mask: %s", mask.what());
-    if (nargs > 4 && !(mboard = to<size_t>(PyTuple_GetItem(args, 4))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 5)
-            self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get(), mboard.get());
-        else if (nargs == 4)
-            self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get());
-        else
-            self->dev->set_gpio_attr(bank.get(), attr.get(), value.get());
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-PyObject *Usrp_set_gpio_attr(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs >= 3 && nargs <= 5
-        && is<std::string>(PyTuple_GetItem(args, 0))
-        && is<std::string>(PyTuple_GetItem(args, 1))
-        && is<uint32_t>(PyTuple_GetItem(args, 2))
-        && (nargs <= 3 || is<uint32_t>(PyTuple_GetItem(args, 3)))
-        && (nargs <= 4 || is<size_t>(PyTuple_GetItem(args, 4)))) {
-        return Usrp_set_gpio_attr_0(self, args);
-    } else if (nargs >= 3 && nargs <= 5
-        && is<std::string>(PyTuple_GetItem(args, 0))
-        && is<std::string>(PyTuple_GetItem(args, 1))
-        && is<std::string>(PyTuple_GetItem(args, 2))
-        && (nargs <= 3 || is<uint32_t>(PyTuple_GetItem(args, 3)))
-        && (nargs <= 4 || is<size_t>(PyTuple_GetItem(args, 4)))) {
-        return Usrp_set_gpio_attr_1(self, args);
-    }
-    return Usrp_set_gpio_attr_0(self, args);
 }
 
 #define DOC_SET_MASTER_CLOCK_RATE \
@@ -3040,8 +3277,8 @@ PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
 #define DOC_SET_RX_AGC \
 "Enable or disable the RX AGC module.\n" \
 "Once this module is enabled manual gain settings will be ignored.\n" \
-"The AGC will start in a default configuration which should be good for most use cases.\n" \
-"Device specific configuration parameters can be found in the property tree.\n" \
+"The AGC will start in a default configuration which should be good for most use\n" \
+"cases. Device specific configuration parameters can be found in the property tree.\n" \
 "\n" \
 "Args:\n" \
 "    enable (bool): Enable or Disable the AGC\n" \
@@ -3616,6 +3853,44 @@ PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_RX_POWER_REFERENCE \
+"Set the reference RX power level for a given channel\n" \
+"Note: This functionality is not supported for most devices, and will\n" \
+"cause a uhd::not_implemented_error exception to be thrown on devices that\n" \
+"do not have this functionality.\n" \
+"For more information on how to use this API, see page_power.\n" \
+"\n" \
+"Args:\n" \
+"    power_dbm (float): The reference power level in dBm\n" \
+"    chan (int, optional): The channel for which this setting applies\n"
+PyObject *Usrp_set_rx_power_reference(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<double> power_dbm;
+    if (!(power_dbm = to<double>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "power_dbm: %s", power_dbm.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_rx_power_reference(power_dbm.get(), chan.get());
+        else
+            self->dev->set_rx_power_reference(power_dbm.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 #define DOC_SET_RX_RATE \
 "Set the RX sample rate.\n" \
 "\n" \
@@ -3642,6 +3917,43 @@ PyObject *Usrp_set_rx_rate(Usrp *self, PyObject *args) {
             self->dev->set_rx_rate(rate.get(), chan.get());
         else
             self->dev->set_rx_rate(rate.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_RX_SPP \
+"Set the number of samples sent per packet (spp) for RX streaming\n" \
+"On RFNoC devices, this will set the spp value on the radio itself. For\n" \
+"older devices, it will inject the spp value into a later get_rx_stream()\n" \
+"call, but it won't change anything in existing streamers.\n" \
+"\n" \
+"Args:\n" \
+"    spp (int): the new spp value\n" \
+"    chan (int, optional): the channel index 0 to N-1\n"
+PyObject *Usrp_set_rx_spp(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<size_t> spp;
+    if (!(spp = to<size_t>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "spp: %s", spp.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_rx_spp(spp.get(), chan.get());
+        else
+            self->dev->set_rx_spp(spp.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3679,6 +3991,46 @@ PyObject *Usrp_set_rx_subdev_spec(Usrp *self, PyObject *args) {
             self->dev->set_rx_subdev_spec(spec.get(), mboard.get());
         else
             self->dev->set_rx_subdev_spec(spec.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+#define DOC_SET_SYNC_SOURCE \
+"Set the reference/synchronization sources for the USRP device\n" \
+"This is a shorthand for calling\n" \
+"`set_sync_source(device_addr_t(\"clock_source=$CLOCK_SOURCE,time_source=$TIME_SOURCE\"))`\n" \
+"\n" \
+"Args:\n" \
+"    clock_source (str): A string representing the clock source\n" \
+"    time_source (str): A string representing the time source\n" \
+"    mboard (int, optional): which motherboard to set the config\n"
+PyObject *Usrp_set_sync_source(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 2 || nargs > 3)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 2 to 3.", nargs);
+
+    Expect<std::string> clock_source;
+    if (!(clock_source = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "clock_source: %s", clock_source.what());
+    Expect<std::string> time_source;
+    if (!(time_source = to<std::string>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "time_source: %s", time_source.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 3)
+            self->dev->set_sync_source(clock_source.get(), time_source.get(), mboard.get());
+        else
+            self->dev->set_sync_source(clock_source.get(), time_source.get());
     } catch(const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3765,10 +4117,37 @@ PyObject *Usrp_set_time_now(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_TIME_SOURCE \
-"Set the time source for the usrp device.\n" \
-"This sets the method of time synchronization,\n" \
-"typically a pulse per second or an encoded time.\n" \
-"Typical options for source: external, MIMO.\n" \
+"Set the time source for the USRP device\n" \
+"This sets the method of time synchronization, typically a pulse per\n" \
+"second signal. In order to time-align multiple USRPs, it is necessary to\n" \
+"connect all of them to a common reference and provide them with the same\n" \
+"time source.\n" \
+"Typical values for source are 'internal', 'external'. Refer to the\n" \
+"specific device manual for a full list of options.\n" \
+"If the value for for source is not available for this device, it will\n" \
+"throw an exception. Calling get_time_sources() will return a valid list\n" \
+"of options for this method.\n" \
+"Side effects: Some devices only support certain combinations of time and\n" \
+"clock source. It is possible that the underlying device implementation\n" \
+"will change the clock source when the time source changes and vice versa.\n" \
+"Reading back the current values of clock and time source using\n" \
+"get_clock_source() and get_time_source() is the only certain way of\n" \
+"knowing which clock and time source are currently selected.\n" \
+"This function does not force a re-initialization of the underlying\n" \
+"hardware when the value does not change. Consider the following snippet:\n" \
+"~~~{.cpp}\n" \
+"auto usrp = uhd::usrp::multi_usrp::make(device_args);\n" \
+"// This may or may not cause the hardware to reconfigure, depending on\n" \
+"// the default state of the device\n" \
+"usrp->set_time_source(\"internal\");\n" \
+"// Now, the time source is definitely set to \"internal\"!\n" \
+"// The next call probably won't do anything but will return immediately,\n" \
+"// because the time source was already set to \"internal\"\n" \
+"usrp->set_time_source(\"internal\");\n" \
+"// The time source is still guaranteed to be \"internal\" at this point\n" \
+"See also:\n" \
+"- set_clock_source()\n" \
+"- set_sync_source()\n" \
 "\n" \
 "Args:\n" \
 "    source (str): a string representing the time source\n" \
@@ -4313,6 +4692,44 @@ PyObject *Usrp_set_tx_lo_source(Usrp *self, PyObject *args) {
     return Py_None;
 }
 
+#define DOC_SET_TX_POWER_REFERENCE \
+"Set the reference TX power level for a given channel\n" \
+"Note: This functionality is not supported for most devices, and will\n" \
+"cause a uhd::not_implemented_error exception to be thrown on devices that\n" \
+"do not have this functionality.\n" \
+"For more information on how to use this API, see page_power.\n" \
+"\n" \
+"Args:\n" \
+"    power_dbm (float): The reference power level in dBm\n" \
+"    chan (int, optional): The channel for which this setting applies\n"
+PyObject *Usrp_set_tx_power_reference(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<double> power_dbm;
+    if (!(power_dbm = to<double>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "power_dbm: %s", power_dbm.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2)
+            self->dev->set_tx_power_reference(power_dbm.get(), chan.get());
+        else
+            self->dev->set_tx_power_reference(power_dbm.get());
+    } catch(const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 #define DOC_SET_TX_RATE \
 "Set the TX sample rate.\n" \
 "\n" \
@@ -4423,59 +4840,17 @@ PyObject *Usrp_set_user_register(Usrp *self, PyObject *args) {
     return Py_None;
 }
 
-#define DOC_WRITE_REGISTER \
-"Write a low-level register field for a register in the USRP hardware\n" \
-"\n" \
-"Args:\n" \
-"    path (str): the full path to the register\n" \
-"    field (int): the identifier of bitfield to be written (all other bits remain unchanged)\n" \
-"    value (int): the value to write to the register field\n" \
-"    mboard (int, optional): the motherboard index 0 to M-1\n"
-PyObject *Usrp_write_register(Usrp *self, PyObject *args) {
-
-    const Py_ssize_t nargs = PyTuple_Size(args);
-    if (nargs < 3 || nargs > 4)
-        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 3 to 4.", nargs);
-
-    Expect<std::string> path;
-    if (!(path = to<std::string>(PyTuple_GetItem(args, 0))))
-        return PyErr_Format(PyExc_TypeError, "path: %s", path.what());
-    Expect<uint32_t> field;
-    if (!(field = to<uint32_t>(PyTuple_GetItem(args, 1))))
-        return PyErr_Format(PyExc_TypeError, "field: %s", field.what());
-    Expect<uint64_t> value;
-    if (!(value = to<uint64_t>(PyTuple_GetItem(args, 2))))
-        return PyErr_Format(PyExc_TypeError, "value: %s", value.what());
-
-    Expect<size_t> mboard;
-    if (nargs > 3 && !(mboard = to<size_t>(PyTuple_GetItem(args, 3))))
-        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
-
-    try {
-        std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 4)
-            self->dev->write_register(path.get(), field.get(), value.get(), mboard.get());
-        else
-            self->dev->write_register(path.get(), field.get(), value.get());
-    } catch(const uhd::exception &e) {
-        return PyErr_Format(UhdError, "%s", e.what());
-    }
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
 const std::vector<PyMethodDef> Usrp_gen_methods {
     {"clear_command_time", (PyCFunction)Usrp_clear_command_time, METH_VARARGS, DOC_CLEAR_COMMAND_TIME},
-    {"enumerate_registers", (PyCFunction)Usrp_enumerate_registers, METH_VARARGS, DOC_ENUMERATE_REGISTERS},
     {"get_clock_source", (PyCFunction)Usrp_get_clock_source, METH_VARARGS, DOC_GET_CLOCK_SOURCE},
     {"get_clock_sources", (PyCFunction)Usrp_get_clock_sources, METH_VARARGS, DOC_GET_CLOCK_SOURCES},
     {"get_fe_rx_freq_range", (PyCFunction)Usrp_get_fe_rx_freq_range, METH_VARARGS, DOC_GET_FE_RX_FREQ_RANGE},
     {"get_fe_tx_freq_range", (PyCFunction)Usrp_get_fe_tx_freq_range, METH_VARARGS, DOC_GET_FE_TX_FREQ_RANGE},
-    {"get_filter_names", (PyCFunction)Usrp_get_filter_names, METH_VARARGS, DOC_GET_FILTER_NAMES},
     {"get_gpio_attr", (PyCFunction)Usrp_get_gpio_attr, METH_VARARGS, DOC_GET_GPIO_ATTR},
     {"get_gpio_banks", (PyCFunction)Usrp_get_gpio_banks, METH_VARARGS, DOC_GET_GPIO_BANKS},
-    {"get_gpio_string_attr", (PyCFunction)Usrp_get_gpio_string_attr, METH_VARARGS, DOC_GET_GPIO_STRING_ATTR},
+    {"get_gpio_src", (PyCFunction)Usrp_get_gpio_src, METH_VARARGS, DOC_GET_GPIO_SRC},
+    {"get_gpio_src_banks", (PyCFunction)Usrp_get_gpio_src_banks, METH_VARARGS, DOC_GET_GPIO_SRC_BANKS},
+    {"get_gpio_srcs", (PyCFunction)Usrp_get_gpio_srcs, METH_VARARGS, DOC_GET_GPIO_SRCS},
     {"get_master_clock_rate", (PyCFunction)Usrp_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
     {"get_master_clock_rate_range", (PyCFunction)Usrp_get_master_clock_rate_range, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE_RANGE},
     {"get_mboard_name", (PyCFunction)Usrp_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
@@ -4488,6 +4863,8 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_antennas", (PyCFunction)Usrp_get_rx_antennas, METH_VARARGS, DOC_GET_RX_ANTENNAS},
     {"get_rx_bandwidth", (PyCFunction)Usrp_get_rx_bandwidth, METH_VARARGS, DOC_GET_RX_BANDWIDTH},
     {"get_rx_bandwidth_range", (PyCFunction)Usrp_get_rx_bandwidth_range, METH_VARARGS, DOC_GET_RX_BANDWIDTH_RANGE},
+    {"get_rx_dc_offset_range", (PyCFunction)Usrp_get_rx_dc_offset_range, METH_VARARGS, DOC_GET_RX_DC_OFFSET_RANGE},
+    {"get_rx_filter_names", (PyCFunction)Usrp_get_rx_filter_names, METH_VARARGS, DOC_GET_RX_FILTER_NAMES},
     {"get_rx_freq", (PyCFunction)Usrp_get_rx_freq, METH_VARARGS, DOC_GET_RX_FREQ},
     {"get_rx_freq_range", (PyCFunction)Usrp_get_rx_freq_range, METH_VARARGS, DOC_GET_RX_FREQ_RANGE},
     {"get_rx_gain", (PyCFunction)Usrp_get_rx_gain, METH_VARARGS, DOC_GET_RX_GAIN},
@@ -4502,6 +4879,8 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_lo_source", (PyCFunction)Usrp_get_rx_lo_source, METH_VARARGS, DOC_GET_RX_LO_SOURCE},
     {"get_rx_lo_sources", (PyCFunction)Usrp_get_rx_lo_sources, METH_VARARGS, DOC_GET_RX_LO_SOURCES},
     {"get_rx_num_channels", (PyCFunction)Usrp_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
+    {"get_rx_power_range", (PyCFunction)Usrp_get_rx_power_range, METH_VARARGS, DOC_GET_RX_POWER_RANGE},
+    {"get_rx_power_reference", (PyCFunction)Usrp_get_rx_power_reference, METH_VARARGS, DOC_GET_RX_POWER_REFERENCE},
     {"get_rx_rate", (PyCFunction)Usrp_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
     {"get_rx_rates", (PyCFunction)Usrp_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
     {"get_rx_sensor_names", (PyCFunction)Usrp_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
@@ -4516,6 +4895,8 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_antennas", (PyCFunction)Usrp_get_tx_antennas, METH_VARARGS, DOC_GET_TX_ANTENNAS},
     {"get_tx_bandwidth", (PyCFunction)Usrp_get_tx_bandwidth, METH_VARARGS, DOC_GET_TX_BANDWIDTH},
     {"get_tx_bandwidth_range", (PyCFunction)Usrp_get_tx_bandwidth_range, METH_VARARGS, DOC_GET_TX_BANDWIDTH_RANGE},
+    {"get_tx_dc_offset_range", (PyCFunction)Usrp_get_tx_dc_offset_range, METH_VARARGS, DOC_GET_TX_DC_OFFSET_RANGE},
+    {"get_tx_filter_names", (PyCFunction)Usrp_get_tx_filter_names, METH_VARARGS, DOC_GET_TX_FILTER_NAMES},
     {"get_tx_freq", (PyCFunction)Usrp_get_tx_freq, METH_VARARGS, DOC_GET_TX_FREQ},
     {"get_tx_freq_range", (PyCFunction)Usrp_get_tx_freq_range, METH_VARARGS, DOC_GET_TX_FREQ_RANGE},
     {"get_tx_gain", (PyCFunction)Usrp_get_tx_gain, METH_VARARGS, DOC_GET_TX_GAIN},
@@ -4530,6 +4911,8 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_lo_source", (PyCFunction)Usrp_get_tx_lo_source, METH_VARARGS, DOC_GET_TX_LO_SOURCE},
     {"get_tx_lo_sources", (PyCFunction)Usrp_get_tx_lo_sources, METH_VARARGS, DOC_GET_TX_LO_SOURCES},
     {"get_tx_num_channels", (PyCFunction)Usrp_get_tx_num_channels, METH_VARARGS, DOC_GET_TX_NUM_CHANNELS},
+    {"get_tx_power_range", (PyCFunction)Usrp_get_tx_power_range, METH_VARARGS, DOC_GET_TX_POWER_RANGE},
+    {"get_tx_power_reference", (PyCFunction)Usrp_get_tx_power_reference, METH_VARARGS, DOC_GET_TX_POWER_REFERENCE},
     {"get_tx_rate", (PyCFunction)Usrp_get_tx_rate, METH_VARARGS, DOC_GET_TX_RATE},
     {"get_tx_rates", (PyCFunction)Usrp_get_tx_rates, METH_VARARGS, DOC_GET_TX_RATES},
     {"get_tx_sensor_names", (PyCFunction)Usrp_get_tx_sensor_names, METH_VARARGS, DOC_GET_TX_SENSOR_NAMES},
@@ -4537,7 +4920,8 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_subdev_spec", (PyCFunction)Usrp_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
     {"get_usrp_rx_info", (PyCFunction)Usrp_get_usrp_rx_info, METH_VARARGS, DOC_GET_USRP_RX_INFO},
     {"get_usrp_tx_info", (PyCFunction)Usrp_get_usrp_tx_info, METH_VARARGS, DOC_GET_USRP_TX_INFO},
-    {"read_register", (PyCFunction)Usrp_read_register, METH_VARARGS, DOC_READ_REGISTER},
+    {"has_rx_power_reference", (PyCFunction)Usrp_has_rx_power_reference, METH_VARARGS, DOC_HAS_RX_POWER_REFERENCE},
+    {"has_tx_power_reference", (PyCFunction)Usrp_has_tx_power_reference, METH_VARARGS, DOC_HAS_TX_POWER_REFERENCE},
     {"set_clock_source", (PyCFunction)Usrp_set_clock_source, METH_VARARGS, DOC_SET_CLOCK_SOURCE},
     {"set_clock_source_out", (PyCFunction)Usrp_set_clock_source_out, METH_VARARGS, DOC_SET_CLOCK_SOURCE_OUT},
     {"set_command_time", (PyCFunction)Usrp_set_command_time, METH_VARARGS, DOC_SET_COMMAND_TIME},
@@ -4556,8 +4940,11 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"set_rx_lo_export_enabled", (PyCFunction)Usrp_set_rx_lo_export_enabled, METH_VARARGS, DOC_SET_RX_LO_EXPORT_ENABLED},
     {"set_rx_lo_freq", (PyCFunction)Usrp_set_rx_lo_freq, METH_VARARGS, DOC_SET_RX_LO_FREQ},
     {"set_rx_lo_source", (PyCFunction)Usrp_set_rx_lo_source, METH_VARARGS, DOC_SET_RX_LO_SOURCE},
+    {"set_rx_power_reference", (PyCFunction)Usrp_set_rx_power_reference, METH_VARARGS, DOC_SET_RX_POWER_REFERENCE},
     {"set_rx_rate", (PyCFunction)Usrp_set_rx_rate, METH_VARARGS, DOC_SET_RX_RATE},
+    {"set_rx_spp", (PyCFunction)Usrp_set_rx_spp, METH_VARARGS, DOC_SET_RX_SPP},
     {"set_rx_subdev_spec", (PyCFunction)Usrp_set_rx_subdev_spec, METH_VARARGS, DOC_SET_RX_SUBDEV_SPEC},
+    {"set_sync_source", (PyCFunction)Usrp_set_sync_source, METH_VARARGS, DOC_SET_SYNC_SOURCE},
     {"set_time_next_pps", (PyCFunction)Usrp_set_time_next_pps, METH_VARARGS, DOC_SET_TIME_NEXT_PPS},
     {"set_time_now", (PyCFunction)Usrp_set_time_now, METH_VARARGS, DOC_SET_TIME_NOW},
     {"set_time_source", (PyCFunction)Usrp_set_time_source, METH_VARARGS, DOC_SET_TIME_SOURCE},
@@ -4573,10 +4960,10 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"set_tx_lo_export_enabled", (PyCFunction)Usrp_set_tx_lo_export_enabled, METH_VARARGS, DOC_SET_TX_LO_EXPORT_ENABLED},
     {"set_tx_lo_freq", (PyCFunction)Usrp_set_tx_lo_freq, METH_VARARGS, DOC_SET_TX_LO_FREQ},
     {"set_tx_lo_source", (PyCFunction)Usrp_set_tx_lo_source, METH_VARARGS, DOC_SET_TX_LO_SOURCE},
+    {"set_tx_power_reference", (PyCFunction)Usrp_set_tx_power_reference, METH_VARARGS, DOC_SET_TX_POWER_REFERENCE},
     {"set_tx_rate", (PyCFunction)Usrp_set_tx_rate, METH_VARARGS, DOC_SET_TX_RATE},
     {"set_tx_subdev_spec", (PyCFunction)Usrp_set_tx_subdev_spec, METH_VARARGS, DOC_SET_TX_SUBDEV_SPEC},
     {"set_user_register", (PyCFunction)Usrp_set_user_register, METH_VARARGS, DOC_SET_USER_REGISTER},
-    {"write_register", (PyCFunction)Usrp_write_register, METH_VARARGS, DOC_WRITE_REGISTER},
 };
 
 }

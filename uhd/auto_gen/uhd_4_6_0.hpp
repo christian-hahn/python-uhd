@@ -2,7 +2,7 @@
 
 #include <uhd/version.hpp>
 
-#if UHD_VERSION == 4000099
+#if (UHD_VERSION / 100) == 40600
 
 #ifndef __UHD_GEN_HPP__
 #define __UHD_GEN_HPP__
@@ -172,18 +172,19 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
 #define DOC_GET_GPIO_ATTR \
 "Get a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
-" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
-" - DDR - 1 for output 0 for input\n" \
+" - CTRL - 1 for ATR mode, 0 for GPIO mode\n" \
+" - DDR - 1 for output, 0 for input\n" \
 " - OUT - GPIO output level (not ATR mode)\n" \
 " - ATR_0X - ATR idle state\n" \
 " - ATR_RX - ATR receive only state\n" \
 " - ATR_TX - ATR transmit only state\n" \
 " - ATR_XX - ATR full duplex state\n" \
 " - READBACK - readback input GPIOs\n" \
+"For bank names, refer to set_gpio_attr().\n" \
 "\n" \
 "Args:\n" \
 "    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
+"    attr (str): the name of a GPIO attribute (see list above)\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n" \
 "\n" \
 "Returns:\n" \
@@ -220,7 +221,7 @@ PyObject *Usrp_get_gpio_attr(Usrp *self, PyObject *args) {
 }
 
 #define DOC_GET_GPIO_BANKS \
-"Enumerate gpio banks on the specified device.\n" \
+"Enumerate GPIO banks on the specified device.\n" \
 "\n" \
 "Args:\n" \
 "    mboard (int): the motherboard index 0 to M-1\n" \
@@ -252,8 +253,8 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
 "Get the current source for each pin in a GPIO bank.\n" \
 "\n" \
 "Args:\n" \
-"    bank (str): the name of a GPIO bank. Valid values can be obtained by\n" \
-"                calling get_gpio_src_banks().\n" \
+"    bank (str): the name of a GPIO bank (connector). Valid values can be\n" \
+"                obtained by calling get_gpio_src_banks().\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n" \
 "\n" \
 "Returns:\n" \
@@ -292,7 +293,10 @@ PyObject *Usrp_get_gpio_src(Usrp *self, PyObject *args) {
 "Return a list of GPIO banks that can be source-controlled on this motherboard\n" \
 "This is a different set of banks than those returned from get_gpio_banks().\n" \
 "Here, we return a list of banks that can be used as arguments for\n" \
-"get_gpio_src(), get_gpio_srcs(), and set_gpio_src().\n" \
+"get_gpio_src(), get_gpio_srcs(), and set_gpio_src(). These return values\n" \
+"correspond to the physical connectors of the USRP, e.g., for X410, it\n" \
+"will return \"GPIO0\" and \"GPIO1\" (see also page_x400_gpio_api). On\n" \
+"X310, it will return a single value, \"FP0\" (see also xgpio_fpanel_gpio).\n" \
 "Some motherboards have GPIO banks that can be driven from different\n" \
 "sources, e.g., the N310 can have any radio channel drive the FP-GPIOs,\n" \
 "or the PS.\n" \
@@ -332,8 +336,8 @@ PyObject *Usrp_get_gpio_src_banks(Usrp *self, PyObject *args) {
 "returned sources.\n" \
 "\n" \
 "Args:\n" \
-"    bank (str): the name of a GPIO bank. Valid values can be obtained by\n" \
-"                calling get_gpio_src_banks().\n" \
+"    bank (str): the name of a GPIO bank (connector). Valid values can be\n" \
+"                obtained by calling get_gpio_src_banks().\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n" \
 "\n" \
 "Returns:\n" \
@@ -685,7 +689,7 @@ PyObject *Usrp_get_rx_antennas(Usrp *self, PyObject *args) {
 }
 
 #define DOC_GET_RX_BANDWIDTH \
-"Get the RX bandwidth on the frontend.\n" \
+"Get the RX bandwidth on the frontend\n" \
 "\n" \
 "Args:\n" \
 "    chan (int, optional): the channel index 0 to N-1\n" \
@@ -1351,8 +1355,9 @@ PyObject *Usrp_get_rx_lo_source(Usrp *self, PyObject *args) {
 "Get a list of possible LO sources.\n" \
 "Channels which do not have controllable LO sources will return\n" \
 "\"internal\". Typical values are \"internal\" and \"external\", although the\n" \
-"TwinRX has more options, such as \"companion\". These options are device-\n" \
-"specific.\n" \
+"TwinRX, for example, has more options, such as \"companion\". These options\n" \
+"are device-specific, so consult the individual device manual pages for\n" \
+"details.\n" \
 "\n" \
 "Args:\n" \
 "    name (str, optional): the name of the LO stage to query\n" \
@@ -1645,6 +1650,9 @@ PyObject *Usrp_get_rx_subdev_spec(Usrp *self, PyObject *args) {
 
 #define DOC_GET_TIME_LAST_PPS \
 "Get the time when the last pps pulse occurred.\n" \
+"For RFNoC devices with multiple timekeepers, this returns the time of the first\n" \
+"timekeeper. To access specific timekeepers, use the corresponding RFNoC APIs\n" \
+"(e.g., mb_controller::get_timekeeper()).\n" \
 "\n" \
 "Args:\n" \
 "    mboard (int, optional): which motherboard to query\n" \
@@ -1677,6 +1685,9 @@ PyObject *Usrp_get_time_last_pps(Usrp *self, PyObject *args) {
 
 #define DOC_GET_TIME_NOW \
 "Get the current time in the usrp time registers.\n" \
+"For RFNoC devices with multiple timekeepers, this returns the time of the first\n" \
+"timekeeper. To access specific timekeepers, use the corresponding RFNoC APIs\n" \
+"(e.g., mb_controller::get_timekeeper()).\n" \
 "\n" \
 "Args:\n" \
 "    mboard (int, optional): which motherboard to query\n" \
@@ -3022,10 +3033,12 @@ PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_CLOCK_SOURCE_OUT \
-"Send the clock source to an output connector.\n" \
+"Send the clock signal to an output connector.\n" \
 "This call is only applicable on devices with reference outputs.\n" \
 "By default, the reference output will be enabled for ease of use.\n" \
 "This call may be used to enable or disable the output.\n" \
+"If the device does not support this operation, calling this method will\n" \
+"throw a uhd::runtime_error.\n" \
 "\n" \
 "Args:\n" \
 "    enb (bool): true to output the clock source.\n" \
@@ -3098,17 +3111,47 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 #define DOC_SET_GPIO_ATTR \
 "Set a GPIO attribute on a particular GPIO bank.\n" \
 "Possible attribute names:\n" \
-" - CTRL - 1 for ATR mode 0 for GPIO mode\n" \
-" - DDR - 1 for output 0 for input\n" \
+" - CTRL - 1 for ATR mode, 0 for GPIO mode\n" \
+" - DDR - 1 for output, 0 for input\n" \
 " - OUT - GPIO output level (not ATR mode)\n" \
 " - ATR_0X - ATR idle state\n" \
 " - ATR_RX - ATR receive only state\n" \
 " - ATR_TX - ATR transmit only state\n" \
 " - ATR_XX - ATR full duplex state\n" \
+"A note on bank names: Query get_gpio_banks() for a valid list of arguments\n" \
+"for bank names. Note that RFNoC devices (E3xx, N3xx, X3x0, X410) behave\n" \
+"slightly differently when using this API vs. using the\n" \
+"radio_control::set_gpio_attr() API. For backward-compatibility reasons,\n" \
+"this API does not have a dedicated argument to address a specific radio,\n" \
+"although the aforementioned devices have separate GPIO banks for each\n" \
+"radio. This API thus allows appending the slot name (typically \"A\" or \"B\")\n" \
+"to the GPIO bank to differentiate between radios. The following example\n" \
+"shows the difference between the RFNoC and multi_usrp APIs on a USRP N310:\n" \
+"~~~{.py}\n" \
+"my_usrp = uhd.usrp.MultiUSRP(\"type=n3xx\")\n" \
+"print(my_usrp.get_gpio_banks()) # Will print: FP0A, FP0B\n" \
+"# Now set all pins to GPIO for Radio 1 (note the 'B' in 'FP0B'):\n" \
+"my_usrp.set_gpio_attr(\"FP0B\", \"CTRL\", 0x000)\n" \
+"# For backwards compatibility, you can omit the 'A', but that will default\n" \
+"# to radio 0. The following lines thus do the same:\n" \
+"my_usrp.set_gpio_attr(\"FP0\", \"CTRL\", 0x000)\n" \
+"my_usrp.set_gpio_attr(\"FP0A\", \"CTRL\", 0x000)\n" \
+"### This is how you do the same thing with RFNoC API:\n" \
+"print(my_usrp.get_radio_control(0).get_gpio_banks()) # Will print: FP0\n" \
+"print(my_usrp.get_radio_control(1).get_gpio_banks()) # Will print: FP0\n" \
+"# Note how the radio controller only has a single bank!\n" \
+"# When accessing the radio directly, we thus can't specify any other bank\n" \
+"# than FP0:\n" \
+"my_usrp.get_radio_control(1).set_gpio_attr(\"FP0\", \"CTRL\", 0x000)\n" \
+"The mask argument can be used to apply value only to select pins,\n" \
+"and retain the existing value on the rest. Because of this feature, this\n" \
+"API call will incur two register transactions (one read, one write).\n" \
+"Note that this API call alone may not be sufficient to configure the\n" \
+"physical GPIO pins. See set_gpio_src() for more details.\n" \
 "\n" \
 "Args:\n" \
 "    bank (str): the name of a GPIO bank\n" \
-"    attr (str): the name of a GPIO attribute\n" \
+"    attr (str): the name of a GPIO attribute (see list above)\n" \
 "    value (int): the new value for this GPIO bank\n" \
 "    mask (int, optional): the bit mask to effect which pins are changed\n" \
 "    mboard (int, optional): the motherboard index 0 to M-1\n"
@@ -3203,6 +3246,8 @@ PyObject *Usrp_set_master_clock_rate(Usrp *self, PyObject *args) {
 "The normalized gain is a value in [0, 1], where 0 is the\n" \
 "smallest gain value available, and 1 is the largest, independent\n" \
 "of the device. In between, gains are linearly interpolated.\n" \
+"If the requested normalized gain is outside of this range, an exception\n" \
+"is thrown.\n" \
 "Check the individual device manual for notes on the gain range.\n" \
 "Note that it is not possible to specify a gain name for\n" \
 "this function, it will always set the overall gain.\n" \
@@ -3242,6 +3287,8 @@ PyObject *Usrp_set_normalized_rx_gain(Usrp *self, PyObject *args) {
 "Set the normalized TX gain value.\n" \
 "See set_normalized_rx_gain() for a discussion on normalized\n" \
 "gains.\n" \
+"If the requested normalized gain is outside of this range, an exception\n" \
+"is thrown.\n" \
 "\n" \
 "Args:\n" \
 "    gain (float): the normalized gain value\n" \
@@ -3276,9 +3323,14 @@ PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
 
 #define DOC_SET_RX_AGC \
 "Enable or disable the RX AGC module.\n" \
+"Only some devices implement an AGC, including all USRPs from the B200\n" \
+"series, the E310, and the E320.\n" \
+"When called on a device that does not implement an AGC, an exception will\n" \
+"be thrown.\n" \
 "Once this module is enabled manual gain settings will be ignored.\n" \
-"The AGC will start in a default configuration which should be good for most use\n" \
-"cases. Device specific configuration parameters can be found in the property tree.\n" \
+"The AGC will start in a default configuration which should be good for\n" \
+"most use cases. Device specific configuration parameters can be found in\n" \
+"the property tree.\n" \
 "\n" \
 "Args:\n" \
 "    enable (bool): Enable or Disable the AGC\n" \
@@ -3315,7 +3367,9 @@ PyObject *Usrp_set_rx_agc(Usrp *self, PyObject *args) {
 "Select the RX antenna on the frontend.\n" \
 "\n" \
 "Args:\n" \
-"    ant (str): the antenna name\n" \
+"    ant (str): the antenna name. If an invalid name is provided, an exception\n" \
+"               is thrown. Call get_rx_antennas() to return a valid list of\n" \
+"               antenna names.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Usrp_set_rx_antenna(Usrp *self, PyObject *args) {
 
@@ -3347,6 +3401,9 @@ PyObject *Usrp_set_rx_antenna(Usrp *self, PyObject *args) {
 
 #define DOC_SET_RX_BANDWIDTH \
 "Set the RX bandwidth on the frontend.\n" \
+"If a bandwidth is provided that is outside the valid range, it is coerced\n" \
+"to the nearest valid value. Call get_rx_bandwidth_range() to identify the\n" \
+"valid range of bandwidth values.\n" \
 "\n" \
 "Args:\n" \
 "    bandwidth (float): the bandwidth in Hz\n" \
@@ -3471,6 +3528,9 @@ PyObject *Usrp_set_rx_dc_offset(Usrp *self, PyObject *args) {
 
 #define DOC_SET_RX_FREQ \
 "Set the RX center frequency.\n" \
+"If the requested frequency is outside of the valid frequency range, it\n" \
+"will be coerced to the nearest valid frequency. Check the return value or\n" \
+"call get_rx_freq() to get the actual center frequency.\n" \
 "\n" \
 "Args:\n" \
 "    tune_request (float, dict): tune request instructions\n" \
@@ -3508,6 +3568,10 @@ PyObject *Usrp_set_rx_freq(Usrp *self, PyObject *args) {
 
 #define DOC_SET_RX_GAIN \
 "(1) ""Set the RX gain value for the specified gain element.\n" \
+"If the requested gain value is outside the valid range, it will be\n" \
+"coerced to a valid gain value. Call get_rx_gain_range() to return the\n" \
+"currently valid gain range, and call get_rx_gain() after calling this\n" \
+"function to return the actual current gain value after coercion.\n" \
 "For an empty name, distribute across all gain elements.\n" \
 "\n" \
 "Args:\n" \
@@ -3597,6 +3661,7 @@ PyObject *Usrp_set_rx_gain(Usrp *self, PyObject *args) {
 
 #define DOC_SET_RX_GAIN_PROFILE \
 "Set the RX gain profile.\n" \
+"Call get_rx_gain_profile_names() for valid names.\n" \
 "\n" \
 "Args:\n" \
 "    profile (str): the profile string option\n" \
@@ -3812,12 +3877,16 @@ PyObject *Usrp_set_rx_lo_freq(Usrp *self, PyObject *args) {
 "Set the LO source for the USRP device.\n" \
 "For USRPs that support selectable LO sources, this function allows\n" \
 "switching between them. Typical options for source: internal, external.\n" \
+"Call get_rx_lo_sources() to enumerate the list of valid options. Calling\n" \
+"this function with an invalid argument will cause an exception to be\n" \
+"thrown.\n" \
 "\n" \
 "Args:\n" \
 "    src (str): a string representing the LO source\n" \
 "    name (str, optional): the name of the LO stage to update. If the wildcard value\n" \
 "                          ALL_LOS is used, the setting will be applied to all LOs on\n" \
-"                          this channel.\n" \
+"                          this channel. Call get_tx_lo_names() for a list of valid\n" \
+"                          argument values.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
 
@@ -3892,7 +3961,10 @@ PyObject *Usrp_set_rx_power_reference(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_RX_RATE \
-"Set the RX sample rate.\n" \
+"Set the RX sample rate\n" \
+"This function will coerce the requested rate to a rate that the device\n" \
+"can handle. A warning may be logged during coercion. Call get_rx_rate()\n" \
+"to identify the actual rate.\n" \
 "\n" \
 "Args:\n" \
 "    rate (float): the rate in Sps\n" \
@@ -3963,7 +4035,7 @@ PyObject *Usrp_set_rx_spp(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_RX_SUBDEV_SPEC \
-"Set the RX frontend specification:\n" \
+"Set the RX frontend specification\n" \
 "The subdev spec maps a physical part of a daughter-board to a channel number.\n" \
 "Set the subdev spec before calling into any methods with a channel number.\n" \
 "The subdev spec must be the same size across all motherboards.\n" \
@@ -4040,12 +4112,22 @@ PyObject *Usrp_set_sync_source(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_TIME_NEXT_PPS \
-"Set the time registers on the usrp at the next pps tick.\n" \
-"The values will not be latched in until the pulse occurs.\n" \
-"It is recommended that the user sleep(1) after calling to ensure\n" \
-"that the time registers will be in a known state prior to use.\n" \
-"Note: Because this call sets the time on the \"next\" pps,\n" \
-"the seconds in the time spec should be current seconds + 1.\n" \
+"Set the time registers on the USRP at the next PPS rising edge.\n" \
+"This will set the tick count on the timekeepers of all devices on\n" \
+"the next rising edge of the PPS trigger signal.  It is important\n" \
+"to note that this means the time may not be set for up to 1 second\n" \
+"after this call is made, so it is recommended to wait for 1 second\n" \
+"after this call before making any calls that depend on the time to\n" \
+"ensure that the time registers will be in a known state prior to use.\n" \
+"Note: Because this call sets the time on the next PPS edge, the time\n" \
+"spec supplied should correspond to the next pulse (i.e. current\n" \
+"time + 1 second).\n" \
+"Note: Make sure to not call this shortly before the next PPS edge. This\n" \
+"should be called with plenty of time before the next PPS edge to ensure\n" \
+"that all timekeepers on all devices will execute this command on the\n" \
+"same PPS edge. If not, timekeepers could be unsynchronized in time by\n" \
+"exactly one second. If in doubt, use set_time_unknown_pps() which will\n" \
+"take care of this issue (but will also take longer to execute).\n" \
 "\n" \
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
@@ -4079,11 +4161,10 @@ PyObject *Usrp_set_time_next_pps(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_TIME_NOW \
-"Sets the time registers on the usrp immediately.\n" \
-"If only one MIMO master is present in your configuration, set_time_now is\n" \
-"safe to use because the slave's time automatically follows the master's time.\n" \
-"Otherwise, this call cannot set the time synchronously across multiple devices.\n" \
-"Please use the set_time_next_pps or set_time_unknown_pps calls with a PPS signal.\n" \
+"Sets the time registers on the USRP immediately.\n" \
+"This will set the tick count on the timekeepers of all devices as soon\n" \
+"as possible.  It is done serially for multiple timekeepers, so times\n" \
+"across multiple timekeepers will not be synchronized.\n" \
 "\n" \
 "Args:\n" \
 "    time_spec (float, TimeSpec): the time to latch into the usrp device\n" \
@@ -4181,10 +4262,12 @@ PyObject *Usrp_set_time_source(Usrp *self, PyObject *args) {
 }
 
 #define DOC_SET_TIME_SOURCE_OUT \
-"Send the time source to an output connector.\n" \
+"Send the time signal (PPS) to an output connector.\n" \
 "This call is only applicable on devices with PPS outputs.\n" \
 "By default, the PPS output will be enabled for ease of use.\n" \
 "This call may be used to enable or disable the output.\n" \
+"If the device does not support this operation, calling this method will\n" \
+"throw a uhd::runtime_error.\n" \
 "\n" \
 "Args:\n" \
 "    enb (bool): true to output the time source.\n" \
@@ -4254,7 +4337,9 @@ PyObject *Usrp_set_time_unknown_pps(Usrp *self, PyObject *args) {
 "Select the TX antenna on the frontend.\n" \
 "\n" \
 "Args:\n" \
-"    ant (str): the antenna name\n" \
+"    ant (str): the antenna name. If an invalid name is provided, an exception\n" \
+"               is thrown. Call get_tx_antennas() to return a valid list of\n" \
+"               antenna names.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Usrp_set_tx_antenna(Usrp *self, PyObject *args) {
 
@@ -4286,6 +4371,9 @@ PyObject *Usrp_set_tx_antenna(Usrp *self, PyObject *args) {
 
 #define DOC_SET_TX_BANDWIDTH \
 "Set the TX bandwidth on the frontend.\n" \
+"If a bandwidth is provided that is outside the valid range, it is coerced\n" \
+"to the nearest valid value. Call get_tx_bandwidth_range() to identify the\n" \
+"valid range of bandwidth values.\n" \
 "\n" \
 "Args:\n" \
 "    bandwidth (float): the bandwidth in Hz\n" \
@@ -4355,6 +4443,9 @@ PyObject *Usrp_set_tx_dc_offset(Usrp *self, PyObject *args) {
 
 #define DOC_SET_TX_FREQ \
 "Set the TX center frequency.\n" \
+"If the requested frequency is outside of the valid frequency range, it\n" \
+"will be coerced to the nearest valid frequency. Check the return value or\n" \
+"call get_tx_freq() to get the actual center frequency.\n" \
 "\n" \
 "Args:\n" \
 "    tune_request (float, dict): tune request instructions\n" \
@@ -4392,6 +4483,10 @@ PyObject *Usrp_set_tx_freq(Usrp *self, PyObject *args) {
 
 #define DOC_SET_TX_GAIN \
 "(1) ""Set the TX gain value for the specified gain element.\n" \
+"If the requested gain value is outside the valid range, it will be\n" \
+"coerced to a valid gain value. Call get_rx_gain_range() to return the\n" \
+"currently valid gain range, and call get_rx_gain() after calling this\n" \
+"function to return the actual current gain value after coercion.\n" \
 "For an empty name, distribute across all gain elements.\n" \
 "\n" \
 "Args:\n" \
@@ -4481,9 +4576,10 @@ PyObject *Usrp_set_tx_gain(Usrp *self, PyObject *args) {
 
 #define DOC_SET_TX_GAIN_PROFILE \
 "Set the TX gain profile.\n" \
+"Call get_tx_gain_profile_names() for valid names.\n" \
 "\n" \
 "Args:\n" \
-"    profile (str): the profile string option\n" \
+"    profile (str): the profile string option.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Usrp_set_tx_gain_profile(Usrp *self, PyObject *args) {
 
@@ -4651,12 +4747,16 @@ PyObject *Usrp_set_tx_lo_freq(Usrp *self, PyObject *args) {
 "Set the TX LO source for the USRP device.\n" \
 "For USRPs that support selectable LO sources, this function allows\n" \
 "switching between them. Typical options for source: internal, external.\n" \
+"Call get_tx_lo_sources() to enumerate the list of valid options. Calling\n" \
+"this function with an invalid argument will cause an exception to be\n" \
+"thrown.\n" \
 "\n" \
 "Args:\n" \
 "    src (str): a string representing the LO source\n" \
 "    name (str, optional): the name of the LO stage to update. If the wildcard value\n" \
 "                          ALL_LOS is used, the setting will be applied to all LOs on\n" \
-"                          this channel.\n" \
+"                          this channel. Call get_tx_lo_names() for a list of valid\n" \
+"                          argument values.\n" \
 "    chan (int, optional): the channel index 0 to N-1\n"
 PyObject *Usrp_set_tx_lo_source(Usrp *self, PyObject *args) {
 
@@ -4732,6 +4832,9 @@ PyObject *Usrp_set_tx_power_reference(Usrp *self, PyObject *args) {
 
 #define DOC_SET_TX_RATE \
 "Set the TX sample rate.\n" \
+"This function will coerce the requested rate to a rate that the device\n" \
+"can handle. A warning may be logged during coercion. Call get_rx_rate()\n" \
+"to identify the actual rate.\n" \
 "\n" \
 "Args:\n" \
 "    rate (float): the rate in Sps\n" \
