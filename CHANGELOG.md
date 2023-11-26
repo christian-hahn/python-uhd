@@ -1,3 +1,7 @@
+* v2.2.0 - 11/26/2023
+    * Add UHD support up to v4.6.0.0
+    * Fix UHD version ABI handling to ignore PATCH
+
 * v2.1.0 - 7/28/2021
     * Add UHD support up to v4.1.0.1
 
