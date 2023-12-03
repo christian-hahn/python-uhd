@@ -91,9 +91,20 @@ static int Usrp_init(Usrp *self, PyObject *args) {
     return 0;
 }
 
-static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
+static PyObject *_get_receive(Usrp *self, const bool fresh, const bool release_gil) {
 
-    ReceiveResult *result = self->receiver->get_result(fresh);
+    ReceiveResult *result;
+
+    if (release_gil) {
+        // Release GIL while blocking on get_result()
+        Py_BEGIN_ALLOW_THREADS
+        result = self->receiver->get_result(fresh);
+        Py_END_ALLOW_THREADS
+    } else {
+        // Do not release GIL
+        result = self->receiver->get_result(fresh);
+    }
+
     if (result->error) {
         std::string error(std::move(result->message));
         delete result;
@@ -149,6 +160,8 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 "                                         default is 1.0\n" \
 "    timeout (float, optional): timeout in seconds, default is 0.5\n" \
 "    otw_format (str, optional): over-the-wire format, default is 'sc16'\n" \
+"    release_gil (bool, optional): release Python global interpreter lock while\n" \
+"                                  blocking on receiving samples. Default is False.\n" \
 "\n" \
 "Returns:\n" \
 "    tuple: None if streaming else same return as (2) below.\n" \
@@ -159,6 +172,8 @@ static PyObject *_get_receive(Usrp *self, const bool fresh = false) {
 "Args:\n" \
 "    fresh (bool, optional): block until fresh samples are available. Only valid\n" \
 "                            if streaming and recycle are True. Default is False.\n" \
+"    release_gil (bool, optional): release Python global interpreter lock while\n" \
+"                                  blocking on receiving samples. Default is False.\n" \
 "\n" \
 "Returns:\n" \
 "    tuple: (samps, time_spec) where 'samps' is list of ndarrays and 'time_spec'\n" \
@@ -176,10 +191,13 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
         PyObject *p_seconds_in_future = nullptr;
         PyObject *p_timeout = nullptr;
         PyObject *p_otw_format = nullptr;
+        PyObject *p_release_gil = nullptr;
         static const char *keywords[] = {"num_samps", "channels", "streaming", "recycle",
-                                         "seconds_in_future", "timeout", "otw_format", nullptr};
-        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOOO", const_cast<char **>(keywords), &p_num_samps,
-                                         &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
+                                         "seconds_in_future", "timeout", "otw_format",
+                                         "release_gil", nullptr};
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOOOO", const_cast<char **>(keywords), &p_num_samps,
+                                         &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout,
+                                         &p_otw_format, &p_release_gil)) {
             return nullptr;
         }
 
@@ -252,14 +270,24 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
             otw_format = _otw_format.get();
         }
 
+        /** release_gil (optional) **/
+        bool release_gil = false;
+        if (p_release_gil) {
+            Expect<bool> _release_gil;
+            if (!(_release_gil = to<bool>(p_release_gil)))
+                return PyErr_Format(PyExc_TypeError, "release_gil: %s", _release_gil.what());
+            release_gil = _release_gil.get();
+        }
+
         /** Classify request type. **/
         ReceiveRequestType req_type;
-        if (streaming && recycle)
+        if (streaming && recycle) {
             req_type = ReceiveRequestType::Recycle;
-        else if (streaming)
+        } else if (streaming) {
             req_type = ReceiveRequestType::Continuous;
-        else
+        } else {
             req_type = ReceiveRequestType::Single;
+        }
 
         std::future<void> accepted = self->receiver->make_request(
             req_type,
@@ -275,13 +303,14 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
             Py_INCREF(Py_None);
             return Py_None;
         } else {
-            return _get_receive(self);
+            return _get_receive(self, false, release_gil);
         }
     } else {
         /** Optional **/
-        PyObject *p_fresh = nullptr;
-        static const char *keywords[] = {"fresh", nullptr};
-        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", const_cast<char **>(keywords), &p_fresh)) {
+        PyObject *p_fresh = nullptr, *p_release_gil = nullptr;
+        static const char *keywords[] = {"fresh", "release_gil", nullptr};
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|OO", const_cast<char **>(keywords),
+                                         &p_fresh, &p_release_gil)) {
             return nullptr;
         }
 
@@ -294,7 +323,16 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
             fresh = _fresh.get();
         }
 
-        return _get_receive(self, fresh);
+        /** release_gil (optional) **/
+        bool release_gil = false;
+        if (p_release_gil) {
+            Expect<bool> _release_gil;
+            if (!(_release_gil = to<bool>(p_release_gil)))
+                return PyErr_Format(PyExc_TypeError, "release_gil: %s", _release_gil.what());
+            release_gil = _release_gil.get();
+        }
+
+        return _get_receive(self, fresh, release_gil);
     }
 }
 

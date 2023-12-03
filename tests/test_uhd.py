@@ -374,17 +374,22 @@ class UhdTestCase(unittest.TestCase):
                           channels + [None] * (len(channels) - 1), len(channels))]
         channels_types = (list, tuple)
         kwargs_cases = (
+            # These are non-streaming test-cases
             {},
             {'seconds_in_future': 1.0},
             {'timeout': 0.5},
             {'streaming': False},
+            {'otw_format': 'sc16'},
+            {'otw_format': 'sc8'},
+            {'release_gil': True},
+            # These are streaming test-cases
+            # Each case is tuple of: (1st receive() call kwargs, 2nd receive() call kwargs)
             ({'streaming': True}, {}),
             ({'streaming': True, 'recycle': False}, {}),
             ({'streaming': True, 'recycle': True}, {}),
             ({'streaming': True, 'recycle': True}, {'fresh': False}),
             ({'streaming': True, 'recycle': True}, {'fresh': True}),
-            {'otw_format': 'sc16'},
-            {'otw_format': 'sc8'},
+            ({'streaming': True, 'recycle': True}, {'fresh': True, 'release_gil': True}),
         )
         for channels_type, channels_case in product(channels_types, channels_cases):
             channels = channels_type(channels_case)
@@ -394,10 +399,12 @@ class UhdTestCase(unittest.TestCase):
                           channels, num_samps, kwargs))
                     try:
                         if isinstance(kwargs, tuple):
+                            # This is a streaming test-case
                             self.dut.receive(num_samps, channels, **kwargs[0])
                             samps, start = self.dut.receive(**kwargs[1])
                             self.dut.stop_receive()
                         else:
+                            # This is a non-streaming test-case
                             samps, start = self.dut.receive(num_samps, channels, **kwargs)
                         self.assertEqual(len(samps), len(channels))
                         self.assertTrue(all(len(i) == num_samps for i in samps))
