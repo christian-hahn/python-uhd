@@ -104,9 +104,9 @@ void TransmitWorker::_worker() {
             md.end_of_burst = false;
             md.has_time_spec = true;
             md.time_spec = _dev->get_time_now() + uhd::time_spec_t(seconds_in_future);
-        } catch(const uhd::exception &e) {
+        } catch (const uhd::exception &e) {
             error = "UHD exception occurred: " + std::string(e.what());
-        } catch(...) {
+        } catch (...) {
             error = "Unkown exception occurred.";
         }
 

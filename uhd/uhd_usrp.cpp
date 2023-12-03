@@ -74,10 +74,10 @@ static int Usrp_init(Usrp *self, PyObject *args) {
 
     try {
         self->dev = uhd::usrp::multi_usrp::make(dev_addr);
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         PyErr_SetString(UhdError, e.what());
         return -1;
-    } catch(...) {
+    } catch (...) {
         PyErr_SetString(UhdError, "Error: unknown exception has occurred.");
         return -1;
     }
@@ -178,8 +178,8 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
         PyObject *p_otw_format = nullptr;
         static const char *keywords[] = {"num_samps", "channels", "streaming", "recycle",
                                          "seconds_in_future", "timeout", "otw_format", nullptr};
-        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOOO", const_cast<char **>(keywords), &p_num_samps,
-                                        &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOOO", const_cast<char **>(keywords), &p_num_samps,
+                                         &p_channels, &p_streaming, &p_recycle, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
             return nullptr;
         }
 
@@ -281,7 +281,7 @@ static PyObject *Usrp_receive(Usrp *self, PyObject *args, PyObject *kwargs) {
         /** Optional **/
         PyObject *p_fresh = nullptr;
         static const char *keywords[] = {"fresh", nullptr};
-        if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", const_cast<char **>(keywords), &p_fresh)) {
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", const_cast<char **>(keywords), &p_fresh)) {
             return nullptr;
         }
 
@@ -339,8 +339,8 @@ static PyObject *Usrp_transmit(Usrp *self, PyObject *args, PyObject *kwargs) {
     PyObject *p_otw_format = nullptr;
     static const char *keywords[] = {"samples", "channels", "continuous",
                                      "seconds_in_future", "timeout", "otw_format", nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOO", const_cast<char **>(keywords), &p_samples,
-                                    &p_channels, &p_continuous, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|OOOO", const_cast<char **>(keywords), &p_samples,
+                                     &p_channels, &p_continuous, &p_seconds_in_future, &p_timeout, &p_otw_format)) {
         return nullptr;
     }
 

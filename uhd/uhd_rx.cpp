@@ -166,9 +166,9 @@ void ReceiveWorker::_worker() {
             stream_cmd.stream_now = (seconds_in_future < 0.0001) ? true : false;
             stream_cmd.time_spec = _dev->get_time_now() + uhd::time_spec_t(seconds_in_future);
             rx_stream->issue_stream_cmd(stream_cmd);
-        } catch(const uhd::exception &e) {
+        } catch (const uhd::exception &e) {
             error = "UHD exception occurred: " + std::string(e.what());
-        } catch(...) {
+        } catch (...) {
             error = "Unkown exception occurred.";
         }
 
@@ -220,9 +220,9 @@ void ReceiveWorker::_worker() {
                 } else {
                     result->start = md.time_spec;
                 }
-            } catch(const uhd::exception &e) {
+            } catch (const uhd::exception &e) {
                 error = "UHD exception occurred: " + std::string(e.what());
-            } catch(...) {
+            } catch (...) {
                 error = "An unknown exception occurred.";
             }
 

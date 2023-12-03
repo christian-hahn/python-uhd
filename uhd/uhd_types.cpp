@@ -265,7 +265,7 @@ Expect<device_addr_t> to<device_addr_t>(PyObject *arg) {
         if (str) {
             try {
                 return device_addr_t(std::string(str));
-            } catch(const uhd::exception &e) {
+            } catch (const uhd::exception &e) {
                 return Error(e.what());
             }
         }
@@ -352,7 +352,7 @@ Expect<usrp::subdev_spec_t> to<usrp::subdev_spec_t>(PyObject *arg) {
         if (str) {
             try {
                 return usrp::subdev_spec_t(std::string(str));
-            } catch(const uhd::exception &e) {
+            } catch (const uhd::exception &e) {
                 return Error(e.what());
             }
         }
