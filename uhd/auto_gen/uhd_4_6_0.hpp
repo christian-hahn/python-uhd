@@ -39,7 +39,7 @@ PyObject *Usrp_clear_command_time(Usrp *self, PyObject *args) {
             self->dev->clear_command_time(mboard.get());
         else
             self->dev->clear_command_time();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -69,7 +69,7 @@ PyObject *Usrp_get_clock_source(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_clock_source(mboard.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -98,7 +98,7 @@ PyObject *Usrp_get_clock_sources(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_clock_sources(mboard.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -130,7 +130,7 @@ PyObject *Usrp_get_fe_rx_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_fe_rx_freq_range(chan.get());
         else
             ret = self->dev->get_fe_rx_freq_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -162,7 +162,7 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_fe_tx_freq_range(chan.get());
         else
             ret = self->dev->get_fe_tx_freq_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -213,7 +213,7 @@ PyObject *Usrp_get_gpio_attr(Usrp *self, PyObject *args) {
             ret = self->dev->get_gpio_attr(bank.get(), attr.get(), mboard.get());
         else
             ret = self->dev->get_gpio_attr(bank.get(), attr.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -242,7 +242,7 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_gpio_banks(mboard.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -282,7 +282,7 @@ PyObject *Usrp_get_gpio_src(Usrp *self, PyObject *args) {
             ret = self->dev->get_gpio_src(bank.get(), mboard.get());
         else
             ret = self->dev->get_gpio_src(bank.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -323,7 +323,7 @@ PyObject *Usrp_get_gpio_src_banks(Usrp *self, PyObject *args) {
             ret = self->dev->get_gpio_src_banks(mboard.get());
         else
             ret = self->dev->get_gpio_src_banks();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -363,7 +363,7 @@ PyObject *Usrp_get_gpio_srcs(Usrp *self, PyObject *args) {
             ret = self->dev->get_gpio_srcs(bank.get(), mboard.get());
         else
             ret = self->dev->get_gpio_srcs(bank.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -395,7 +395,7 @@ PyObject *Usrp_get_master_clock_rate(Usrp *self, PyObject *args) {
             ret = self->dev->get_master_clock_rate(mboard.get());
         else
             ret = self->dev->get_master_clock_rate();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -441,7 +441,7 @@ PyObject *Usrp_get_master_clock_rate_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_master_clock_rate_range(mboard.get());
         else
             ret = self->dev->get_master_clock_rate_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -473,7 +473,7 @@ PyObject *Usrp_get_mboard_name(Usrp *self, PyObject *args) {
             ret = self->dev->get_mboard_name(mboard.get());
         else
             ret = self->dev->get_mboard_name();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -505,7 +505,7 @@ PyObject *Usrp_get_mboard_sensor_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_mboard_sensor_names(mboard.get());
         else
             ret = self->dev->get_mboard_sensor_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -539,7 +539,7 @@ PyObject *Usrp_get_normalized_rx_gain(Usrp *self, PyObject *args) {
             ret = self->dev->get_normalized_rx_gain(chan.get());
         else
             ret = self->dev->get_normalized_rx_gain();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -573,7 +573,7 @@ PyObject *Usrp_get_normalized_tx_gain(Usrp *self, PyObject *args) {
             ret = self->dev->get_normalized_tx_gain(chan.get());
         else
             ret = self->dev->get_normalized_tx_gain();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -595,7 +595,7 @@ PyObject *Usrp_get_num_mboards(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_num_mboards();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -617,7 +617,7 @@ PyObject *Usrp_get_pp_string(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_pp_string();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -649,7 +649,7 @@ PyObject *Usrp_get_rx_antenna(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_antenna(chan.get());
         else
             ret = self->dev->get_rx_antenna();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -681,7 +681,7 @@ PyObject *Usrp_get_rx_antennas(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_antennas(chan.get());
         else
             ret = self->dev->get_rx_antennas();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -713,7 +713,7 @@ PyObject *Usrp_get_rx_bandwidth(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_bandwidth(chan.get());
         else
             ret = self->dev->get_rx_bandwidth();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -745,7 +745,7 @@ PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_bandwidth_range(chan.get());
         else
             ret = self->dev->get_rx_bandwidth_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -777,7 +777,7 @@ PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_dc_offset_range(chan.get());
         else
             ret = self->dev->get_rx_dc_offset_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -808,7 +808,7 @@ PyObject *Usrp_get_rx_filter_names(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_rx_filter_names(chan.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -840,7 +840,7 @@ PyObject *Usrp_get_rx_freq(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_freq(chan.get());
         else
             ret = self->dev->get_rx_freq();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -876,7 +876,7 @@ PyObject *Usrp_get_rx_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_freq_range(chan.get());
         else
             ret = self->dev->get_rx_freq_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -922,7 +922,7 @@ static PyObject *Usrp_get_rx_gain_0(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain(name.get(), chan.get());
         else
             ret = self->dev->get_rx_gain(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -946,7 +946,7 @@ static PyObject *Usrp_get_rx_gain_1(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain(chan.get());
         else
             ret = self->dev->get_rx_gain();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -993,7 +993,7 @@ PyObject *Usrp_get_rx_gain_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain_names(chan.get());
         else
             ret = self->dev->get_rx_gain_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1025,7 +1025,7 @@ PyObject *Usrp_get_rx_gain_profile(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain_profile(chan.get());
         else
             ret = self->dev->get_rx_gain_profile();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1063,7 +1063,7 @@ PyObject *Usrp_get_rx_gain_profile_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain_profile_names(chan.get());
         else
             ret = self->dev->get_rx_gain_profile_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1109,7 +1109,7 @@ static PyObject *Usrp_get_rx_gain_range_0(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain_range(name.get(), chan.get());
         else
             ret = self->dev->get_rx_gain_range(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1133,7 +1133,7 @@ static PyObject *Usrp_get_rx_gain_range_1(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_gain_range(chan.get());
         else
             ret = self->dev->get_rx_gain_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1186,7 +1186,7 @@ PyObject *Usrp_get_rx_lo_export_enabled(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_export_enabled(name.get());
         else
             ret = self->dev->get_rx_lo_export_enabled();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1226,7 +1226,7 @@ PyObject *Usrp_get_rx_lo_freq(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_freq(name.get(), chan.get());
         else
             ret = self->dev->get_rx_lo_freq(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1265,7 +1265,7 @@ PyObject *Usrp_get_rx_lo_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_freq_range(name.get(), chan.get());
         else
             ret = self->dev->get_rx_lo_freq_range(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1304,7 +1304,7 @@ PyObject *Usrp_get_rx_lo_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_names(chan.get());
         else
             ret = self->dev->get_rx_lo_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1344,7 +1344,7 @@ PyObject *Usrp_get_rx_lo_source(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_source(name.get());
         else
             ret = self->dev->get_rx_lo_source();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1388,7 +1388,7 @@ PyObject *Usrp_get_rx_lo_sources(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_lo_sources(name.get());
         else
             ret = self->dev->get_rx_lo_sources();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1412,7 +1412,7 @@ PyObject *Usrp_get_rx_num_channels(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_rx_num_channels();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1445,7 +1445,7 @@ PyObject *Usrp_get_rx_power_range(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_rx_power_range(chan.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1481,7 +1481,7 @@ PyObject *Usrp_get_rx_power_reference(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_power_reference(chan.get());
         else
             ret = self->dev->get_rx_power_reference();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1513,7 +1513,7 @@ PyObject *Usrp_get_rx_rate(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_rate(chan.get());
         else
             ret = self->dev->get_rx_rate();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1545,7 +1545,7 @@ PyObject *Usrp_get_rx_rates(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_rates(chan.get());
         else
             ret = self->dev->get_rx_rates();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1577,7 +1577,7 @@ PyObject *Usrp_get_rx_sensor_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_sensor_names(chan.get());
         else
             ret = self->dev->get_rx_sensor_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1609,7 +1609,7 @@ PyObject *Usrp_get_rx_subdev_name(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_subdev_name(chan.get());
         else
             ret = self->dev->get_rx_subdev_name();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1641,7 +1641,7 @@ PyObject *Usrp_get_rx_subdev_spec(Usrp *self, PyObject *args) {
             ret = self->dev->get_rx_subdev_spec(mboard.get());
         else
             ret = self->dev->get_rx_subdev_spec();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1676,7 +1676,7 @@ PyObject *Usrp_get_time_last_pps(Usrp *self, PyObject *args) {
             ret = self->dev->get_time_last_pps(mboard.get());
         else
             ret = self->dev->get_time_last_pps();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1711,7 +1711,7 @@ PyObject *Usrp_get_time_now(Usrp *self, PyObject *args) {
             ret = self->dev->get_time_now(mboard.get());
         else
             ret = self->dev->get_time_now();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1740,7 +1740,7 @@ PyObject *Usrp_get_time_source(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_time_source(mboard.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1769,7 +1769,7 @@ PyObject *Usrp_get_time_sources(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_time_sources(mboard.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1793,7 +1793,7 @@ PyObject *Usrp_get_time_synchronized(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_time_synchronized();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1825,7 +1825,7 @@ PyObject *Usrp_get_tx_antenna(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_antenna(chan.get());
         else
             ret = self->dev->get_tx_antenna();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1857,7 +1857,7 @@ PyObject *Usrp_get_tx_antennas(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_antennas(chan.get());
         else
             ret = self->dev->get_tx_antennas();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1889,7 +1889,7 @@ PyObject *Usrp_get_tx_bandwidth(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_bandwidth(chan.get());
         else
             ret = self->dev->get_tx_bandwidth();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1921,7 +1921,7 @@ PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_bandwidth_range(chan.get());
         else
             ret = self->dev->get_tx_bandwidth_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1953,7 +1953,7 @@ PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_dc_offset_range(chan.get());
         else
             ret = self->dev->get_tx_dc_offset_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -1984,7 +1984,7 @@ PyObject *Usrp_get_tx_filter_names(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_tx_filter_names(chan.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2016,7 +2016,7 @@ PyObject *Usrp_get_tx_freq(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_freq(chan.get());
         else
             ret = self->dev->get_tx_freq();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2052,7 +2052,7 @@ PyObject *Usrp_get_tx_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_freq_range(chan.get());
         else
             ret = self->dev->get_tx_freq_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2098,7 +2098,7 @@ static PyObject *Usrp_get_tx_gain_0(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain(name.get(), chan.get());
         else
             ret = self->dev->get_tx_gain(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2122,7 +2122,7 @@ static PyObject *Usrp_get_tx_gain_1(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain(chan.get());
         else
             ret = self->dev->get_tx_gain();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2169,7 +2169,7 @@ PyObject *Usrp_get_tx_gain_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain_names(chan.get());
         else
             ret = self->dev->get_tx_gain_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2201,7 +2201,7 @@ PyObject *Usrp_get_tx_gain_profile(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain_profile(chan.get());
         else
             ret = self->dev->get_tx_gain_profile();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2239,7 +2239,7 @@ PyObject *Usrp_get_tx_gain_profile_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain_profile_names(chan.get());
         else
             ret = self->dev->get_tx_gain_profile_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2285,7 +2285,7 @@ static PyObject *Usrp_get_tx_gain_range_0(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain_range(name.get(), chan.get());
         else
             ret = self->dev->get_tx_gain_range(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2309,7 +2309,7 @@ static PyObject *Usrp_get_tx_gain_range_1(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_gain_range(chan.get());
         else
             ret = self->dev->get_tx_gain_range();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2362,7 +2362,7 @@ PyObject *Usrp_get_tx_lo_export_enabled(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_export_enabled(name.get());
         else
             ret = self->dev->get_tx_lo_export_enabled();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2402,7 +2402,7 @@ PyObject *Usrp_get_tx_lo_freq(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_freq(name.get(), chan.get());
         else
             ret = self->dev->get_tx_lo_freq(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2441,7 +2441,7 @@ PyObject *Usrp_get_tx_lo_freq_range(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_freq_range(name.get(), chan.get());
         else
             ret = self->dev->get_tx_lo_freq_range(name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2478,7 +2478,7 @@ PyObject *Usrp_get_tx_lo_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_names(chan.get());
         else
             ret = self->dev->get_tx_lo_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2518,7 +2518,7 @@ PyObject *Usrp_get_tx_lo_source(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_source(name.get());
         else
             ret = self->dev->get_tx_lo_source();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2560,7 +2560,7 @@ PyObject *Usrp_get_tx_lo_sources(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_lo_sources(name.get());
         else
             ret = self->dev->get_tx_lo_sources();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2584,7 +2584,7 @@ PyObject *Usrp_get_tx_num_channels(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_tx_num_channels();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2617,7 +2617,7 @@ PyObject *Usrp_get_tx_power_range(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         ret = self->dev->get_tx_power_range(chan.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2653,7 +2653,7 @@ PyObject *Usrp_get_tx_power_reference(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_power_reference(chan.get());
         else
             ret = self->dev->get_tx_power_reference();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2685,7 +2685,7 @@ PyObject *Usrp_get_tx_rate(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_rate(chan.get());
         else
             ret = self->dev->get_tx_rate();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2717,7 +2717,7 @@ PyObject *Usrp_get_tx_rates(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_rates(chan.get());
         else
             ret = self->dev->get_tx_rates();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2749,7 +2749,7 @@ PyObject *Usrp_get_tx_sensor_names(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_sensor_names(chan.get());
         else
             ret = self->dev->get_tx_sensor_names();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2781,7 +2781,7 @@ PyObject *Usrp_get_tx_subdev_name(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_subdev_name(chan.get());
         else
             ret = self->dev->get_tx_subdev_name();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2813,7 +2813,7 @@ PyObject *Usrp_get_tx_subdev_spec(Usrp *self, PyObject *args) {
             ret = self->dev->get_tx_subdev_spec(mboard.get());
         else
             ret = self->dev->get_tx_subdev_spec();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2847,7 +2847,7 @@ PyObject *Usrp_get_usrp_rx_info(Usrp *self, PyObject *args) {
             ret = self->dev->get_usrp_rx_info(chan.get());
         else
             ret = self->dev->get_usrp_rx_info();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2881,7 +2881,7 @@ PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
             ret = self->dev->get_usrp_tx_info(chan.get());
         else
             ret = self->dev->get_usrp_tx_info();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2921,7 +2921,7 @@ PyObject *Usrp_has_rx_power_reference(Usrp *self, PyObject *args) {
             ret = self->dev->has_rx_power_reference(chan.get());
         else
             ret = self->dev->has_rx_power_reference();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -2961,7 +2961,7 @@ PyObject *Usrp_has_tx_power_reference(Usrp *self, PyObject *args) {
             ret = self->dev->has_tx_power_reference(chan.get());
         else
             ret = self->dev->has_tx_power_reference();
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3024,7 +3024,7 @@ PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
             self->dev->set_clock_source(source.get(), mboard.get());
         else
             self->dev->set_clock_source(source.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3063,7 +3063,7 @@ PyObject *Usrp_set_clock_source_out(Usrp *self, PyObject *args) {
             self->dev->set_clock_source_out(enb.get(), mboard.get());
         else
             self->dev->set_clock_source_out(enb.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3100,7 +3100,7 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
             self->dev->set_command_time(time_spec.get(), mboard.get());
         else
             self->dev->set_command_time(time_spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3187,7 +3187,7 @@ PyObject *Usrp_set_gpio_attr(Usrp *self, PyObject *args) {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get());
         else
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3233,7 +3233,7 @@ PyObject *Usrp_set_master_clock_rate(Usrp *self, PyObject *args) {
             self->dev->set_master_clock_rate(rate.get(), mboard.get());
         else
             self->dev->set_master_clock_rate(rate.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3275,7 +3275,7 @@ PyObject *Usrp_set_normalized_rx_gain(Usrp *self, PyObject *args) {
             self->dev->set_normalized_rx_gain(gain.get(), chan.get());
         else
             self->dev->set_normalized_rx_gain(gain.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3313,7 +3313,7 @@ PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
             self->dev->set_normalized_tx_gain(gain.get(), chan.get());
         else
             self->dev->set_normalized_tx_gain(gain.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3355,7 +3355,7 @@ PyObject *Usrp_set_rx_agc(Usrp *self, PyObject *args) {
             self->dev->set_rx_agc(enable.get(), chan.get());
         else
             self->dev->set_rx_agc(enable.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3391,7 +3391,7 @@ PyObject *Usrp_set_rx_antenna(Usrp *self, PyObject *args) {
             self->dev->set_rx_antenna(ant.get(), chan.get());
         else
             self->dev->set_rx_antenna(ant.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3428,7 +3428,7 @@ PyObject *Usrp_set_rx_bandwidth(Usrp *self, PyObject *args) {
             self->dev->set_rx_bandwidth(bandwidth.get(), chan.get());
         else
             self->dev->set_rx_bandwidth(bandwidth.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3475,7 +3475,7 @@ static PyObject *Usrp_set_rx_dc_offset_0(Usrp *self, PyObject *args) {
             self->dev->set_rx_dc_offset(enb.get(), chan.get());
         else
             self->dev->set_rx_dc_offset(enb.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3503,7 +3503,7 @@ static PyObject *Usrp_set_rx_dc_offset_1(Usrp *self, PyObject *args) {
             self->dev->set_rx_dc_offset(offset.get(), chan.get());
         else
             self->dev->set_rx_dc_offset(offset.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3559,7 +3559,7 @@ PyObject *Usrp_set_rx_freq(Usrp *self, PyObject *args) {
             ret = self->dev->set_rx_freq(tune_request.get(), chan.get());
         else
             ret = self->dev->set_rx_freq(tune_request.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3607,7 +3607,7 @@ static PyObject *Usrp_set_rx_gain_0(Usrp *self, PyObject *args) {
             self->dev->set_rx_gain(gain.get(), name.get(), chan.get());
         else
             self->dev->set_rx_gain(gain.get(), name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3635,7 +3635,7 @@ static PyObject *Usrp_set_rx_gain_1(Usrp *self, PyObject *args) {
             self->dev->set_rx_gain(gain.get(), chan.get());
         else
             self->dev->set_rx_gain(gain.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3686,7 +3686,7 @@ PyObject *Usrp_set_rx_gain_profile(Usrp *self, PyObject *args) {
             self->dev->set_rx_gain_profile(profile.get(), chan.get());
         else
             self->dev->set_rx_gain_profile(profile.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3723,7 +3723,7 @@ static PyObject *Usrp_set_rx_iq_balance_0(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         self->dev->set_rx_iq_balance(enb.get(), chan.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3751,7 +3751,7 @@ static PyObject *Usrp_set_rx_iq_balance_1(Usrp *self, PyObject *args) {
             self->dev->set_rx_iq_balance(correction.get(), chan.get());
         else
             self->dev->set_rx_iq_balance(correction.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3809,7 +3809,7 @@ PyObject *Usrp_set_rx_lo_export_enabled(Usrp *self, PyObject *args) {
             self->dev->set_rx_lo_export_enabled(enabled.get(), name.get());
         else
             self->dev->set_rx_lo_export_enabled(enabled.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3866,7 +3866,7 @@ PyObject *Usrp_set_rx_lo_freq(Usrp *self, PyObject *args) {
             ret = self->dev->set_rx_lo_freq(freq.get(), name.get(), chan.get());
         else
             ret = self->dev->set_rx_lo_freq(freq.get(), name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3914,7 +3914,7 @@ PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
             self->dev->set_rx_lo_source(src.get(), name.get());
         else
             self->dev->set_rx_lo_source(src.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3952,7 +3952,7 @@ PyObject *Usrp_set_rx_power_reference(Usrp *self, PyObject *args) {
             self->dev->set_rx_power_reference(power_dbm.get(), chan.get());
         else
             self->dev->set_rx_power_reference(power_dbm.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -3989,7 +3989,7 @@ PyObject *Usrp_set_rx_rate(Usrp *self, PyObject *args) {
             self->dev->set_rx_rate(rate.get(), chan.get());
         else
             self->dev->set_rx_rate(rate.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4026,7 +4026,7 @@ PyObject *Usrp_set_rx_spp(Usrp *self, PyObject *args) {
             self->dev->set_rx_spp(spp.get(), chan.get());
         else
             self->dev->set_rx_spp(spp.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4063,7 +4063,7 @@ PyObject *Usrp_set_rx_subdev_spec(Usrp *self, PyObject *args) {
             self->dev->set_rx_subdev_spec(spec.get(), mboard.get());
         else
             self->dev->set_rx_subdev_spec(spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4103,7 +4103,7 @@ PyObject *Usrp_set_sync_source(Usrp *self, PyObject *args) {
             self->dev->set_sync_source(clock_source.get(), time_source.get(), mboard.get());
         else
             self->dev->set_sync_source(clock_source.get(), time_source.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4152,7 +4152,7 @@ PyObject *Usrp_set_time_next_pps(Usrp *self, PyObject *args) {
             self->dev->set_time_next_pps(time_spec.get(), mboard.get());
         else
             self->dev->set_time_next_pps(time_spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4189,7 +4189,7 @@ PyObject *Usrp_set_time_now(Usrp *self, PyObject *args) {
             self->dev->set_time_now(time_spec.get(), mboard.get());
         else
             self->dev->set_time_now(time_spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4253,7 +4253,7 @@ PyObject *Usrp_set_time_source(Usrp *self, PyObject *args) {
             self->dev->set_time_source(source.get(), mboard.get());
         else
             self->dev->set_time_source(source.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4292,7 +4292,7 @@ PyObject *Usrp_set_time_source_out(Usrp *self, PyObject *args) {
             self->dev->set_time_source_out(enb.get(), mboard.get());
         else
             self->dev->set_time_source_out(enb.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4325,7 +4325,7 @@ PyObject *Usrp_set_time_unknown_pps(Usrp *self, PyObject *args) {
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
         self->dev->set_time_unknown_pps(time_spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4361,7 +4361,7 @@ PyObject *Usrp_set_tx_antenna(Usrp *self, PyObject *args) {
             self->dev->set_tx_antenna(ant.get(), chan.get());
         else
             self->dev->set_tx_antenna(ant.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4398,7 +4398,7 @@ PyObject *Usrp_set_tx_bandwidth(Usrp *self, PyObject *args) {
             self->dev->set_tx_bandwidth(bandwidth.get(), chan.get());
         else
             self->dev->set_tx_bandwidth(bandwidth.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4433,7 +4433,7 @@ PyObject *Usrp_set_tx_dc_offset(Usrp *self, PyObject *args) {
             self->dev->set_tx_dc_offset(offset.get(), chan.get());
         else
             self->dev->set_tx_dc_offset(offset.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4474,7 +4474,7 @@ PyObject *Usrp_set_tx_freq(Usrp *self, PyObject *args) {
             ret = self->dev->set_tx_freq(tune_request.get(), chan.get());
         else
             ret = self->dev->set_tx_freq(tune_request.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4522,7 +4522,7 @@ static PyObject *Usrp_set_tx_gain_0(Usrp *self, PyObject *args) {
             self->dev->set_tx_gain(gain.get(), name.get(), chan.get());
         else
             self->dev->set_tx_gain(gain.get(), name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4550,7 +4550,7 @@ static PyObject *Usrp_set_tx_gain_1(Usrp *self, PyObject *args) {
             self->dev->set_tx_gain(gain.get(), chan.get());
         else
             self->dev->set_tx_gain(gain.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4601,7 +4601,7 @@ PyObject *Usrp_set_tx_gain_profile(Usrp *self, PyObject *args) {
             self->dev->set_tx_gain_profile(profile.get(), chan.get());
         else
             self->dev->set_tx_gain_profile(profile.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4636,7 +4636,7 @@ PyObject *Usrp_set_tx_iq_balance(Usrp *self, PyObject *args) {
             self->dev->set_tx_iq_balance(correction.get(), chan.get());
         else
             self->dev->set_tx_iq_balance(correction.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4679,7 +4679,7 @@ PyObject *Usrp_set_tx_lo_export_enabled(Usrp *self, PyObject *args) {
             self->dev->set_tx_lo_export_enabled(enabled.get(), name.get());
         else
             self->dev->set_tx_lo_export_enabled(enabled.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4736,7 +4736,7 @@ PyObject *Usrp_set_tx_lo_freq(Usrp *self, PyObject *args) {
             ret = self->dev->set_tx_lo_freq(freq.get(), name.get(), chan.get());
         else
             ret = self->dev->set_tx_lo_freq(freq.get(), name.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4784,7 +4784,7 @@ PyObject *Usrp_set_tx_lo_source(Usrp *self, PyObject *args) {
             self->dev->set_tx_lo_source(src.get(), name.get());
         else
             self->dev->set_tx_lo_source(src.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4822,7 +4822,7 @@ PyObject *Usrp_set_tx_power_reference(Usrp *self, PyObject *args) {
             self->dev->set_tx_power_reference(power_dbm.get(), chan.get());
         else
             self->dev->set_tx_power_reference(power_dbm.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4859,7 +4859,7 @@ PyObject *Usrp_set_tx_rate(Usrp *self, PyObject *args) {
             self->dev->set_tx_rate(rate.get(), chan.get());
         else
             self->dev->set_tx_rate(rate.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4896,7 +4896,7 @@ PyObject *Usrp_set_tx_subdev_spec(Usrp *self, PyObject *args) {
             self->dev->set_tx_subdev_spec(spec.get(), mboard.get());
         else
             self->dev->set_tx_subdev_spec(spec.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
@@ -4935,7 +4935,7 @@ PyObject *Usrp_set_user_register(Usrp *self, PyObject *args) {
             self->dev->set_user_register(addr.get(), data.get(), mboard.get());
         else
             self->dev->set_user_register(addr.get(), data.get());
-    } catch(const uhd::exception &e) {
+    } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
 
