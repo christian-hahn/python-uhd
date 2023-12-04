@@ -259,8 +259,18 @@ class UhdTestCase(unittest.TestCase):
             names = self.dut.get_tx_gain_names(chan)
             self.assertTrue(all(isinstance(n, str) and len(n) for n in names))
             # get_tx_sensor_names
-            names = self.dut.get_tx_sensor_names(chan)
-            self.assertTrue(all(isinstance(n, str) and len(n) for n in names))
+            sensors = self.dut.get_tx_sensor_names(chan)
+            self.assertTrue(all(isinstance(n, str) and len(n) for n in sensors))
+            # get_tx_sensor
+            expected_keys = {'name', 'type', 'unit', 'value'}
+            for sensor in sensors:
+                value = self.dut.get_tx_sensor(sensor, chan)
+                self.assertIsInstance(value, dict)
+                self.assertTrue(len(value) == len(expected_keys))
+                self.assertTrue(all(
+                    key in value and isinstance(value[key], str)
+                    for key in expected_keys
+                ))
             # get_tx_subdev_name
             subdev = self.dut.get_tx_subdev_name(chan)
             self.assertTrue(isinstance(subdev, str) and len(subdev))
@@ -280,8 +290,18 @@ class UhdTestCase(unittest.TestCase):
             names = self.dut.get_rx_gain_names(chan)
             self.assertTrue(all(isinstance(n, str) and len(n) for n in names))
             # get_rx_sensor_names
-            names = self.dut.get_rx_sensor_names(chan)
-            self.assertTrue(all(isinstance(n, str) and len(n) for n in names))
+            sensors = self.dut.get_rx_sensor_names(chan)
+            self.assertTrue(all(isinstance(n, str) and len(n) for n in sensors))
+            # get_rx_sensor
+            expected_keys = {'name', 'type', 'unit', 'value'}
+            for sensor in sensors:
+                value = self.dut.get_rx_sensor(sensor, chan)
+                self.assertIsInstance(value, dict)
+                self.assertTrue(len(value) == len(expected_keys))
+                self.assertTrue(all(
+                    key in value and isinstance(value[key], str)
+                    for key in expected_keys
+                ))
             # get_rx_subdev_name
             subdev = self.dut.get_rx_subdev_name(chan)
             self.assertTrue(isinstance(subdev, str) and len(subdev))
@@ -297,6 +317,16 @@ class UhdTestCase(unittest.TestCase):
         # get_mboard_sensor_names
         sensors = self.dut.get_mboard_sensor_names(0)
         self.assertTrue(all(isinstance(n, str) and len(n) for n in sensors))
+        # get_mboard_sensor
+        expected_keys = {'name', 'type', 'unit', 'value'}
+        for sensor in sensors:
+            value = self.dut.get_mboard_sensor(sensor, 0)
+            self.assertIsInstance(value, dict)
+            self.assertTrue(len(value) == len(expected_keys))
+            self.assertTrue(all(
+                key in value and isinstance(value[key], str)
+                for key in expected_keys
+            ))
         # get_num_mboards
         num_mboards = self.dut.get_num_mboards()
         self.assertTrue(isinstance(num_mboards, int) and num_mboards > 0)

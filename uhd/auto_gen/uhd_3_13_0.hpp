@@ -35,10 +35,11 @@ PyObject *Usrp_clear_command_time(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
+        if (nargs == 1) {
             self->dev->clear_command_time(mboard.get());
-        else
+        } else {
             self->dev->clear_command_time();
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -65,18 +66,16 @@ PyObject *Usrp_enumerate_registers(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->enumerate_registers(mboard.get());
-        else
-            ret = self->dev->enumerate_registers();
+        if (nargs == 1) {
+            return from(self->dev->enumerate_registers(mboard.get()));
+        } else {
+            return from(self->dev->enumerate_registers());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_CLOCK_SOURCE \
@@ -97,15 +96,12 @@ PyObject *Usrp_get_clock_source(Usrp *self, PyObject *args) {
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_clock_source(mboard.get());
+        return from(self->dev->get_clock_source(mboard.get()));
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_CLOCK_SOURCES \
@@ -126,15 +122,12 @@ PyObject *Usrp_get_clock_sources(Usrp *self, PyObject *args) {
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_clock_sources(mboard.get());
+        return from(self->dev->get_clock_sources(mboard.get()));
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_FE_RX_FREQ_RANGE \
@@ -155,18 +148,16 @@ PyObject *Usrp_get_fe_rx_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_fe_rx_freq_range(chan.get());
-        else
-            ret = self->dev->get_fe_rx_freq_range();
+        if (nargs == 1) {
+            return from(self->dev->get_fe_rx_freq_range(chan.get()));
+        } else {
+            return from(self->dev->get_fe_rx_freq_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_FE_TX_FREQ_RANGE \
@@ -187,18 +178,16 @@ PyObject *Usrp_get_fe_tx_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_fe_tx_freq_range(chan.get());
-        else
-            ret = self->dev->get_fe_tx_freq_range();
+        if (nargs == 1) {
+            return from(self->dev->get_fe_tx_freq_range(chan.get()));
+        } else {
+            return from(self->dev->get_fe_tx_freq_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_FILTER_NAMES \
@@ -221,18 +210,16 @@ PyObject *Usrp_get_filter_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(search_mask = to<std::string>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "search_mask: %s", search_mask.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_filter_names(search_mask.get());
-        else
-            ret = self->dev->get_filter_names();
+        if (nargs == 1) {
+            return from(self->dev->get_filter_names(search_mask.get()));
+        } else {
+            return from(self->dev->get_filter_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_GPIO_ATTR \
@@ -271,18 +258,16 @@ PyObject *Usrp_get_gpio_attr(Usrp *self, PyObject *args) {
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    uint32_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->get_gpio_attr(bank.get(), attr.get(), mboard.get());
-        else
-            ret = self->dev->get_gpio_attr(bank.get(), attr.get());
+        if (nargs == 3) {
+            return from(self->dev->get_gpio_attr(bank.get(), attr.get(), mboard.get()));
+        } else {
+            return from(self->dev->get_gpio_attr(bank.get(), attr.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_GPIO_BANKS \
@@ -303,15 +288,12 @@ PyObject *Usrp_get_gpio_banks(Usrp *self, PyObject *args) {
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_gpio_banks(mboard.get());
+        return from(self->dev->get_gpio_banks(mboard.get()));
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_GPIO_STRING_ATTR \
@@ -359,18 +341,16 @@ PyObject *Usrp_get_gpio_string_attr(Usrp *self, PyObject *args) {
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->get_gpio_string_attr(bank.get(), attr.get(), mboard.get());
-        else
-            ret = self->dev->get_gpio_string_attr(bank.get(), attr.get());
+        if (nargs == 3) {
+            return from(self->dev->get_gpio_string_attr(bank.get(), attr.get(), mboard.get()));
+        } else {
+            return from(self->dev->get_gpio_string_attr(bank.get(), attr.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_MASTER_CLOCK_RATE \
@@ -391,18 +371,16 @@ PyObject *Usrp_get_master_clock_rate(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_master_clock_rate(mboard.get());
-        else
-            ret = self->dev->get_master_clock_rate();
+        if (nargs == 1) {
+            return from(self->dev->get_master_clock_rate(mboard.get()));
+        } else {
+            return from(self->dev->get_master_clock_rate());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_MASTER_CLOCK_RATE_RANGE \
@@ -437,18 +415,16 @@ PyObject *Usrp_get_master_clock_rate_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_master_clock_rate_range(mboard.get());
-        else
-            ret = self->dev->get_master_clock_rate_range();
+        if (nargs == 1) {
+            return from(self->dev->get_master_clock_rate_range(mboard.get()));
+        } else {
+            return from(self->dev->get_master_clock_rate_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_MBOARD_NAME \
@@ -469,18 +445,51 @@ PyObject *Usrp_get_mboard_name(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_mboard_name(mboard.get());
-        else
-            ret = self->dev->get_mboard_name();
+        if (nargs == 1) {
+            return from(self->dev->get_mboard_name(mboard.get()));
+        } else {
+            return from(self->dev->get_mboard_name());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
+}
 
-    return from(ret);
+#define DOC_GET_MBOARD_SENSOR \
+"Get a motherboard sensor value.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the sensor\n" \
+"    mboard (int, optional): the motherboard index 0 to M-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a sensor value object\n"
+PyObject *Usrp_get_mboard_sensor(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> mboard;
+    if (nargs > 1 && !(mboard = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2) {
+            return from(self->dev->get_mboard_sensor(name.get(), mboard.get()));
+        } else {
+            return from(self->dev->get_mboard_sensor(name.get()));
+        }
+    } catch (const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
 }
 
 #define DOC_GET_MBOARD_SENSOR_NAMES \
@@ -501,18 +510,16 @@ PyObject *Usrp_get_mboard_sensor_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_mboard_sensor_names(mboard.get());
-        else
-            ret = self->dev->get_mboard_sensor_names();
+        if (nargs == 1) {
+            return from(self->dev->get_mboard_sensor_names(mboard.get()));
+        } else {
+            return from(self->dev->get_mboard_sensor_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_NORMALIZED_RX_GAIN \
@@ -535,18 +542,16 @@ PyObject *Usrp_get_normalized_rx_gain(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_normalized_rx_gain(chan.get());
-        else
-            ret = self->dev->get_normalized_rx_gain();
+        if (nargs == 1) {
+            return from(self->dev->get_normalized_rx_gain(chan.get()));
+        } else {
+            return from(self->dev->get_normalized_rx_gain());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_NORMALIZED_TX_GAIN \
@@ -569,18 +574,16 @@ PyObject *Usrp_get_normalized_tx_gain(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_normalized_tx_gain(chan.get());
-        else
-            ret = self->dev->get_normalized_tx_gain();
+        if (nargs == 1) {
+            return from(self->dev->get_normalized_tx_gain(chan.get()));
+        } else {
+            return from(self->dev->get_normalized_tx_gain());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_NUM_MBOARDS \
@@ -594,15 +597,12 @@ PyObject *Usrp_get_num_mboards(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    size_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_num_mboards();
+        return from(self->dev->get_num_mboards());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_PP_STRING \
@@ -616,15 +616,12 @@ PyObject *Usrp_get_pp_string(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_pp_string();
+        return from(self->dev->get_pp_string());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_ANTENNA \
@@ -645,18 +642,16 @@ PyObject *Usrp_get_rx_antenna(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_antenna(chan.get());
-        else
-            ret = self->dev->get_rx_antenna();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_antenna(chan.get()));
+        } else {
+            return from(self->dev->get_rx_antenna());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_ANTENNAS \
@@ -677,18 +672,16 @@ PyObject *Usrp_get_rx_antennas(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_antennas(chan.get());
-        else
-            ret = self->dev->get_rx_antennas();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_antennas(chan.get()));
+        } else {
+            return from(self->dev->get_rx_antennas());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_BANDWIDTH \
@@ -709,18 +702,16 @@ PyObject *Usrp_get_rx_bandwidth(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_bandwidth(chan.get());
-        else
-            ret = self->dev->get_rx_bandwidth();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_bandwidth(chan.get()));
+        } else {
+            return from(self->dev->get_rx_bandwidth());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_BANDWIDTH_RANGE \
@@ -741,18 +732,16 @@ PyObject *Usrp_get_rx_bandwidth_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_bandwidth_range(chan.get());
-        else
-            ret = self->dev->get_rx_bandwidth_range();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_bandwidth_range(chan.get()));
+        } else {
+            return from(self->dev->get_rx_bandwidth_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_DC_OFFSET_RANGE \
@@ -773,18 +762,16 @@ PyObject *Usrp_get_rx_dc_offset_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_rx_dc_offset_range();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_dc_offset_range(chan.get()));
+        } else {
+            return from(self->dev->get_rx_dc_offset_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_FREQ \
@@ -805,18 +792,16 @@ PyObject *Usrp_get_rx_freq(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_freq(chan.get());
-        else
-            ret = self->dev->get_rx_freq();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_freq(chan.get()));
+        } else {
+            return from(self->dev->get_rx_freq());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_FREQ_RANGE \
@@ -841,18 +826,16 @@ PyObject *Usrp_get_rx_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_freq_range(chan.get());
-        else
-            ret = self->dev->get_rx_freq_range();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_freq_range(chan.get()));
+        } else {
+            return from(self->dev->get_rx_freq_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_GAIN \
@@ -887,18 +870,16 @@ static PyObject *Usrp_get_rx_gain_0(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_gain(name.get(), chan.get());
-        else
-            ret = self->dev->get_rx_gain(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_rx_gain(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 static PyObject *Usrp_get_rx_gain_1(Usrp *self, PyObject *args) {
@@ -911,18 +892,16 @@ static PyObject *Usrp_get_rx_gain_1(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_gain(chan.get());
-        else
-            ret = self->dev->get_rx_gain();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_gain(chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 PyObject *Usrp_get_rx_gain(Usrp *self, PyObject *args) {
@@ -958,18 +937,16 @@ PyObject *Usrp_get_rx_gain_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_gain_names(chan.get());
-        else
-            ret = self->dev->get_rx_gain_names();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_gain_names(chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_GAIN_PROFILE \
@@ -990,18 +967,16 @@ PyObject *Usrp_get_rx_gain_profile(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_gain_profile(chan.get());
-        else
-            ret = self->dev->get_rx_gain_profile();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_gain_profile(chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain_profile());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_GAIN_PROFILE_NAMES \
@@ -1028,18 +1003,16 @@ PyObject *Usrp_get_rx_gain_profile_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_gain_profile_names(chan.get());
-        else
-            ret = self->dev->get_rx_gain_profile_names();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_gain_profile_names(chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain_profile_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_GAIN_RANGE \
@@ -1074,18 +1047,16 @@ static PyObject *Usrp_get_rx_gain_range_0(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    gain_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_gain_range(name.get(), chan.get());
-        else
-            ret = self->dev->get_rx_gain_range(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_rx_gain_range(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain_range(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 static PyObject *Usrp_get_rx_gain_range_1(Usrp *self, PyObject *args) {
@@ -1098,18 +1069,16 @@ static PyObject *Usrp_get_rx_gain_range_1(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    gain_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_gain_range(chan.get());
-        else
-            ret = self->dev->get_rx_gain_range();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_gain_range(chan.get()));
+        } else {
+            return from(self->dev->get_rx_gain_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 PyObject *Usrp_get_rx_gain_range(Usrp *self, PyObject *args) {
@@ -1149,20 +1118,18 @@ PyObject *Usrp_get_rx_lo_export_enabled(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    bool ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_lo_export_enabled(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_rx_lo_export_enabled(name.get());
-        else
-            ret = self->dev->get_rx_lo_export_enabled();
+        if (nargs == 2) {
+            return from(self->dev->get_rx_lo_export_enabled(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_rx_lo_export_enabled(name.get()));
+        } else {
+            return from(self->dev->get_rx_lo_export_enabled());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_LO_FREQ \
@@ -1191,18 +1158,16 @@ PyObject *Usrp_get_rx_lo_freq(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_lo_freq(name.get(), chan.get());
-        else
-            ret = self->dev->get_rx_lo_freq(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_rx_lo_freq(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_rx_lo_freq(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_LO_FREQ_RANGE \
@@ -1230,18 +1195,16 @@ PyObject *Usrp_get_rx_lo_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_lo_freq_range(name.get(), chan.get());
-        else
-            ret = self->dev->get_rx_lo_freq_range(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_rx_lo_freq_range(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_rx_lo_freq_range(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_LO_NAMES \
@@ -1269,18 +1232,16 @@ PyObject *Usrp_get_rx_lo_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_lo_names(chan.get());
-        else
-            ret = self->dev->get_rx_lo_names();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_lo_names(chan.get()));
+        } else {
+            return from(self->dev->get_rx_lo_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_LO_SOURCE \
@@ -1307,20 +1268,18 @@ PyObject *Usrp_get_rx_lo_source(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_lo_source(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_rx_lo_source(name.get());
-        else
-            ret = self->dev->get_rx_lo_source();
+        if (nargs == 2) {
+            return from(self->dev->get_rx_lo_source(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_rx_lo_source(name.get()));
+        } else {
+            return from(self->dev->get_rx_lo_source());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_LO_SOURCES \
@@ -1350,20 +1309,18 @@ PyObject *Usrp_get_rx_lo_sources(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_rx_lo_sources(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_rx_lo_sources(name.get());
-        else
-            ret = self->dev->get_rx_lo_sources();
+        if (nargs == 2) {
+            return from(self->dev->get_rx_lo_sources(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_rx_lo_sources(name.get()));
+        } else {
+            return from(self->dev->get_rx_lo_sources());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_NUM_CHANNELS \
@@ -1379,15 +1336,12 @@ PyObject *Usrp_get_rx_num_channels(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    size_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_rx_num_channels();
+        return from(self->dev->get_rx_num_channels());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_RATE \
@@ -1408,18 +1362,16 @@ PyObject *Usrp_get_rx_rate(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_rate(chan.get());
-        else
-            ret = self->dev->get_rx_rate();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_rate(chan.get()));
+        } else {
+            return from(self->dev->get_rx_rate());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_RATES \
@@ -1440,18 +1392,51 @@ PyObject *Usrp_get_rx_rates(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_rates(chan.get());
-        else
-            ret = self->dev->get_rx_rates();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_rates(chan.get()));
+        } else {
+            return from(self->dev->get_rx_rates());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
+}
 
-    return from(ret);
+#define DOC_GET_RX_SENSOR \
+"Get an RX frontend sensor value.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the sensor\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a sensor value object\n"
+PyObject *Usrp_get_rx_sensor(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2) {
+            return from(self->dev->get_rx_sensor(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_rx_sensor(name.get()));
+        }
+    } catch (const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
 }
 
 #define DOC_GET_RX_SENSOR_NAMES \
@@ -1472,18 +1457,16 @@ PyObject *Usrp_get_rx_sensor_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_sensor_names(chan.get());
-        else
-            ret = self->dev->get_rx_sensor_names();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_sensor_names(chan.get()));
+        } else {
+            return from(self->dev->get_rx_sensor_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_SUBDEV_NAME \
@@ -1504,18 +1487,16 @@ PyObject *Usrp_get_rx_subdev_name(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_subdev_name(chan.get());
-        else
-            ret = self->dev->get_rx_subdev_name();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_subdev_name(chan.get()));
+        } else {
+            return from(self->dev->get_rx_subdev_name());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_RX_SUBDEV_SPEC \
@@ -1536,18 +1517,16 @@ PyObject *Usrp_get_rx_subdev_spec(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    usrp::subdev_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_rx_subdev_spec(mboard.get());
-        else
-            ret = self->dev->get_rx_subdev_spec();
+        if (nargs == 1) {
+            return from(self->dev->get_rx_subdev_spec(mboard.get()));
+        } else {
+            return from(self->dev->get_rx_subdev_spec());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TIME_LAST_PPS \
@@ -1568,18 +1547,16 @@ PyObject *Usrp_get_time_last_pps(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    time_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_time_last_pps(mboard.get());
-        else
-            ret = self->dev->get_time_last_pps();
+        if (nargs == 1) {
+            return from(self->dev->get_time_last_pps(mboard.get()));
+        } else {
+            return from(self->dev->get_time_last_pps());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TIME_NOW \
@@ -1600,18 +1577,16 @@ PyObject *Usrp_get_time_now(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    time_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_time_now(mboard.get());
-        else
-            ret = self->dev->get_time_now();
+        if (nargs == 1) {
+            return from(self->dev->get_time_now(mboard.get()));
+        } else {
+            return from(self->dev->get_time_now());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TIME_SOURCE \
@@ -1632,15 +1607,12 @@ PyObject *Usrp_get_time_source(Usrp *self, PyObject *args) {
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_time_source(mboard.get());
+        return from(self->dev->get_time_source(mboard.get()));
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TIME_SOURCES \
@@ -1661,15 +1633,12 @@ PyObject *Usrp_get_time_sources(Usrp *self, PyObject *args) {
     if (!(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_time_sources(mboard.get());
+        return from(self->dev->get_time_sources(mboard.get()));
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TIME_SYNCHRONIZED \
@@ -1685,15 +1654,12 @@ PyObject *Usrp_get_time_synchronized(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    bool ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_time_synchronized();
+        return from(self->dev->get_time_synchronized());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_ANTENNA \
@@ -1714,18 +1680,16 @@ PyObject *Usrp_get_tx_antenna(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_antenna(chan.get());
-        else
-            ret = self->dev->get_tx_antenna();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_antenna(chan.get()));
+        } else {
+            return from(self->dev->get_tx_antenna());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_ANTENNAS \
@@ -1746,18 +1710,16 @@ PyObject *Usrp_get_tx_antennas(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_antennas(chan.get());
-        else
-            ret = self->dev->get_tx_antennas();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_antennas(chan.get()));
+        } else {
+            return from(self->dev->get_tx_antennas());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_BANDWIDTH \
@@ -1778,18 +1740,16 @@ PyObject *Usrp_get_tx_bandwidth(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_bandwidth(chan.get());
-        else
-            ret = self->dev->get_tx_bandwidth();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_bandwidth(chan.get()));
+        } else {
+            return from(self->dev->get_tx_bandwidth());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_BANDWIDTH_RANGE \
@@ -1810,18 +1770,16 @@ PyObject *Usrp_get_tx_bandwidth_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_bandwidth_range(chan.get());
-        else
-            ret = self->dev->get_tx_bandwidth_range();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_bandwidth_range(chan.get()));
+        } else {
+            return from(self->dev->get_tx_bandwidth_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_DC_OFFSET_RANGE \
@@ -1842,18 +1800,16 @@ PyObject *Usrp_get_tx_dc_offset_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_dc_offset_range(chan.get());
-        else
-            ret = self->dev->get_tx_dc_offset_range();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_dc_offset_range(chan.get()));
+        } else {
+            return from(self->dev->get_tx_dc_offset_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_FREQ \
@@ -1874,18 +1830,16 @@ PyObject *Usrp_get_tx_freq(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_freq(chan.get());
-        else
-            ret = self->dev->get_tx_freq();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_freq(chan.get()));
+        } else {
+            return from(self->dev->get_tx_freq());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_FREQ_RANGE \
@@ -1910,18 +1864,16 @@ PyObject *Usrp_get_tx_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_freq_range(chan.get());
-        else
-            ret = self->dev->get_tx_freq_range();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_freq_range(chan.get()));
+        } else {
+            return from(self->dev->get_tx_freq_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_GAIN \
@@ -1956,18 +1908,16 @@ static PyObject *Usrp_get_tx_gain_0(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_gain(name.get(), chan.get());
-        else
-            ret = self->dev->get_tx_gain(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_tx_gain(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 static PyObject *Usrp_get_tx_gain_1(Usrp *self, PyObject *args) {
@@ -1980,18 +1930,16 @@ static PyObject *Usrp_get_tx_gain_1(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_gain(chan.get());
-        else
-            ret = self->dev->get_tx_gain();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_gain(chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 PyObject *Usrp_get_tx_gain(Usrp *self, PyObject *args) {
@@ -2027,18 +1975,16 @@ PyObject *Usrp_get_tx_gain_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_gain_names(chan.get());
-        else
-            ret = self->dev->get_tx_gain_names();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_gain_names(chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_GAIN_PROFILE \
@@ -2059,18 +2005,16 @@ PyObject *Usrp_get_tx_gain_profile(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_gain_profile(chan.get());
-        else
-            ret = self->dev->get_tx_gain_profile();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_gain_profile(chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain_profile());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_GAIN_PROFILE_NAMES \
@@ -2097,18 +2041,16 @@ PyObject *Usrp_get_tx_gain_profile_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_gain_profile_names(chan.get());
-        else
-            ret = self->dev->get_tx_gain_profile_names();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_gain_profile_names(chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain_profile_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_GAIN_RANGE \
@@ -2143,18 +2085,16 @@ static PyObject *Usrp_get_tx_gain_range_0(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    gain_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_gain_range(name.get(), chan.get());
-        else
-            ret = self->dev->get_tx_gain_range(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_tx_gain_range(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain_range(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 static PyObject *Usrp_get_tx_gain_range_1(Usrp *self, PyObject *args) {
@@ -2167,18 +2107,16 @@ static PyObject *Usrp_get_tx_gain_range_1(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    gain_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_gain_range(chan.get());
-        else
-            ret = self->dev->get_tx_gain_range();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_gain_range(chan.get()));
+        } else {
+            return from(self->dev->get_tx_gain_range());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 PyObject *Usrp_get_tx_gain_range(Usrp *self, PyObject *args) {
@@ -2218,20 +2156,18 @@ PyObject *Usrp_get_tx_lo_export_enabled(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    bool ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_lo_export_enabled(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_tx_lo_export_enabled(name.get());
-        else
-            ret = self->dev->get_tx_lo_export_enabled();
+        if (nargs == 2) {
+            return from(self->dev->get_tx_lo_export_enabled(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_tx_lo_export_enabled(name.get()));
+        } else {
+            return from(self->dev->get_tx_lo_export_enabled());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_LO_FREQ \
@@ -2260,18 +2196,16 @@ PyObject *Usrp_get_tx_lo_freq(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_lo_freq(name.get(), chan.get());
-        else
-            ret = self->dev->get_tx_lo_freq(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_tx_lo_freq(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_tx_lo_freq(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_LO_FREQ_RANGE \
@@ -2299,18 +2233,16 @@ PyObject *Usrp_get_tx_lo_freq_range(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    freq_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_lo_freq_range(name.get(), chan.get());
-        else
-            ret = self->dev->get_tx_lo_freq_range(name.get());
+        if (nargs == 2) {
+            return from(self->dev->get_tx_lo_freq_range(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_tx_lo_freq_range(name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_LO_NAMES \
@@ -2336,18 +2268,16 @@ PyObject *Usrp_get_tx_lo_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_lo_names(chan.get());
-        else
-            ret = self->dev->get_tx_lo_names();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_lo_names(chan.get()));
+        } else {
+            return from(self->dev->get_tx_lo_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_LO_SOURCE \
@@ -2374,20 +2304,18 @@ PyObject *Usrp_get_tx_lo_source(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_lo_source(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_tx_lo_source(name.get());
-        else
-            ret = self->dev->get_tx_lo_source();
+        if (nargs == 2) {
+            return from(self->dev->get_tx_lo_source(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_tx_lo_source(name.get()));
+        } else {
+            return from(self->dev->get_tx_lo_source());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_LO_SOURCES \
@@ -2416,20 +2344,18 @@ PyObject *Usrp_get_tx_lo_sources(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->get_tx_lo_sources(name.get(), chan.get());
-        else if (nargs == 1)
-            ret = self->dev->get_tx_lo_sources(name.get());
-        else
-            ret = self->dev->get_tx_lo_sources();
+        if (nargs == 2) {
+            return from(self->dev->get_tx_lo_sources(name.get(), chan.get()));
+        } else if (nargs == 1) {
+            return from(self->dev->get_tx_lo_sources(name.get()));
+        } else {
+            return from(self->dev->get_tx_lo_sources());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_NUM_CHANNELS \
@@ -2445,15 +2371,12 @@ PyObject *Usrp_get_tx_num_channels(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    size_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->get_tx_num_channels();
+        return from(self->dev->get_tx_num_channels());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_RATE \
@@ -2474,18 +2397,16 @@ PyObject *Usrp_get_tx_rate(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_rate(chan.get());
-        else
-            ret = self->dev->get_tx_rate();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_rate(chan.get()));
+        } else {
+            return from(self->dev->get_tx_rate());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_RATES \
@@ -2506,18 +2427,51 @@ PyObject *Usrp_get_tx_rates(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    meta_range_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_rates(chan.get());
-        else
-            ret = self->dev->get_tx_rates();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_rates(chan.get()));
+        } else {
+            return from(self->dev->get_tx_rates());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
+}
 
-    return from(ret);
+#define DOC_GET_TX_SENSOR \
+"Get an TX frontend sensor value.\n" \
+"\n" \
+"Args:\n" \
+"    name (str): the name of the sensor\n" \
+"    chan (int, optional): the channel index 0 to N-1\n" \
+"\n" \
+"Returns:\n" \
+"    dict: a sensor value object\n"
+PyObject *Usrp_get_tx_sensor(Usrp *self, PyObject *args) {
+
+    const Py_ssize_t nargs = PyTuple_Size(args);
+    if (nargs < 1 || nargs > 2)
+        return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected 1 to 2.", nargs);
+
+    Expect<std::string> name;
+    if (!(name = to<std::string>(PyTuple_GetItem(args, 0))))
+        return PyErr_Format(PyExc_TypeError, "name: %s", name.what());
+
+    Expect<size_t> chan;
+    if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
+        return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
+
+    try {
+        std::lock_guard<std::mutex> lg(self->dev_lock);
+        if (nargs == 2) {
+            return from(self->dev->get_tx_sensor(name.get(), chan.get()));
+        } else {
+            return from(self->dev->get_tx_sensor(name.get()));
+        }
+    } catch (const uhd::exception &e) {
+        return PyErr_Format(UhdError, "%s", e.what());
+    }
 }
 
 #define DOC_GET_TX_SENSOR_NAMES \
@@ -2538,18 +2492,16 @@ PyObject *Usrp_get_tx_sensor_names(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::vector<std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_sensor_names(chan.get());
-        else
-            ret = self->dev->get_tx_sensor_names();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_sensor_names(chan.get()));
+        } else {
+            return from(self->dev->get_tx_sensor_names());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_SUBDEV_NAME \
@@ -2570,18 +2522,16 @@ PyObject *Usrp_get_tx_subdev_name(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    std::string ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_subdev_name(chan.get());
-        else
-            ret = self->dev->get_tx_subdev_name();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_subdev_name(chan.get()));
+        } else {
+            return from(self->dev->get_tx_subdev_name());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_TX_SUBDEV_SPEC \
@@ -2602,18 +2552,16 @@ PyObject *Usrp_get_tx_subdev_spec(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(mboard = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    usrp::subdev_spec_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_tx_subdev_spec(mboard.get());
-        else
-            ret = self->dev->get_tx_subdev_spec();
+        if (nargs == 1) {
+            return from(self->dev->get_tx_subdev_spec(mboard.get()));
+        } else {
+            return from(self->dev->get_tx_subdev_spec());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_USRP_RX_INFO \
@@ -2625,7 +2573,7 @@ PyObject *Usrp_get_tx_subdev_spec(Usrp *self, PyObject *args) {
 "    chan (int, optional): channel index 0 to N-1\n" \
 "\n" \
 "Returns:\n" \
-"    list: RX info\n"
+"    dict: RX info\n"
 PyObject *Usrp_get_usrp_rx_info(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -2636,18 +2584,16 @@ PyObject *Usrp_get_usrp_rx_info(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    dict<std::string, std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_usrp_rx_info(chan.get());
-        else
-            ret = self->dev->get_usrp_rx_info();
+        if (nargs == 1) {
+            return from(self->dev->get_usrp_rx_info(chan.get()));
+        } else {
+            return from(self->dev->get_usrp_rx_info());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_GET_USRP_TX_INFO \
@@ -2659,7 +2605,7 @@ PyObject *Usrp_get_usrp_rx_info(Usrp *self, PyObject *args) {
 "    chan (int, optional): channel index 0 to N-1\n" \
 "\n" \
 "Returns:\n" \
-"    list: TX info\n"
+"    dict: TX info\n"
 PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
 
     const Py_ssize_t nargs = PyTuple_Size(args);
@@ -2670,18 +2616,16 @@ PyObject *Usrp_get_usrp_tx_info(Usrp *self, PyObject *args) {
     if (nargs > 0 && !(chan = to<size_t>(PyTuple_GetItem(args, 0))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    dict<std::string, std::string> ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 1)
-            ret = self->dev->get_usrp_tx_info(chan.get());
-        else
-            ret = self->dev->get_usrp_tx_info();
+        if (nargs == 1) {
+            return from(self->dev->get_usrp_tx_info(chan.get()));
+        } else {
+            return from(self->dev->get_usrp_tx_info());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_IS_DEVICE3 \
@@ -2695,15 +2639,12 @@ PyObject *Usrp_is_device3(Usrp *self, PyObject *args) {
     if (nargs < 0 || nargs > 0)
         return PyErr_Format(PyExc_TypeError, "Invalid number of arguments: got %ld, expected None.", nargs);
 
-    bool ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        ret = self->dev->is_device3();
+        return from(self->dev->is_device3());
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_READ_REGISTER \
@@ -2733,18 +2674,16 @@ PyObject *Usrp_read_register(Usrp *self, PyObject *args) {
     if (nargs > 2 && !(mboard = to<size_t>(PyTuple_GetItem(args, 2))))
         return PyErr_Format(PyExc_TypeError, "mboard: %s", mboard.what());
 
-    uint64_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->read_register(path.get(), field.get(), mboard.get());
-        else
-            ret = self->dev->read_register(path.get(), field.get());
+        if (nargs == 3) {
+            return from(self->dev->read_register(path.get(), field.get(), mboard.get()));
+        } else {
+            return from(self->dev->read_register(path.get(), field.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_SET_CLOCK_SOURCE \
@@ -2771,10 +2710,11 @@ PyObject *Usrp_set_clock_source(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_clock_source(source.get(), mboard.get());
-        else
+        } else {
             self->dev->set_clock_source(source.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2808,10 +2748,11 @@ PyObject *Usrp_set_clock_source_out(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_clock_source_out(enb.get(), mboard.get());
-        else
+        } else {
             self->dev->set_clock_source_out(enb.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2845,10 +2786,11 @@ PyObject *Usrp_set_command_time(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_command_time(time_spec.get(), mboard.get());
-        else
+        } else {
             self->dev->set_command_time(time_spec.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2926,12 +2868,13 @@ static PyObject *Usrp_set_gpio_attr_0(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 5)
+        if (nargs == 5) {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get(), mboard.get());
-        else if (nargs == 4)
+        } else if (nargs == 4) {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get());
-        else
+        } else {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -2966,12 +2909,13 @@ static PyObject *Usrp_set_gpio_attr_1(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 5)
+        if (nargs == 5) {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get(), mboard.get());
-        else if (nargs == 4)
+        } else if (nargs == 4) {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get(), mask.get());
-        else
+        } else {
             self->dev->set_gpio_attr(bank.get(), attr.get(), value.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3035,10 +2979,11 @@ PyObject *Usrp_set_master_clock_rate(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_master_clock_rate(rate.get(), mboard.get());
-        else
+        } else {
             self->dev->set_master_clock_rate(rate.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3075,10 +3020,11 @@ PyObject *Usrp_set_normalized_rx_gain(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_normalized_rx_gain(gain.get(), chan.get());
-        else
+        } else {
             self->dev->set_normalized_rx_gain(gain.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3111,10 +3057,11 @@ PyObject *Usrp_set_normalized_tx_gain(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_normalized_tx_gain(gain.get(), chan.get());
-        else
+        } else {
             self->dev->set_normalized_tx_gain(gain.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3148,10 +3095,11 @@ PyObject *Usrp_set_rx_agc(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_agc(enable.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_agc(enable.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3182,10 +3130,11 @@ PyObject *Usrp_set_rx_antenna(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_antenna(ant.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_antenna(ant.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3216,10 +3165,11 @@ PyObject *Usrp_set_rx_bandwidth(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_bandwidth(bandwidth.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_bandwidth(bandwidth.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3263,10 +3213,11 @@ static PyObject *Usrp_set_rx_dc_offset_0(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_dc_offset(enb.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_dc_offset(enb.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3291,10 +3242,11 @@ static PyObject *Usrp_set_rx_dc_offset_1(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_dc_offset(offset.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_dc_offset(offset.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3341,18 +3293,16 @@ PyObject *Usrp_set_rx_freq(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    tune_result_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->set_rx_freq(tune_request.get(), chan.get());
-        else
-            ret = self->dev->set_rx_freq(tune_request.get());
+        if (nargs == 2) {
+            return from(self->dev->set_rx_freq(tune_request.get(), chan.get()));
+        } else {
+            return from(self->dev->set_rx_freq(tune_request.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_SET_RX_GAIN \
@@ -3388,10 +3338,11 @@ static PyObject *Usrp_set_rx_gain_0(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_rx_gain(gain.get(), name.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_gain(gain.get(), name.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3416,10 +3367,11 @@ static PyObject *Usrp_set_rx_gain_1(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_gain(gain.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_gain(gain.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3466,10 +3418,11 @@ PyObject *Usrp_set_rx_gain_profile(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_gain_profile(profile.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_gain_profile(profile.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3531,10 +3484,11 @@ static PyObject *Usrp_set_rx_iq_balance_1(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_iq_balance(correction.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_iq_balance(correction.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3587,12 +3541,13 @@ PyObject *Usrp_set_rx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_rx_lo_export_enabled(enabled.get(), name.get(), chan.get());
-        else if (nargs == 2)
+        } else if (nargs == 2) {
             self->dev->set_rx_lo_export_enabled(enabled.get(), name.get());
-        else
+        } else {
             self->dev->set_rx_lo_export_enabled(enabled.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3643,18 +3598,16 @@ PyObject *Usrp_set_rx_lo_freq(Usrp *self, PyObject *args) {
     if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->set_rx_lo_freq(freq.get(), name.get(), chan.get());
-        else
-            ret = self->dev->set_rx_lo_freq(freq.get(), name.get());
+        if (nargs == 3) {
+            return from(self->dev->set_rx_lo_freq(freq.get(), name.get(), chan.get()));
+        } else {
+            return from(self->dev->set_rx_lo_freq(freq.get(), name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_SET_RX_LO_SOURCE \
@@ -3688,12 +3641,13 @@ PyObject *Usrp_set_rx_lo_source(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_rx_lo_source(src.get(), name.get(), chan.get());
-        else if (nargs == 2)
+        } else if (nargs == 2) {
             self->dev->set_rx_lo_source(src.get(), name.get());
-        else
+        } else {
             self->dev->set_rx_lo_source(src.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3724,10 +3678,11 @@ PyObject *Usrp_set_rx_rate(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_rate(rate.get(), chan.get());
-        else
+        } else {
             self->dev->set_rx_rate(rate.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3761,10 +3716,11 @@ PyObject *Usrp_set_rx_subdev_spec(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_rx_subdev_spec(spec.get(), mboard.get());
-        else
+        } else {
             self->dev->set_rx_subdev_spec(spec.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3800,10 +3756,11 @@ PyObject *Usrp_set_time_next_pps(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_time_next_pps(time_spec.get(), mboard.get());
-        else
+        } else {
             self->dev->set_time_next_pps(time_spec.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3838,10 +3795,11 @@ PyObject *Usrp_set_time_now(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_time_now(time_spec.get(), mboard.get());
-        else
+        } else {
             self->dev->set_time_now(time_spec.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3875,10 +3833,11 @@ PyObject *Usrp_set_time_source(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_time_source(source.get(), mboard.get());
-        else
+        } else {
             self->dev->set_time_source(source.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3912,10 +3871,11 @@ PyObject *Usrp_set_time_source_out(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_time_source_out(enb.get(), mboard.get());
-        else
+        } else {
             self->dev->set_time_source_out(enb.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -3979,10 +3939,11 @@ PyObject *Usrp_set_tx_antenna(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_antenna(ant.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_antenna(ant.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4013,10 +3974,11 @@ PyObject *Usrp_set_tx_bandwidth(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_bandwidth(bandwidth.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_bandwidth(bandwidth.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4048,10 +4010,11 @@ PyObject *Usrp_set_tx_dc_offset(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_dc_offset(offset.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_dc_offset(offset.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4083,18 +4046,16 @@ PyObject *Usrp_set_tx_freq(Usrp *self, PyObject *args) {
     if (nargs > 1 && !(chan = to<size_t>(PyTuple_GetItem(args, 1))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    tune_result_t ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
-            ret = self->dev->set_tx_freq(tune_request.get(), chan.get());
-        else
-            ret = self->dev->set_tx_freq(tune_request.get());
+        if (nargs == 2) {
+            return from(self->dev->set_tx_freq(tune_request.get(), chan.get()));
+        } else {
+            return from(self->dev->set_tx_freq(tune_request.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_SET_TX_GAIN \
@@ -4130,10 +4091,11 @@ static PyObject *Usrp_set_tx_gain_0(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_tx_gain(gain.get(), name.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_gain(gain.get(), name.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4158,10 +4120,11 @@ static PyObject *Usrp_set_tx_gain_1(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_gain(gain.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_gain(gain.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4208,10 +4171,11 @@ PyObject *Usrp_set_tx_gain_profile(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_gain_profile(profile.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_gain_profile(profile.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4243,10 +4207,11 @@ PyObject *Usrp_set_tx_iq_balance(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_iq_balance(correction.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_iq_balance(correction.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4284,12 +4249,13 @@ PyObject *Usrp_set_tx_lo_export_enabled(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_tx_lo_export_enabled(enabled.get(), name.get(), chan.get());
-        else if (nargs == 2)
+        } else if (nargs == 2) {
             self->dev->set_tx_lo_export_enabled(enabled.get(), name.get());
-        else
+        } else {
             self->dev->set_tx_lo_export_enabled(enabled.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4340,18 +4306,16 @@ PyObject *Usrp_set_tx_lo_freq(Usrp *self, PyObject *args) {
     if (nargs > 2 && !(chan = to<size_t>(PyTuple_GetItem(args, 2))))
         return PyErr_Format(PyExc_TypeError, "chan: %s", chan.what());
 
-    double ret;
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
-            ret = self->dev->set_tx_lo_freq(freq.get(), name.get(), chan.get());
-        else
-            ret = self->dev->set_tx_lo_freq(freq.get(), name.get());
+        if (nargs == 3) {
+            return from(self->dev->set_tx_lo_freq(freq.get(), name.get(), chan.get()));
+        } else {
+            return from(self->dev->set_tx_lo_freq(freq.get(), name.get()));
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
-
-    return from(ret);
 }
 
 #define DOC_SET_TX_LO_SOURCE \
@@ -4385,12 +4349,13 @@ PyObject *Usrp_set_tx_lo_source(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_tx_lo_source(src.get(), name.get(), chan.get());
-        else if (nargs == 2)
+        } else if (nargs == 2) {
             self->dev->set_tx_lo_source(src.get(), name.get());
-        else
+        } else {
             self->dev->set_tx_lo_source(src.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4421,10 +4386,11 @@ PyObject *Usrp_set_tx_rate(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_rate(rate.get(), chan.get());
-        else
+        } else {
             self->dev->set_tx_rate(rate.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4458,10 +4424,11 @@ PyObject *Usrp_set_tx_subdev_spec(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 2)
+        if (nargs == 2) {
             self->dev->set_tx_subdev_spec(spec.get(), mboard.get());
-        else
+        } else {
             self->dev->set_tx_subdev_spec(spec.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4497,10 +4464,11 @@ PyObject *Usrp_set_user_register(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 3)
+        if (nargs == 3) {
             self->dev->set_user_register(addr.get(), data.get(), mboard.get());
-        else
+        } else {
             self->dev->set_user_register(addr.get(), data.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4539,10 +4507,11 @@ PyObject *Usrp_write_register(Usrp *self, PyObject *args) {
 
     try {
         std::lock_guard<std::mutex> lg(self->dev_lock);
-        if (nargs == 4)
+        if (nargs == 4) {
             self->dev->write_register(path.get(), field.get(), value.get(), mboard.get());
-        else
+        } else {
             self->dev->write_register(path.get(), field.get(), value.get());
+        }
     } catch (const uhd::exception &e) {
         return PyErr_Format(UhdError, "%s", e.what());
     }
@@ -4565,6 +4534,7 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_master_clock_rate", (PyCFunction)Usrp_get_master_clock_rate, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE},
     {"get_master_clock_rate_range", (PyCFunction)Usrp_get_master_clock_rate_range, METH_VARARGS, DOC_GET_MASTER_CLOCK_RATE_RANGE},
     {"get_mboard_name", (PyCFunction)Usrp_get_mboard_name, METH_VARARGS, DOC_GET_MBOARD_NAME},
+    {"get_mboard_sensor", (PyCFunction)Usrp_get_mboard_sensor, METH_VARARGS, DOC_GET_MBOARD_SENSOR},
     {"get_mboard_sensor_names", (PyCFunction)Usrp_get_mboard_sensor_names, METH_VARARGS, DOC_GET_MBOARD_SENSOR_NAMES},
     {"get_normalized_rx_gain", (PyCFunction)Usrp_get_normalized_rx_gain, METH_VARARGS, DOC_GET_NORMALIZED_RX_GAIN},
     {"get_normalized_tx_gain", (PyCFunction)Usrp_get_normalized_tx_gain, METH_VARARGS, DOC_GET_NORMALIZED_TX_GAIN},
@@ -4591,6 +4561,7 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_rx_num_channels", (PyCFunction)Usrp_get_rx_num_channels, METH_VARARGS, DOC_GET_RX_NUM_CHANNELS},
     {"get_rx_rate", (PyCFunction)Usrp_get_rx_rate, METH_VARARGS, DOC_GET_RX_RATE},
     {"get_rx_rates", (PyCFunction)Usrp_get_rx_rates, METH_VARARGS, DOC_GET_RX_RATES},
+    {"get_rx_sensor", (PyCFunction)Usrp_get_rx_sensor, METH_VARARGS, DOC_GET_RX_SENSOR},
     {"get_rx_sensor_names", (PyCFunction)Usrp_get_rx_sensor_names, METH_VARARGS, DOC_GET_RX_SENSOR_NAMES},
     {"get_rx_subdev_name", (PyCFunction)Usrp_get_rx_subdev_name, METH_VARARGS, DOC_GET_RX_SUBDEV_NAME},
     {"get_rx_subdev_spec", (PyCFunction)Usrp_get_rx_subdev_spec, METH_VARARGS, DOC_GET_RX_SUBDEV_SPEC},
@@ -4620,6 +4591,7 @@ const std::vector<PyMethodDef> Usrp_gen_methods {
     {"get_tx_num_channels", (PyCFunction)Usrp_get_tx_num_channels, METH_VARARGS, DOC_GET_TX_NUM_CHANNELS},
     {"get_tx_rate", (PyCFunction)Usrp_get_tx_rate, METH_VARARGS, DOC_GET_TX_RATE},
     {"get_tx_rates", (PyCFunction)Usrp_get_tx_rates, METH_VARARGS, DOC_GET_TX_RATES},
+    {"get_tx_sensor", (PyCFunction)Usrp_get_tx_sensor, METH_VARARGS, DOC_GET_TX_SENSOR},
     {"get_tx_sensor_names", (PyCFunction)Usrp_get_tx_sensor_names, METH_VARARGS, DOC_GET_TX_SENSOR_NAMES},
     {"get_tx_subdev_name", (PyCFunction)Usrp_get_tx_subdev_name, METH_VARARGS, DOC_GET_TX_SUBDEV_NAME},
     {"get_tx_subdev_spec", (PyCFunction)Usrp_get_tx_subdev_spec, METH_VARARGS, DOC_GET_TX_SUBDEV_SPEC},
