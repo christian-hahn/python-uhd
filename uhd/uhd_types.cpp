@@ -420,7 +420,7 @@ PyObject *from(const std::string &value) {
     return PyUnicode_FromString(value.c_str());
 }
 
-inline static bool dict_insert_string_float(PyObject *dict, const char *key, const double &val) {
+inline static bool dict_insert(PyObject *dict, const char *key, const double &val) {
     PyObject *pval = PyFloat_FromDouble(val);
     if (pval) {
         if (PyDict_SetItemString(dict, key, pval)) {
@@ -433,8 +433,8 @@ inline static bool dict_insert_string_float(PyObject *dict, const char *key, con
     return false;
 }
 
-inline static bool dict_insert_string_long_long(PyObject *dict, const char *key, const long long &val) {
-    PyObject *pval = PyLong_FromLongLong(val);
+inline static bool dict_insert(PyObject *dict, const char *key, const std::string &val) {
+    PyObject *pval = PyUnicode_FromString(val.c_str());
     if (pval) {
         if (PyDict_SetItemString(dict, key, pval)) {
             Py_DECREF(pval);
@@ -449,11 +449,11 @@ inline static bool dict_insert_string_long_long(PyObject *dict, const char *key,
 PyObject *from(const tune_result_t &value) {
     PyObject *ret = PyDict_New();
     if (ret) {
-        if (dict_insert_string_float(ret, "clipped_rf_freq", value.clipped_rf_freq)
-            && dict_insert_string_float(ret, "target_rf_freq", value.target_rf_freq)
-            && dict_insert_string_float(ret, "actual_rf_freq", value.actual_rf_freq)
-            && dict_insert_string_float(ret, "target_dsp_freq", value.target_dsp_freq)
-            && dict_insert_string_float(ret, "actual_dsp_freq", value.actual_dsp_freq))
+        if (dict_insert(ret, "clipped_rf_freq", value.clipped_rf_freq)
+            && dict_insert(ret, "target_rf_freq", value.target_rf_freq)
+            && dict_insert(ret, "actual_rf_freq", value.actual_rf_freq)
+            && dict_insert(ret, "target_dsp_freq", value.target_dsp_freq)
+            && dict_insert(ret, "actual_dsp_freq", value.actual_dsp_freq))
             return ret;
         Py_DECREF(ret);
         return PyErr_Format(PyExc_ValueError, "Failed to create dict: error on insert.");
@@ -514,9 +514,9 @@ PyObject *from(const meta_range_t &value) {
     }
     PyObject *ret = PyDict_New();
     if (ret) {
-        if (dict_insert_string_float(ret, "start", value.start())
-            && dict_insert_string_float(ret, "stop", value.stop())
-            && dict_insert_string_float(ret, "step", value.step()))
+        if (dict_insert(ret, "start", value.start())
+            && dict_insert(ret, "stop", value.stop())
+            && dict_insert(ret, "step", value.step()))
             return ret;
         Py_DECREF(ret);
         return PyErr_Format(PyExc_ValueError, "Failed to create dict: error on insert.");
@@ -528,6 +528,21 @@ PyObject *from(const time_spec_t &value) {
     PyObject *ret = reinterpret_cast<PyObject *>(TimeSpec_from_time_spec_t(value));
     if (!ret)
         return PyErr_Format(PyExc_ValueError, "Failed to create TimeSpec.");
+    return ret;
+}
+
+PyObject *from(const sensor_value_t &value) {
+    const sensor_value_t::sensor_map_t map = std::move(value.to_map());
+    PyObject *ret = PyDict_New();
+    if (!ret) {
+        return PyErr_Format(PyExc_ValueError, "Failed to create dict.");
+    }
+    for (const auto &kv : map) {
+        if (!dict_insert(ret, kv.first.c_str(), kv.second)) {
+            Py_DECREF(ret);
+            return PyErr_Format(PyExc_ValueError, "Failed to create dict: error on insert.");
+        }
+    }
     return ret;
 }
 

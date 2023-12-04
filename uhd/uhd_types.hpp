@@ -12,6 +12,7 @@
 #include <uhd/types/tune_request.hpp>
 #include <uhd/types/tune_result.hpp>
 #include <uhd/types/time_spec.hpp>
+#include <uhd/types/sensors.hpp>
 #include <uhd/usrp/subdev_spec.hpp>
 
 #include "uhd_expect.hpp"
@@ -110,6 +111,7 @@ PyObject *from(const std::vector<std::string> &value);
 PyObject *from(const dict<std::string, std::string> &value);
 PyObject *from(const meta_range_t &value);
 PyObject *from(const time_spec_t &value);
+PyObject *from(const sensor_value_t &value);
 
 }
 
