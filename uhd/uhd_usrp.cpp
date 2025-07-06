@@ -40,6 +40,8 @@
 #include "uhd_4_4_0.hpp"
 #include "uhd_4_5_0.hpp"
 #include "uhd_4_6_0.hpp"
+#include "uhd_4_7_0.hpp"
+#include "uhd_4_8_0.hpp"
 
 #ifndef __UHD_GEN_HPP__
   #error Unsupported UHD version
