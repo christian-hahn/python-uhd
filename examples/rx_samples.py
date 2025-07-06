@@ -18,8 +18,8 @@ u.set_rx_rate(samp_rate)
 for chan in channels:
     u.set_rx_bandwidth(samp_rate, chan)
     u.set_rx_freq(center_freq, chan)
-    u.set_rx_antenna('RX2', chan)
-    u.set_rx_gain(40., chan)
+    u.set_rx_antenna("RX2", chan)
+    u.set_rx_gain(40.0, chan)
 
 """(1) Capture samples: not streaming"""
 samps, start = u.receive(
