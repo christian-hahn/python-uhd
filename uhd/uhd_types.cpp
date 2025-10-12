@@ -532,7 +532,7 @@ PyObject *from(const time_spec_t &value) {
 }
 
 PyObject *from(const sensor_value_t &value) {
-    const sensor_value_t::sensor_map_t map = std::move(value.to_map());
+    const sensor_value_t::sensor_map_t &map = value.to_map();
     PyObject *ret = PyDict_New();
     if (!ret) {
         return PyErr_Format(PyExc_ValueError, "Failed to create dict.");
