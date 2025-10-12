@@ -23,7 +23,7 @@ class Expect {
     Expect() : _success(false) {}
     Expect(T &&value) : _value(std::move(value)), _success(true) {}
     Expect(const T &value) : _value(value), _success(true) {}
-    Expect(Error &&error) : _what(std::move(error.what())), _success(false) {}
+    Expect(Error &&error) : _what(error.what()), _success(false) {}
     Expect(const Error &error) : _what(error.what()), _success(false) {}
     Expect(const Expect &other) : _value(other._value), _what(other._what), _success(other._success) {}
     Expect(Expect &&other) : _value(std::move(other._value)), _what(std::move(other._what)), _success(other._success) {}
@@ -50,7 +50,7 @@ class Expect<void> {
 
   public:
     Expect() : _success(true) {}
-    Expect(Error &&error) : _what(std::move(error.what())), _success(false) {}
+    Expect(Error &&error) : _what(error.what()), _success(false) {}
     Expect(const Error &error) : _what(error.what()), _success(false) {}
     Expect(const Expect &other) : _what(other._what), _success(other._success) {}
     Expect(Expect &&other) : _what(std::move(other._what)), _success(other._success) {}
