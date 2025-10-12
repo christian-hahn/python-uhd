@@ -29,9 +29,6 @@ static PyModuleDef moduledef = {
     NULL,                                   /* m_free */
 };
 
-#ifdef __cplusplus
-extern "C"
-#endif
 PyMODINIT_FUNC PyInit_pyuhd(void) {
 
     import_array();
