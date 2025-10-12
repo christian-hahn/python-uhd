@@ -418,7 +418,7 @@ static PyObject *Usrp_transmit(Usrp *self, PyObject *args, PyObject *kwargs) {
         if (!(PyArray_FLAGS(array) & NPY_ARRAY_OWNDATA)
             || PyArray_BASE(array) != nullptr
             || reinterpret_cast<PyArrayObject_fields *>(array)->weakreflist != nullptr
-            || PyArray_REFCOUNT(array) > 2) {
+            || Py_REFCNT(array) > 2) {
             Py_DECREF(p_samples);
             return PyErr_Format(PyExc_ValueError, "(0) samples[i]: Bad ndarray: must own its data and "
                                                   "cannot be referenced-by or reference another array.");
@@ -430,7 +430,7 @@ static PyObject *Usrp_transmit(Usrp *self, PyObject *args, PyObject *kwargs) {
         PyArrayObject * const array = reinterpret_cast<PyArrayObject *>(samples[it]);
         PyArrayObject_fields * const fields = reinterpret_cast<PyArrayObject_fields *>(array);
         samples[it] = reinterpret_cast<std::complex<float> *>(fields->data);
-        void * const new_data = PyDataMem_NEW(PyArray_DESCR(array)->elsize);
+        void * const new_data = PyDataMem_NEW(PyArray_ITEMSIZE(array));
         if (new_data == nullptr)
             return PyErr_Format(PyExc_MemoryError, "Failed to allocate memory for array.");
         fields->data = reinterpret_cast<char *>(new_data);
