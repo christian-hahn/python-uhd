@@ -18,7 +18,6 @@ pyuhd = Extension(
     sources=[
         "uhd/uhd.cpp",
         "uhd/uhd_usrp.cpp",
-        "uhd/uhd_types.cpp",
         "uhd/uhd_rx.cpp",
         "uhd/uhd_tx.cpp",
         "uhd/uhd_timespec.cpp",
