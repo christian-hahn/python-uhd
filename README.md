@@ -30,6 +30,7 @@ Install USRP Hardware Driver (UHD) software.  There are several ways to achieve 
 * v4.6.0.0
 * v4.7.0.0
 * v4.8.0.0
+* v4.9.0.0 - v4.9.0.1
 
 **python-uhd** has been tested with the following hardware:
 
