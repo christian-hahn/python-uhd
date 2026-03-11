@@ -1,9 +1,5 @@
-try:
-    from setuptools import setup, Extension
-except ImportError:
-    from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import numpy
-
 
 VERSION = "2.3.0"
 
@@ -34,7 +30,6 @@ setup(
     version=VERSION,
     description="A Python 3 C++ extension to facilitate development with USRP "
     "hardware.",
-    setup_requires=["numpy"],
     install_requires=["numpy"],
     ext_modules=[pyuhd],
     author="Christian Hahn",

@@ -1,0 +1,2 @@
+# Include all headers in the uhd folder
+recursive-include uhd *.hpp *.h
