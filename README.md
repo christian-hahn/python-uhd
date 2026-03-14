@@ -43,18 +43,13 @@ Install UHD.  For example, in Ubuntu using package manager:
 sudo apt-get install libuhd-dev uhd-host
 ```
 
-Install numpy.  For example, in Ubuntu using package manager:
-``` text
-sudo apt-get install python3-numpy
-```
-
 ## Installation
 
-Using `setup.py`:
+Using `pip`:
 ``` text
 git clone https://github.com/christian-hahn/python-uhd.git
 cd python-uhd/
-sudo python3 setup.py install
+python3 -m pip install .
 ```
 
 ## Examples
