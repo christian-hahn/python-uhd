@@ -58,6 +58,8 @@ static void Usrp_dealloc(Usrp *self) {
 
 static PyObject *Usrp_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Usrp *self = reinterpret_cast<Usrp *>(type->tp_alloc(type, 0));
+    // Must use placement-new to construct std::mutex after allocated.
+    new (&self->dev_lock) std::mutex;
     return reinterpret_cast<PyObject *>(self);
 }
 
