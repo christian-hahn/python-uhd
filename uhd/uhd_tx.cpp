@@ -7,7 +7,7 @@
 
 #include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
-#include <uhd/utils/thread_priority.hpp>
+#include <uhd/utils/thread.hpp>
 
 #include "uhd_types.hpp"
 #include "uhd_tx.hpp"
