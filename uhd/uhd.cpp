@@ -1,3 +1,11 @@
+/**
+ * @file   uhd.cpp
+ * @brief  Defines Uhd module.
+ * @author Christian Hahn
+ */
+
+#include "uhd.hpp"
+
 #include <Python.h>
 
 /** Since import_array() IS called here, include like this. **/
@@ -7,9 +15,8 @@
 
 #include <uhd/version.hpp>
 
-#include "uhd.hpp"
-#include "uhd_usrp.hpp"
 #include "uhd_timespec.hpp"
+#include "uhd_usrp.hpp"
 
 namespace uhd {
 
@@ -65,4 +72,4 @@ PyMODINIT_FUNC PyInit_pyuhd(void) {
     return module;
 }
 
-}
+} // namespace uhd

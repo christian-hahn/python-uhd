@@ -1,9 +1,16 @@
+/**
+ * @file   uhd_timespec.cpp
+ * @brief  Defines TimeSpec object.
+ * @author Christian Hahn
+ */
+
+#include "uhd_timespec.hpp"
+
 #include <Python.h>
 #include "structmember.h"
 
-#include "uhd_timespec.hpp"
-#include "uhd_types.hpp"
 #include "uhd_expect.hpp"
+#include "uhd_types.hpp"
 
 namespace uhd {
 
@@ -265,4 +272,4 @@ TimeSpec *TimeSpec_from_time_spec_t(const time_spec_t &value) {
     return ret;
 }
 
-}
+} // namespace uhd

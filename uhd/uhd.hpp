@@ -1,10 +1,15 @@
-#ifndef __UHD_HPP__
-#define __UHD_HPP__
+/**
+ * @file   uhd.hpp
+ * @brief  Defines Uhd module.
+ * @author Christian Hahn
+ */
+
+#pragma once
+
+#include <Python.h>
 
 namespace uhd {
 
-    extern PyObject *UhdError;
+extern PyObject *UhdError;
 
-}
-
-#endif  /** __UHD_HPP__ **/
+} // namespace uhd

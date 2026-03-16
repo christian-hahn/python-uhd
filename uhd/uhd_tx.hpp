@@ -1,14 +1,21 @@
-#ifndef __UHD_TX_HPP__
-#define __UHD_TX_HPP__
+/**
+ * @file   uhd_tx.hpp
+ * @brief  Defines transmit worker.
+ * @author Christian Hahn
+ */
 
-#include <mutex>
-#include <vector>
-#include <future>
-#include <queue>
+#pragma once
+
+#include <atomic>
 #include <condition_variable>
+#include <future>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <vector>
 
-#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
+#include <uhd/usrp/multi_usrp.hpp>
 
 namespace uhd {
 
@@ -62,6 +69,4 @@ class TransmitWorker {
     std::queue<TransmitRequest *> _requests_queue;
 };
 
-}
-
-#endif  /** __UHD_TX_HPP__ **/
+} // namespace uhd

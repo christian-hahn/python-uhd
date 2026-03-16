@@ -1,5 +1,10 @@
-#ifndef __UHD_QUEUE_HPP__
-#define __UHD_QUEUE_HPP__
+/**
+ * @file   uhd_queue.hpp
+ * @brief  Defines a thread-safe queue.
+ * @author Christian Hahn
+ */
+
+#pragma once
 
 #include <queue>
 #include <mutex>
@@ -67,6 +72,4 @@ size_t Queue<T>::size() {
     return _queue.size();
 }
 
-}
-
-#endif  /** __UHD_QUEUE_HPP__ **/
+} // namespace uhd

@@ -1,14 +1,21 @@
-#ifndef __UHD_RX_HPP__
-#define __UHD_RX_HPP__
+/**
+ * @file   uhd_rx.hpp
+ * @brief  Defines receive worker.
+ * @author Christian Hahn
+ */
 
-#include <mutex>
-#include <vector>
-#include <future>
-#include <queue>
+#pragma once
+
 #include <condition_variable>
+#include <cstdlib>
+#include <future>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <vector>
 
-#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
+#include <uhd/usrp/multi_usrp.hpp>
 
 namespace uhd {
 
@@ -80,6 +87,4 @@ class ReceiveWorker {
     std::queue<ReceiveResult *> _results_queue;
 };
 
-}
-
-#endif  /** __UHD_RX_HPP__ **/
+} // namespace uhd

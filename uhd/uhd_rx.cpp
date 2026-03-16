@@ -1,16 +1,21 @@
-#include <Python.h>
+/**
+ * @file   uhd_rx.cpp
+ * @brief  Defines receive worker.
+ * @author Christian Hahn
+ */
 
-#include <mutex>
-#include <vector>
+#include "uhd_rx.hpp"
+
 #include <memory>
+#include <mutex>
 #include <thread>
+#include <vector>
 
-#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
+#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/utils/thread.hpp>
 
 #include "uhd_types.hpp"
-#include "uhd_rx.hpp"
 
 namespace uhd {
 
@@ -278,4 +283,4 @@ size_t ReceiveWorker::num_received() {
     return _results_queue.size();
 }
 
-}
+} // namespace uhd

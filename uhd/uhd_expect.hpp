@@ -1,5 +1,12 @@
-#ifndef __UHD_EXPECT_HPP__
-#define __UHD_EXPECT_HPP__
+/**
+ * @file   uhd_expect.hpp
+ * @brief  Defines optional return type Expect<>
+ * @author Christian Hahn
+ */
+
+#pragma once
+
+#include <string>
 
 namespace uhd {
 
@@ -66,6 +73,4 @@ class Expect<void> {
     const char *what() { return _what.c_str(); }
 };
 
-}
-
-#endif  /** __UHD_EXPECT_HPP__ **/
+} // namespace uhd

@@ -1,3 +1,11 @@
+/**
+ * @file   uhd_usrp.cpp
+ * @brief  Defines Usrp object.
+ * @author Christian Hahn
+ */
+
+#include "uhd_usrp.hpp"
+
 #include <vector>
 
 #include <Python.h>
@@ -9,16 +17,15 @@
 #define PY_ARRAY_UNIQUE_SYMBOL UHD_ARRAY_API
 #include <numpy/arrayobject.h>
 
-#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/exception.hpp>
+#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/version.hpp>
 
-#include "uhd.hpp"
-#include "uhd_usrp.hpp"
-#include "uhd_types.hpp"
 #include "uhd_expect.hpp"
 #include "uhd_rx.hpp"
 #include "uhd_tx.hpp"
+#include "uhd_types.hpp"
+#include "uhd.hpp"
 
 #include "uhd_3_9_0.hpp"
 #include "uhd_3_10_0.hpp"
@@ -608,4 +615,4 @@ int Usrp_register_type(PyObject *module) {
     return 0;
 }
 
-}
+} // namespace uhd

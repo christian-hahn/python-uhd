@@ -1,3 +1,9 @@
+/**
+ * @file   uhd_types.hpp
+ * @brief  Type translation of native types to/from PyObject.
+ * @author Christian Hahn
+ */
+
 #pragma once
 
 #include <array>
@@ -741,4 +747,4 @@ PyObject *from(const T &value)
     return type_t<T>::from(value);
 }
 
-}
+} // namespace uhd

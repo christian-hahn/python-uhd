@@ -1,16 +1,23 @@
-#include <Python.h>
+/**
+ * @file   uhd_tx.cpp
+ * @brief  Defines transmit worker.
+ * @author Christian Hahn
+ */
+
+#include "uhd_tx.hpp"
 
 #include <mutex>
 #include <vector>
 #include <memory>
 #include <thread>
 
-#include <uhd/usrp/multi_usrp.hpp>
+#include <Python.h>
+
 #include <uhd/exception.hpp>
+#include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/utils/thread.hpp>
 
 #include "uhd_types.hpp"
-#include "uhd_tx.hpp"
 
 namespace uhd {
 
@@ -146,4 +153,4 @@ void TransmitWorker::_worker() {
     }
 }
 
-}
+} // namespace uhd
